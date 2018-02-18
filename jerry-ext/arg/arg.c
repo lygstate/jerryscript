@@ -16,7 +16,7 @@
 #include "arg-internal.h"
 #include "jerryscript-ext/arg.h"
 #include "jerryscript.h"
-
+#include "jerryscript-port.h"
 
 #define JERRYX_STATIC_ASSERT(x, msg) \
   enum { static_assertion_failed_ ## msg = 1 / (!!(x)) }
@@ -115,7 +115,7 @@ jerryx_arg_transform_object_properties (const jerry_value_t obj_val,/**< the JS 
     return jerry_create_error (JERRY_ERROR_TYPE, (jerry_char_t *) "Not an object.");
   }
 
-  jerry_value_t prop[name_cnt];
+  jerry_alloca(prop, jerry_value_t, name_cnt);
 
   for (jerry_length_t i = 0; i < name_cnt; i++, name_p++)
   {
@@ -160,7 +160,7 @@ jerryx_arg_transform_array (const jerry_value_t array_val, /**< points to the JS
     return jerry_create_error (JERRY_ERROR_TYPE, (jerry_char_t *) "Not an array.");
   }
 
-  jerry_value_t arr[c_arg_cnt];
+  jerry_alloca(arr, jerry_value_t, c_arg_cnt);
 
   for (jerry_length_t i = 0; i < c_arg_cnt; i++)
   {

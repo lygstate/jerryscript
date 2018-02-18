@@ -16,6 +16,7 @@
 #include <string.h>
 #include "jerryscript.h"
 #include "jerryscript-ext/module.h"
+#include "jerryscript-port.h"
 
 static const jerry_char_t *module_name_property_name = (jerry_char_t *) "moduleName";
 static const jerry_char_t *module_not_found = (jerry_char_t *) "Module not found";
@@ -173,7 +174,7 @@ jerryx_resolve_native_module (const jerry_value_t canonical_name, /**< canonical
   const jerryx_native_module_t *module_p = NULL;
 
   jerry_size_t name_size = jerry_get_utf8_string_size (canonical_name);
-  jerry_char_t name_string[name_size];
+  jerry_alloca(name_string, jerry_char_t, name_size);
   jerry_string_to_utf8_char_buffer (canonical_name, name_string, name_size);
 
   /* Look for the module by its name in the list of module definitions. */
@@ -223,7 +224,7 @@ jerryx_module_resolve (const jerry_value_t name, /**< name of the module to load
   size_t canonical_names_used = 0;
   jerry_value_t ret;
   jerry_value_t instances;
-  jerry_value_t canonical_names[resolver_count];
+  jerry_alloca(canonical_names, jerry_value_t, resolver_count);
   jerry_value_t (*get_canonical_name_p) (const jerry_value_t name);
   bool (*resolve_p) (const jerry_value_t canonical_name,
                      jerry_value_t *result);

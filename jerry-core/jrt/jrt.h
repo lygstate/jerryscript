@@ -31,6 +31,21 @@
 /*
  * Attributes
  */
+#ifdef _MSC_VER
+#define __noreturn __declspec(noreturn)
+#define __attr_noinline___ __declspec(noinline)
+#define __attr_return_value_should_be_checked___
+#define __attr_hot___
+#ifndef __attr_always_inline___
+#define __attr_always_inline___
+#endif /* !__attr_always_inline___ */
+#ifndef __attr_const___
+#define __attr_const___
+#endif /* !__attr_const___ */
+#ifndef __attr_pure___
+#define __attr_pure___
+#endif /* !__attr_pure___ */
+#else
 #define __noreturn __attribute__((noreturn))
 #define __attr_noinline___ __attribute__((noinline))
 #define __attr_return_value_should_be_checked___ __attribute__((warn_unused_result))
@@ -44,6 +59,7 @@
 #ifndef __attr_pure___
 #define __attr_pure___ __attribute__((pure))
 #endif /* !__attr_pure___ */
+#endif
 
 /*
  * Conditions' likeliness, unlikeliness.
@@ -109,6 +125,9 @@ void __noreturn jerry_unreachable (const char *file, const char *function, const
     jerry_unreachable (__FILE__, __func__, __LINE__); \
   } while (0)
 #else /* JERRY_NDEBUG */
+#if defined(_MSC_VER)
+#define JERRY_ASSERT(x) do {} while(0)
+#else
 #define JERRY_ASSERT(x) \
   do \
   { \
@@ -117,6 +136,7 @@ void __noreturn jerry_unreachable (const char *file, const char *function, const
       JERRY_UNUSED (x); \
     } \
   } while (0)
+#endif
 
 #ifdef __GNUC__
 #define JERRY_UNREACHABLE() __builtin_unreachable ()

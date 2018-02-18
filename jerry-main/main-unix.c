@@ -283,7 +283,7 @@ wait_for_source_callback (const jerry_char_t *resource_name_p, /**< resource nam
                           size_t resource_name_size, /**< size of resource name */
                           const jerry_char_t *source_p, /**< source code */
                           size_t source_size, /**< source code size */
-                          void *user_p __attribute__((unused))) /**< user pointer */
+                          void *user_p __attr_unused___) /**< user pointer */
 {
   jerry_value_t ret_val = jerry_parse (resource_name_p,
                                        resource_name_size,
@@ -415,13 +415,13 @@ main (int argc,
       char **argv)
 {
   srand ((unsigned) jerry_port_get_current_time ());
-  const char *file_names[argc];
+  jerry_alloca(file_names, const char *, argc);
   int files_counter = 0;
 
   jerry_init_flag_t flags = JERRY_INIT_EMPTY;
 
-  const char *exec_snapshot_file_names[argc];
-  uint32_t exec_snapshot_file_indices[argc];
+  jerry_alloca(exec_snapshot_file_names, const char *, argc);
+  jerry_alloca(exec_snapshot_file_indices, uint32_t, argc);
   int exec_snapshots_count = 0;
 
   bool is_parse_only = false;
