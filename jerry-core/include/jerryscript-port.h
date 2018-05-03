@@ -25,9 +25,9 @@
 #endif
 
 #if defined(_MSC_VER)
-#define jerry_alloca(name, type, size) type *name = (type*)(alloca(sizeof(type)*size))
+#define JERRY_ALLOCA(name, type, size) type *name = (type*)(alloca(sizeof(type)*size))
 #else
-#define jerry_alloca(name, type, size) type name[size]
+#define JERRY_ALLOCA(name, type, size) type name[size]
 #endif
 
 #if defined(_MSC_VER)
