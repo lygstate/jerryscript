@@ -25,7 +25,7 @@
 
 #include "cli.h"
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #define __attr_unused___
 #define __attr_used___
 #else

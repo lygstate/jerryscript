@@ -23,7 +23,7 @@
 /**
  * Attributes
  */
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #define __attr_unused___
 #define __attr_used___
 #define __attr_noreturn___ __declspec(noreturn)

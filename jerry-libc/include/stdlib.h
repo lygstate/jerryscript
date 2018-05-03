@@ -28,7 +28,7 @@ extern "C"
  *          rand
  */
 #define RAND_MAX (0x7fffffffu)
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #define NO_RETURN_ATTRIBUTE __declspec(noreturn)
 #else
 #define NO_RETURN_ATTRIBUTE __attribute__ ((noreturn))

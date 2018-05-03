@@ -20,24 +20,20 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#if defined(_MSC_VER)
-#include <malloc.h>
-#endif
-
-#if defined(_MSC_VER)
-#define JERRY_ALLOCA(name, type, size) type *name = (type*)(alloca(sizeof(type)*size))
+#ifdef _MSC_VER
+void* __cdecl _alloca(size_t _Size);
+#define JERRY_ALLOCA(name, type, size) type *name = (type*)(_alloca(sizeof(type)*size))
 #else
 #define JERRY_ALLOCA(name, type, size) type name[size]
 #endif
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #define __noreturn __declspec(noreturn)
 #define __attr_format___(...)
 #else
 #define __noreturn __attribute__((noreturn))
 #define __attr_format___(...) __attribute__((format(__VA_ARGS__)))
 #endif
-
 
 #ifdef __cplusplus
 extern "C"

@@ -18,6 +18,8 @@
 
 #include <stddef.h>
 
+#pragma function(memcpy, memset, memcmp, strcmp, strlen)
+
 #ifdef __cplusplus
 extern "C"
 {
