@@ -25,6 +25,14 @@
 
 #include "cli.h"
 
+#if defined(_MSC_VER)
+#define __attr_unused___
+#define __attr_used___
+#else
+#define __attr_unused___ __attribute__((unused))
+#define __attr_used___ __attribute__((used))
+#endif
+
 /**
  * Maximum size of source code
  */

@@ -30,21 +30,14 @@
 #define jerry_alloca(name, type, size) type name[size]
 #endif
 
-#ifdef _MSC_VER
-#define __attr_unused___
-#define __attr_used___
-#ifndef __noreturn
+#if defined(_MSC_VER)
 #define __noreturn __declspec(noreturn)
-#endif
-#define __format_type
+#define __attr_format___(...)
 #else
-#define __attr_unused___ __attribute__((unused))
-#define __attr_used___ __attribute__((used))
-#ifndef __noreturn
 #define __noreturn __attribute__((noreturn))
+#define __attr_format___(...) __attribute__((format(__VA_ARGS__)))
 #endif
-#define __format_type __attribute__((format(printf, 2, 3)))
-#endif
+
 
 #ifdef __cplusplus
 extern "C"
@@ -88,7 +81,7 @@ typedef enum
  *
  * Example: a libc-based port may implement this with exit() or abort(), or both.
  */
-void jerry_port_fatal (jerry_fatal_code_t code) __noreturn;
+__noreturn void jerry_port_fatal (jerry_fatal_code_t code);
 
 /*
  *  I/O Port API
@@ -122,7 +115,7 @@ typedef enum
  * Example: a libc-based port may implement this with vfprintf(stderr) or
  * vfprintf(logfile), or both, depending on log level.
  */
-void jerry_port_log (jerry_log_level_t level, const char *format, ...) __format_type;
+void jerry_port_log (jerry_log_level_t level, const char *format, ...) __attr_format___(printf, 2, 3);
 
 /*
  * Date Port API

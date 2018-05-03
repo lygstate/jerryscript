@@ -38,7 +38,7 @@ jerry_context_t jerry_global_context;
 /**
  * Global heap.
  */
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #define _memory_alignment
 #else
 #define _memory_alignment __attribute__((aligned(JMEM_ALIGNMENT)))

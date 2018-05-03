@@ -100,7 +100,7 @@ endif()
 
 if(USING_MSVC)
   set(ENABLE_ALL_IN_ONE ON)
-  set(ENABLE_ALL_IN_ONE_MESSAGE  " (FORCED BY PLATFORM)")
+  set(ENABLE_ALL_IN_ONE_MESSAGE  " (FORCED BY COMPILER)")
 endif()
 
 # Status messages
@@ -219,8 +219,6 @@ endif()
 
 if(USING_MSVC)
   jerry_add_link_flags(/OPT:NOREF)
-  # Cannot compile builtins now so disable them
-  jerry_add_compile_flags(-DCONFIG_DISABLE_BUILTINS)
 endif()
 
 # Turn off stack protector
@@ -241,7 +239,7 @@ endif()
 
 if(JERRY_LIBC)
   if(USING_MSVC)
-    # jerry_add_compile_flags(/Werror)
+    jerry_add_compile_flags(/Wall) # TODO: We may turn warning to error by /WX
   else()
     jerry_add_compile_flags(-Werror)
   endif()

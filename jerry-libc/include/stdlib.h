@@ -28,12 +28,11 @@ extern "C"
  *          rand
  */
 #define RAND_MAX (0x7fffffffu)
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
 #define NO_RETURN_ATTRIBUTE __declspec(noreturn)
 #else
 #define NO_RETURN_ATTRIBUTE __attribute__ ((noreturn))
 #endif
-
 
 void NO_RETURN_ATTRIBUTE exit (int);
 void NO_RETURN_ATTRIBUTE abort (void);

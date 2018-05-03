@@ -31,8 +31,7 @@
 /*
  * Attributes
  */
-#ifdef _MSC_VER
-#define __noreturn __declspec(noreturn)
+#if defined(_MSC_VER)
 #define __attr_noinline___ __declspec(noinline)
 #define __attr_return_value_should_be_checked___
 #define __attr_hot___
@@ -46,7 +45,6 @@
 #define __attr_pure___
 #endif /* !__attr_pure___ */
 #else
-#define __noreturn __attribute__((noreturn))
 #define __attr_noinline___ __attribute__((noinline))
 #define __attr_return_value_should_be_checked___ __attribute__((warn_unused_result))
 #define __attr_hot___ __attribute__((hot))
