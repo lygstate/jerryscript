@@ -35,15 +35,9 @@
 #define __attr_noinline___ __declspec(noinline)
 #define __attr_return_value_should_be_checked___
 #define __attr_hot___
-#ifndef __attr_always_inline___
 #define __attr_always_inline___
-#endif /* !__attr_always_inline___ */
-#ifndef __attr_const___
 #define __attr_const___
-#endif /* !__attr_const___ */
-#ifndef __attr_pure___
 #define __attr_pure___
-#endif /* !__attr_pure___ */
 #define __attr_aligned___(ALIGNMENT)
 #else
 #define __attr_noinline___ __attribute__((noinline))
