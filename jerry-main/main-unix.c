@@ -423,13 +423,13 @@ main (int argc,
       char **argv)
 {
   srand ((unsigned) jerry_port_get_current_time ());
-  JERRY_ALLOCA(file_names, const char *, argc);
+  JERRY_ALLOCA (file_names, const char *, argc);
   int files_counter = 0;
 
   jerry_init_flag_t flags = JERRY_INIT_EMPTY;
 
-  JERRY_ALLOCA(exec_snapshot_file_names, const char *, argc);
-  JERRY_ALLOCA(exec_snapshot_file_indices, uint32_t, argc);
+  JERRY_ALLOCA (exec_snapshot_file_names, const char *, argc);
+  JERRY_ALLOCA (exec_snapshot_file_indices, uint32_t, argc);
   int exec_snapshots_count = 0;
 
   bool is_parse_only = false;

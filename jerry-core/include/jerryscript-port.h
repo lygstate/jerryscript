@@ -21,8 +21,8 @@
 #include <stdio.h>
 
 #ifdef _MSC_VER
-void* __cdecl _alloca(size_t _Size);
-#define JERRY_ALLOCA(name, type, size) type *name = (type*)(_alloca(sizeof(type)*size))
+void * __cdecl _alloca (size_t _Size);
+#define JERRY_ALLOCA(name, type, size) type *name = (type *)(_alloca (sizeof(type)*size))
 #else
 #define JERRY_ALLOCA(name, type, size) type name[size]
 #endif
@@ -31,8 +31,8 @@ void* __cdecl _alloca(size_t _Size);
 #define __noreturn __declspec(noreturn)
 #define __attr_format___(...)
 #else
-#define __noreturn __attribute__((noreturn))
-#define __attr_format___(...) __attribute__((format(__VA_ARGS__)))
+#define __noreturn __attribute__ ((noreturn))
+#define __attr_format___(...) __attribute__ ((format (__VA_ARGS__)))
 #endif
 
 #ifdef __cplusplus

@@ -145,7 +145,7 @@ endif()
 # Valgrind
 set(INCLUDE_THIRD_PARTY_VALGRIND "${CMAKE_SOURCE_DIR}/third-party/valgrind")
 
-set (DEFINES_JERRY "$<$<NOT:$<CONFIG:Debug>>:JERRY_NDEBUG>")
+set(DEFINES_JERRY ${DEFINES_JERRY} $<$<NOT:$<CONFIG:Debug>>:JERRY_NDEBUG>)
 
 # Jerry heap-section
 if(DEFINED JERRY_HEAP_SECTION_ATTR)

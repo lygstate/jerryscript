@@ -153,11 +153,7 @@ endmacro()
 
 macro(jerry_add_compile_warnings)
   foreach(_warning ${ARGV})
-  if(USING_MSVC)
-    jerry_add_compile_flags(/W${_warning})
-  else()
     jerry_add_compile_flags(-W${_warning})
-  endif()
     if(USING_GCC)
       jerry_add_compile_flags(-Werror=${_warning})
     endif()
@@ -204,10 +200,8 @@ if(("${PLATFORM}" STREQUAL "DARWIN"))
   jerry_add_link_flags(-lSystem)
   set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> Sqc <TARGET> <LINK_FLAGS> <OBJECTS>")
   set(CMAKE_C_ARCHIVE_FINISH "<CMAKE_RANLIB> -no_warning_for_no_symbols -c <TARGET>")
-else()
-  if(NOT USING_MSVC)
-    jerry_add_link_flags(-Wl,-z,noexecstack)
-  endif()
+elseif(NOT USING_MSVC)
+  jerry_add_link_flags(-Wl,-z,noexecstack)
 endif()
 
 # Turn off linking to compiler's default libc, in case jerry-libc is used
@@ -253,7 +247,7 @@ elseif(USING_TI)
 endif()
 
 # Strip binary
-if(NOT USING_MSVC AND ENABLE_STRIP AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(ENABLE_STRIP AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT USING_MSVC)
   jerry_add_link_flags(-s)
 endif()
 
