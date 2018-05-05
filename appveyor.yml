@@ -1,0 +1,29 @@
+version: 1.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  except:
+  - coverity_scan
+  - gh_pages
+skip_tags: true
+image:
+  - Visual Studio 2017
+configuration:
+  - Debug
+  - Release
+platform:
+  - x64
+  - Win32
+init:
+  - cmd: |
+      cmake -version
+before_build:
+  - cmd: |
+      cd /d %APPVEYOR_BUILD_FOLDER%
+      if "%PLATFORM%"=="Win32" mkdir build & cd build & cmake ..
+      if "%PLATFORM%"=="x64" mkdir build & cd build & cmake ..
+
+build_script:
+  - cmd: |
+      cd /d %APPVEYOR_BUILD_FOLDER%
+      "%ProgramFiles(x86)%\MSBuild\14.0\Bin\amd64\MSBuild.exe" /verbosity:minimal build/Jerry.sln /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%"
