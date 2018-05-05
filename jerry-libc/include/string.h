@@ -18,10 +18,6 @@
 
 #include <stddef.h>
 
-#if defined (_MSC_VER) && defined (NDEBUG)
-#pragma function (memcpy, memset, memcmp, strcmp, strlen)
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {

@@ -22,12 +22,9 @@ extern "C"
 #endif /* __cplusplus */
 
 /* General Constants. */
-#define _HUGE_ENUF  1e+300
-#define INFINITY   ((float) (_HUGE_ENUF * _HUGE_ENUF))
-#define HUGE_VAL   ((double) INFINITY)
-#define HUGE_VALF  ((float) INFINITY)
-#define HUGE_VALL  ((long double) INFINITY)
-#define NAN        ((float)(INFINITY * 0.0F))
+#define INFINITY    (1.0/0.0)
+#define NAN         (0.0/0.0)
+#define HUGE_VAL    INFINITY
 
 #define isnan(x)    ((x) != (x))
 #define isinf(x)    (((x) == INFINITY) || ((x) == -INFINITY))
