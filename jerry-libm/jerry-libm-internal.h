@@ -47,6 +47,11 @@
 #define __LO(x) *(1 + (int *) &x)
 #endif /* __LITTLE_ENDIAN */
 
+#if defined (_MSC_VER) && defined (NDEBUG)
+#pragma function (acos, asin, atan, atan2, cos, sin, tan)
+#pragma function (exp, log, pow, sqrt, ceil, fabs, floor, fmod)
+#endif
+
 /*
  * ANSI/POSIX
  */

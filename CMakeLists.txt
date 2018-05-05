@@ -99,13 +99,9 @@ if(USING_TI)
 endif()
 
 if(USING_MSVC)
-  set(JERRY_LIBC         OFF)
-  set(JERRY_LIBM         OFF)
   set(ENABLE_ALL_IN_ONE  ON)
   set(ENABLE_STRIP       OFF)
 
-  set(JERRY_LIBC_MESSAGE         " (FORCED BY COMPILER)")
-  set(JERRY_LIBM_MESSAGE         " (FORCED BY COMPILER)")
   set(ENABLE_ALL_IN_ONE_MESSAGE  " (FORCED BY COMPILER)")
   set(ENABLE_STRIP_MESSAGE       " (FORCED BY PLATFORM)")
 endif()
@@ -213,7 +209,11 @@ endif()
 
 # Turn off linking to compiler's default libc, in case jerry-libc is used
 if(JERRY_LIBC)
-  jerry_add_link_flags(-nostdlib)
+  if(USING_MSVC)
+    jerry_add_link_flags(/NODEFAULTLIB)
+  else()
+    jerry_add_link_flags(-nostdlib)
+  endif()
 endif()
 
 if(USING_MSVC)
@@ -237,7 +237,11 @@ elseif(USING_CLANG)
 endif()
 
 if(JERRY_LIBC)
-  jerry_add_compile_flags(-Werror)
+  if(USING_MSVC)
+    jerry_add_compile_flags(/Wall) # TODO: We may turn warning to error by /WX
+  else()
+    jerry_add_compile_flags(-Werror)
+  endif()
 endif()
 
 # C
