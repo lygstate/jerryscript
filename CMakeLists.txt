@@ -99,7 +99,13 @@ if(USING_TI)
 endif()
 
 if(USING_MSVC)
-  set(ENABLE_ALL_IN_ONE ON)
+  set(JERRY_LIBC         OFF)
+  set(JERRY_LIBM         OFF)
+  set(ENABLE_STRIP       OFF)
+  set(ENABLE_ALL_IN_ONE  ON)
+
+  set(JERRY_LIBC_MESSAGE         " (FORCED BY COMPILER)")
+  set(JERRY_LIBM_MESSAGE         " (FORCED BY COMPILER)")
   set(ENABLE_ALL_IN_ONE_MESSAGE  " (FORCED BY COMPILER)")
 endif()
 
@@ -247,7 +253,7 @@ elseif(USING_TI)
 endif()
 
 # Strip binary
-if(ENABLE_STRIP AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT USING_MSVC)
+if(ENABLE_STRIP AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   jerry_add_link_flags(-s)
 endif()
 
