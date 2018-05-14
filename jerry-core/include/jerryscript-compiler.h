@@ -31,7 +31,7 @@ extern "C"
  * Compiler-specific macros relevant for GCC.
  */
 #define JERRY_ATTR_ALIGNED(ALIGNMENT) __attribute__((aligned(ALIGNMENT)))
-#define JERRY_ATTR_ALWAYS_INLINE __attribute__((always_inline))
+#define JERRY_ATTR_ALWAYS_INLINE inline __attribute__((always_inline))
 #define JERRY_ATTR_CONST __attribute__((const))
 #define JERRY_ATTR_DEPRECATED __attribute__((deprecated))
 #define JERRY_ATTR_FORMAT(...) __attribute__((format(__VA_ARGS__)))
@@ -50,6 +50,7 @@ extern "C"
 #ifdef _MSC_VER
 void * __cdecl _alloca (size_t _Size);
 
+#define JERRY_ATTR_ALWAYS_INLINE __forceinline
 #define JERRY_ATTR_DEPRECATED __declspec(deprecated)
 #define JERRY_ATTR_NOINLINE __declspec(noinline)
 #define JERRY_ATTR_NORETURN __declspec(noreturn)
