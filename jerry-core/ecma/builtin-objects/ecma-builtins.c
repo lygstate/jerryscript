@@ -193,7 +193,7 @@ ecma_builtin_get (ecma_builtin_id_t builtin_id) /**< id of built-in to check on 
  * @return true - if the function object is a built-in routine
  *         false - otherwise
  */
-inline bool JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE bool
 ecma_builtin_function_is_routine (ecma_object_t *func_obj_p) /**< function object */
 {
   JERRY_ASSERT (ecma_get_object_type (func_obj_p) == ECMA_OBJECT_TYPE_FUNCTION);

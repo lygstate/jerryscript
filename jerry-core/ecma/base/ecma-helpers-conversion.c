@@ -960,7 +960,7 @@ ecma_number_to_decimal (ecma_number_t num, /**< ecma-number */
  *
  * @return number of digits
  */
-inline static int32_t JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE static int32_t
 ecma_number_of_digits (double val) /**< ecma number */
 {
   JERRY_ASSERT (fabs (fmod (val, 1.0)) < EPSILON);
@@ -978,7 +978,7 @@ ecma_number_of_digits (double val) /**< ecma number */
 /**
  * Convert double value to ASCII
  */
-inline static void JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE static void
 ecma_double_to_ascii (double val, /**< ecma number */
                       lit_utf8_byte_t *buffer_p, /**< buffer to generate digits into */
                       int32_t num_of_digits, /**< number of digits */
@@ -1012,7 +1012,7 @@ ecma_double_to_ascii (double val, /**< ecma number */
  *
  * @return number of generated digits
  */
-static inline lit_utf8_size_t JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE lit_utf8_size_t
 ecma_double_to_binary_floating_point (double val, /**< ecma number */
                                       lit_utf8_byte_t *buffer_p, /**< buffer to generate digits into */
                                       int32_t *exp_p) /**< [out] exponent */

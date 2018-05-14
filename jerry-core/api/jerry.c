@@ -97,7 +97,7 @@ static const char * const wrong_args_msg_p = "wrong type of argument";
  *           - before jerry_init and after jerry_cleanup
  *           - between enter to and return from a native free callback
  */
-static inline void JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE void
 jerry_assert_api_available (void)
 {
   if (JERRY_UNLIKELY (!(JERRY_CONTEXT (status_flags) & ECMA_STATUS_API_AVAILABLE)))
@@ -110,7 +110,7 @@ jerry_assert_api_available (void)
 /**
  * Turn on API availability
  */
-static inline void JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE void
 jerry_make_api_available (void)
 {
   JERRY_CONTEXT (status_flags) |= ECMA_STATUS_API_AVAILABLE;
@@ -119,7 +119,7 @@ jerry_make_api_available (void)
 /**
  * Turn off API availability
  */
-static inline void JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE void
 jerry_make_api_unavailable (void)
 {
   JERRY_CONTEXT (status_flags) &= (uint32_t) ~ECMA_STATUS_API_AVAILABLE;
@@ -133,7 +133,7 @@ jerry_make_api_unavailable (void)
  *
  * @return return value for Jerry API functions
  */
-static inline jerry_value_t JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE jerry_value_t
 jerry_get_arg_value (jerry_value_t value) /**< return value */
 {
   if (JERRY_UNLIKELY (ecma_is_value_error_reference (value)))
@@ -165,7 +165,7 @@ jerry_return (jerry_value_t value) /**< return value */
  *
  * @return return value for Jerry API functions
  */
-static inline jerry_value_t JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ATTR_ALWAYS_INLINE jerry_value_t
 jerry_throw (jerry_value_t value) /**< return value */
 {
   JERRY_ASSERT (ECMA_IS_VALUE_ERROR (value));

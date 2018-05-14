@@ -238,7 +238,7 @@ ecma_number_get_sign_field (ecma_number_t num) /**< ecma-number */
                   fraction is filled with anything but not all zero bits,
  *         false - otherwise
  */
-inline bool JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE bool
 ecma_number_is_nan (ecma_number_t num) /**< ecma-number */
 {
   bool is_nan = (num != num);
@@ -291,7 +291,7 @@ ecma_number_make_infinity (bool sign) /**< true - for negative Infinity,
  * @return true - if sign bit of ecma-number is set
  *         false - otherwise
  */
-inline bool JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE bool
 ecma_number_is_negative (ecma_number_t num) /**< ecma-number */
 {
   JERRY_ASSERT (!ecma_number_is_nan (num));
@@ -658,7 +658,7 @@ ecma_number_calc_remainder (ecma_number_t left_num, /**< left operand */
  *
  * @return number - result of multiplication.
  */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE ecma_value_t
 ecma_integer_multiply (ecma_integer_value_t left_integer, /**< left operand */
                        ecma_integer_value_t right_integer) /**< right operand */
 {

@@ -40,7 +40,7 @@
  * @return true - if the type is a normal or arrow function;
  *         false - otherwise
  */
-inline bool JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE bool
 ecma_is_normal_or_arrow_function (ecma_object_type_t type)
 {
 #ifndef CONFIG_DISABLE_ES2015_ARROW_FUNCTION
@@ -282,7 +282,7 @@ ecma_op_create_external_function_object (ecma_external_handler_t handler_cb) /**
  *
  * @return compiled code
  */
-inline const ecma_compiled_code_t * JERRY_ATTR_ALWAYS_INLINE
+JERRY_ATTR_ALWAYS_INLINE const ecma_compiled_code_t *
 ecma_op_function_get_compiled_code (ecma_extended_object_t *function_p) /**< function pointer */
 {
 #ifdef JERRY_ENABLE_SNAPSHOT_EXEC
