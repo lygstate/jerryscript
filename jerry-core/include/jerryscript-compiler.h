@@ -47,6 +47,16 @@ extern "C"
 
 #endif /* __GNUC__ */
 
+#ifdef _MSC_VER
+void * __cdecl _alloca (size_t _Size);
+
+#define JERRY_ATTR_DEPRECATED __declspec(deprecated)
+#define JERRY_ATTR_NOINLINE __declspec(noinline)
+#define JERRY_ATTR_NORETURN __declspec(noreturn)
+
+#define JERRY_ALLOCA(type, name, size) type *name = (type *) (_alloca (sizeof (type) * size))
+#endif /* _MSC_VER */
+
 /*
  * Default empty definitions for all compiler-specific macros. Define any of
  * these in a guarded block above (e.g., as for GCC) to fine tune compilation
@@ -109,6 +119,10 @@ extern "C"
 #ifndef JERRY_UNLIKELY
 #define JERRY_UNLIKELY(x) (x)
 #endif /* !JERRY_UNLIKELY */
+
+#ifndef JERRY_ALLOCA
+#define JERRY_ALLOCA(type, name, size) type name[size]
+#endif /* JERRY_ALLOCA */
 
 /**
  * @}
