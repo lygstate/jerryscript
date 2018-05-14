@@ -95,7 +95,10 @@ jerry_unreachable (const char *file, const char *function, const uint32_t line);
 #ifdef __GNUC__
 #define JERRY_UNREACHABLE() __builtin_unreachable ()
 #else /* !__GNUC__ */
-#define JERRY_UNREACHABLE()
+static JERRY_ATTR_ALWAYS_INLINE void JERRY_ATTR_NORETURN
+jerry_unreachable() { }
+
+#define JERRY_UNREACHABLE() jerry_unreachable()
 #endif /* __GNUC__ */
 #endif /* !JERRY_NDEBUG */
 

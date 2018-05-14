@@ -622,7 +622,7 @@ lit_utf8_string_code_unit_at (const lit_utf8_byte_t *utf8_buf_p, /**< utf-8 stri
  * @return number of bytes occupied in CESU-8
  */
 JERRY_ATTR_ALWAYS_INLINE lit_utf8_size_t
-lit_get_unicode_char_size_by_utf8_first_byte (const lit_utf8_byte_t first_byte) /**< buffer with characters */
+lit_get_unicode_char_size_by_utf8_first_byte (lit_utf8_byte_t first_byte) /**< buffer with characters */
 {
   if ((first_byte & LIT_UTF8_1_BYTE_MASK) == LIT_UTF8_1_BYTE_MARKER)
   {
