@@ -14,6 +14,7 @@ jobs:
           fetch-depth: 0
       - run: sudo apt update
       - run: sudo apt install doxygen vera++ cppcheck pylint python-serial
+      - run: python -c "import sys; print(sys.version)"
       - run: $RUNNER --check-signed-off=gh-actions
         if: ${{ always() }}
       - run: $RUNNER --check-doxygen
@@ -125,6 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - run: python -c "import sys; print(sys.version)"
       - run: $RUNNER --test262-es2015=update
       - run: $RUNNER --test262-es2015=update --build-debug
       - uses: actions/upload-artifact@v2
