@@ -17,6 +17,7 @@ jobs:
           python-version: '3.10'
       - run: sudo apt update
       - run: sudo apt install pylint doxygen cppcheck clang-format-15
+      - run: python -c "import sys; print(sys.version)"
       - run: $RUNNER --check-signed-off=gh-actions
         if: ${{ always() }}
       - run: $RUNNER --check-doxygen
