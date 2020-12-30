@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: $RUNNER --test262
+      - run: $RUNNER --test262 update
 
   Conformance_Tests_ES2015:
     runs-on: ubuntu-latest
