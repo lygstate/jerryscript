@@ -52,6 +52,7 @@ INCLUDE_DIRS = [
 
 EXCLUDE_DIRS = [
     'targets/esp8266',
+    'tests/benchmarks/v8',
     os.path.relpath(settings.TEST262_TEST_SUITE_DIR, settings.PROJECT_DIR),
 ]
 
