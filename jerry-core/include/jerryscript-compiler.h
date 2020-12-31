@@ -31,7 +31,6 @@ extern "C"
  * Compiler-specific macros relevant for GCC.
  */
 #define JERRY_ATTR_ALIGNED(ALIGNMENT) __attribute__((aligned(ALIGNMENT)))
-#define JERRY_ATTR_ALWAYS_INLINE __attribute__((always_inline))
 #define JERRY_ATTR_CONST __attribute__((const))
 #define JERRY_ATTR_DEPRECATED __attribute__((deprecated))
 #define JERRY_ATTR_FORMAT(...) __attribute__((format(__VA_ARGS__)))
@@ -40,6 +39,8 @@ extern "C"
 #define JERRY_ATTR_NORETURN __attribute__((noreturn))
 #define JERRY_ATTR_PURE __attribute__((pure))
 #define JERRY_ATTR_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+
+#define JERRY_ALWAYS_INLINE inline __attribute__((always_inline))
 
 #ifndef JERRY_LIKELY
 #define JERRY_LIKELY(x) __builtin_expect(!!(x), 1)
@@ -59,6 +60,8 @@ extern "C"
 #define JERRY_ATTR_DEPRECATED __declspec(deprecated)
 #define JERRY_ATTR_NOINLINE __declspec(noinline)
 #define JERRY_ATTR_NORETURN __declspec(noreturn)
+
+#define JERRY_ALWAYS_INLINE __forceinline
 
 /*
  * Microsoft Visual C/C++ Compiler doesn't support for VLA, using _alloca
@@ -80,13 +83,6 @@ void * __cdecl _alloca (size_t _Size);
 #ifndef JERRY_ATTR_ALIGNED
 #define JERRY_ATTR_ALIGNED(ALIGNMENT)
 #endif /* !JERRY_ATTR_ALIGNED */
-
-/**
- * Function attribute to inline function to all call sites.
- */
-#ifndef JERRY_ATTR_ALWAYS_INLINE
-#define JERRY_ATTR_ALWAYS_INLINE
-#endif /* !JERRY_ATTR_ALWAYS_INLINE */
 
 /**
  * Function attribute to declare that function has no effect except the return
@@ -148,6 +144,16 @@ void * __cdecl _alloca (size_t _Size);
 #ifndef JERRY_ATTR_WARN_UNUSED_RESULT
 #define JERRY_ATTR_WARN_UNUSED_RESULT
 #endif /* !JERRY_ATTR_WARN_UNUSED_RESULT */
+
+/**
+ * Macro to setup function attributes to force inline function to all call sites.
+ * Before it's usage `static` or `extern` modifier must be used.
+ * Because in msvc, inline without `extern` would cause the function don't generate
+ * symbol and then cause linkage error.
+ */
+#ifndef JERRY_ALWAYS_INLINE
+#define JERRY_ALWAYS_INLINE inline
+#endif /* !JERRY_ALWAYS_INLINE */
 
 /**
  * Helper to predict that a condition is likely.
