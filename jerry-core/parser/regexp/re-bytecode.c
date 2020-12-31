@@ -93,26 +93,6 @@ re_insert_byte (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
 } /* re_insert_byte */
 
 /**
- * Get a single byte and icnrease bytecode position.
- */
-inline uint8_t JERRY_ATTR_ALWAYS_INLINE
-re_get_byte (const uint8_t **bc_p) /**< pointer to bytecode start */
-{
-  return *((*bc_p)++);
-} /* re_get_byte */
-
-/**
- * Get a RegExp opcode and increase the bytecode position
- *
- * @return current RegExp opcode
- */
-inline re_opcode_t JERRY_ATTR_ALWAYS_INLINE
-re_get_opcode (const uint8_t **bc_p) /**< pointer to bytecode start */
-{
-  return (re_opcode_t) re_get_byte (bc_p);
-} /* re_get_opcode */
-
-/**
  * Encode 2 byte unsigned integer into the bytecode
  */
 static void

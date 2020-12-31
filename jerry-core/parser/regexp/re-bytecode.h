@@ -137,8 +137,26 @@ re_insert_opcode (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
   re_insert_byte (re_ctx_p, offset, (uint8_t) opcode);
 } /* re_insert_opcode */
 
-re_opcode_t re_get_opcode (const uint8_t **bc_p);
-uint8_t re_get_byte (const uint8_t **bc_p);
+/**
+ * Get a single byte and icnrease bytecode position.
+ */
+inline uint8_t JERRY_ATTR_ALWAYS_INLINE
+re_get_byte (const uint8_t **bc_p) /**< pointer to bytecode start */
+{
+  return *((*bc_p)++);
+} /* re_get_byte */
+
+/**
+ * Get a RegExp opcode and increase the bytecode position
+ *
+ * @return current RegExp opcode
+ */
+inline re_opcode_t JERRY_ATTR_ALWAYS_INLINE
+re_get_opcode (const uint8_t **bc_p) /**< pointer to bytecode start */
+{
+  return (re_opcode_t) re_get_byte (bc_p);
+} /* re_get_opcode */
+
 lit_code_point_t re_get_char (const uint8_t **bc_p, bool unicode);
 uint32_t re_get_value (const uint8_t **bc_p);
 
