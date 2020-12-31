@@ -29,7 +29,27 @@
 
 ecma_property_t ecma_op_object_get_own_property (ecma_object_t *object_p, ecma_string_t *property_name_p,
                                                  ecma_property_ref_t *property_ref_p, uint32_t options);
-bool ecma_op_ordinary_object_has_own_property (ecma_object_t *object_p, ecma_string_t *property_name_p);
+
+/**
+ * Checks whether an object (excluding prototypes) has a named property
+ *
+ * @return true - if property is found
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_op_ordinary_object_has_own_property (ecma_object_t *object_p, /**< the object */
+                                          ecma_string_t *property_name_p) /**< property name */
+{
+  JERRY_ASSERT (!ECMA_OBJECT_IS_PROXY (object_p));
+
+  ecma_property_t property = ecma_op_object_get_own_property (object_p,
+                                                              property_name_p,
+                                                              NULL,
+                                                              ECMA_PROPERTY_GET_NO_OPTIONS);
+
+  return property != ECMA_PROPERTY_TYPE_NOT_FOUND && property != ECMA_PROPERTY_TYPE_NOT_FOUND_AND_STOP;
+} /* ecma_op_ordinary_object_has_own_property */
+
 ecma_value_t ecma_op_object_has_property (ecma_object_t *object_p, ecma_string_t *property_name_p);
 ecma_value_t ecma_op_object_find_own (ecma_value_t base_value, ecma_object_t *object_p, ecma_string_t *property_name_p);
 ecma_value_t ecma_op_object_find (ecma_object_t *object_p, ecma_string_t *property_name_p);
