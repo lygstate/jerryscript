@@ -573,8 +573,33 @@ ecma_value_t ecma_is_value_array (ecma_value_t arg);
 
 void ecma_check_value_type_is_spec_defined (ecma_value_t value);
 
-ecma_value_t JERRY_ATTR_CONST ecma_make_boolean_value (bool boolean_value);
-ecma_value_t JERRY_ATTR_CONST ecma_make_integer_value (ecma_integer_value_t integer_value);
+/**
+ * Creates an ecma value from the given raw boolean.
+ *
+ * @return boolean ecma_value
+ */
+inline ecma_value_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+ecma_make_boolean_value (bool boolean_value) /**< raw bool value from which the ecma value will be created */
+{
+  return boolean_value ? ECMA_VALUE_TRUE : ECMA_VALUE_FALSE;
+} /* ecma_make_boolean_value */
+
+/**
+ * Encode an integer number into an ecma-value without allocating memory
+ *
+ * Note:
+ *   The value must fit into the range of allowed ecma integer values
+ *
+ * @return ecma-value
+ */
+inline ecma_value_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+ecma_make_integer_value (ecma_integer_value_t integer_value) /**< integer number to be encoded */
+{
+  JERRY_ASSERT (ECMA_IS_INTEGER_NUMBER (integer_value));
+
+  return (((ecma_value_t) integer_value) << ECMA_DIRECT_SHIFT) | ECMA_DIRECT_TYPE_INTEGER_VALUE;
+} /* ecma_make_integer_value */
+
 ecma_value_t ecma_make_nan_value (void);
 ecma_value_t ecma_make_float_value (ecma_number_t *ecma_num_p);
 ecma_value_t ecma_make_length_value (ecma_length_t length);
