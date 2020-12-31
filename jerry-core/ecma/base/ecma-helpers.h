@@ -606,27 +606,244 @@ ecma_value_t ecma_make_length_value (ecma_length_t length);
 ecma_value_t ecma_make_number_value (ecma_number_t ecma_number);
 ecma_value_t ecma_make_int32_value (int32_t int32_number);
 ecma_value_t ecma_make_uint32_value (uint32_t uint32_number);
-ecma_value_t JERRY_ATTR_PURE ecma_make_string_value (const ecma_string_t *ecma_string_p);
 #if ENABLED (JERRY_ESNEXT)
-ecma_value_t JERRY_ATTR_PURE ecma_make_symbol_value (const ecma_string_t *ecma_symbol_p);
+bool ecma_prop_name_is_symbol (ecma_string_t *string_p);
 #endif /* ENABLED (JERRY_ESNEXT) */
-ecma_value_t JERRY_ATTR_PURE ecma_make_prop_name_value (const ecma_string_t *ecma_prop_name_p);
-ecma_value_t JERRY_ATTR_PURE ecma_make_magic_string_value (lit_magic_string_id_t id);
-ecma_value_t JERRY_ATTR_PURE ecma_make_object_value (const ecma_object_t *object_p);
-ecma_value_t JERRY_ATTR_PURE ecma_make_extended_primitive_value (const ecma_extended_primitive_t *primitve_p,
-                                                                 uint32_t type);
-ecma_integer_value_t JERRY_ATTR_CONST ecma_get_integer_from_value (ecma_value_t value);
-ecma_number_t JERRY_ATTR_PURE ecma_get_float_from_value (ecma_value_t value);
-ecma_number_t * ecma_get_pointer_from_float_value (ecma_value_t value);
+
+/**
+ * String value constructor
+ *
+ * @return ecma-value representation of the string argument
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_string_value (const ecma_string_t *ecma_string_p) /**< string to reference in value */
+{
+  JERRY_ASSERT (ecma_string_p != NULL);
+#if ENABLED (JERRY_ESNEXT)
+  JERRY_ASSERT (!ecma_prop_name_is_symbol ((ecma_string_t *) ecma_string_p));
+#endif /* ENABLED (JERRY_ESNEXT) */
+
+  if ((((uintptr_t) ecma_string_p) & ECMA_VALUE_TYPE_MASK) != 0)
+  {
+    return (ecma_value_t) (uintptr_t) ecma_string_p;
+  }
+
+  return ecma_pointer_to_ecma_value (ecma_string_p) | ECMA_TYPE_STRING;
+} /* ecma_make_string_value */
+
+#if ENABLED (JERRY_ESNEXT)
+/**
+ * Symbol value constructor
+ *
+ * @return ecma-value representation of the string argument
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_symbol_value (const ecma_string_t *ecma_symbol_p) /**< symbol to reference in value */
+{
+  JERRY_ASSERT (ecma_symbol_p != NULL);
+  JERRY_ASSERT (ecma_prop_name_is_symbol ((ecma_string_t *) ecma_symbol_p));
+
+  return ecma_pointer_to_ecma_value (ecma_symbol_p) | ECMA_TYPE_SYMBOL;
+} /* ecma_make_symbol_value */
+#endif /* ENABLED (JERRY_ESNEXT) */
+
+/**
+ * Property-name value constructor
+ *
+ * @return ecma-value representation of a property name argument
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_prop_name_value (const ecma_string_t *ecma_prop_name_p) /**< property name to reference in value */
+{
+  JERRY_ASSERT (ecma_prop_name_p != NULL);
+
+#if ENABLED (JERRY_ESNEXT)
+  if (ecma_prop_name_is_symbol ((ecma_string_t *) ecma_prop_name_p))
+  {
+    return ecma_make_symbol_value (ecma_prop_name_p);
+  }
+#endif /* ENABLED (JERRY_ESNEXT) */
+
+  return ecma_make_string_value (ecma_prop_name_p);
+} /* ecma_make_prop_name_value */
+
+/**
+ * String value constructor
+ *
+ * @return ecma-value representation of the string argument
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_magic_string_value (lit_magic_string_id_t id) /**< magic string id */
+{
+  return (ecma_value_t) ECMA_CREATE_DIRECT_STRING (ECMA_DIRECT_STRING_MAGIC, (uintptr_t) id);
+} /* ecma_make_magic_string_value */
+
+/**
+ * Object value constructor
+ *
+ * @return ecma-value representation of the object argument
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_object_value (const ecma_object_t *object_p) /**< object to reference in value */
+{
+  JERRY_ASSERT (object_p != NULL);
+
+  return ecma_pointer_to_ecma_value (object_p) | ECMA_TYPE_OBJECT;
+} /* ecma_make_object_value */
+
+/**
+ * Error reference constructor
+ *
+ * @return ecma-value representation of the Error reference
+ */
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_make_extended_primitive_value (const ecma_extended_primitive_t *primitve_p, /**< extended primitve value */
+                                    uint32_t type) /**< ecma type of extended primitve value */
+{
+  JERRY_ASSERT (primitve_p != NULL);
+#if ENABLED (JERRY_BUILTIN_BIGINT)
+  JERRY_ASSERT (primitve_p != ECMA_BIGINT_POINTER_TO_ZERO);
+#endif /* ENABLED (JERRY_BUILTIN_BIGINT) */
+  JERRY_ASSERT (type == ECMA_TYPE_BIGINT || type == ECMA_TYPE_ERROR);
+
+  return ecma_pointer_to_ecma_value (primitve_p) | type;
+} /* ecma_make_extended_primitive_value */
+
+/**
+ * Get integer value from an integer ecma value
+ *
+ * @return integer value
+ */
+inline ecma_integer_value_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+ecma_get_integer_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_integer_number (value));
+
+  return ((ecma_integer_value_t) value) >> ECMA_DIRECT_SHIFT;
+} /* ecma_get_integer_from_value */
+
+/**
+ * Get floating point value from an ecma value
+ *
+ * @return floating point value
+ */
+inline ecma_number_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_float_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_get_value_type_field (value) == ECMA_TYPE_FLOAT);
+
+  return *(ecma_number_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_float_from_value */
+
+/**
+ * Get floating point value pointer from an ecma value
+ *
+ * @return floating point value
+ */
+inline ecma_number_t * JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_pointer_from_float_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_get_value_type_field (value) == ECMA_TYPE_FLOAT);
+
+  return (ecma_number_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_pointer_from_float_value */
+
 ecma_number_t JERRY_ATTR_PURE ecma_get_number_from_value (ecma_value_t value);
-ecma_string_t JERRY_ATTR_PURE *ecma_get_string_from_value (ecma_value_t value);
+
+/**
+ * Get pointer to ecma-string from ecma value
+ *
+ * @return the string pointer
+ */
+inline ecma_string_t *JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_string_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_string (value));
+
+  if ((value & ECMA_VALUE_TYPE_MASK) == ECMA_TYPE_DIRECT_STRING)
+  {
+    return (ecma_string_t *) (uintptr_t) value;
+  }
+
+  return (ecma_string_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_string_from_value */
+
 #if ENABLED (JERRY_ESNEXT)
-ecma_string_t JERRY_ATTR_PURE *ecma_get_symbol_from_value (ecma_value_t value);
+/**
+ * Get pointer to ecma-string from ecma value
+ *
+ * @return the string pointer
+ */
+inline ecma_string_t *JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_symbol_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_symbol (value));
+
+  return (ecma_string_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_symbol_from_value */
 #endif /* ENABLED (JERRY_ESNEXT) */
-ecma_string_t JERRY_ATTR_PURE *ecma_get_prop_name_from_value (ecma_value_t value);
-ecma_object_t JERRY_ATTR_PURE *ecma_get_object_from_value (ecma_value_t value);
-ecma_extended_primitive_t JERRY_ATTR_PURE *ecma_get_extended_primitive_from_value (ecma_value_t value);
-ecma_value_t JERRY_ATTR_CONST ecma_invert_boolean_value (ecma_value_t value);
+
+/**
+ * Get pointer to a property name from ecma value
+ *
+ * @return the string pointer
+ */
+inline ecma_string_t *JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_prop_name_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_prop_name (value));
+
+  if ((value & ECMA_VALUE_TYPE_MASK) == ECMA_TYPE_DIRECT_STRING)
+  {
+    return (ecma_string_t *) (uintptr_t) value;
+  }
+
+  return (ecma_string_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_prop_name_from_value */
+
+/**
+ * Get pointer to ecma-object from ecma value
+ *
+ * @return the pointer
+ */
+inline ecma_object_t *JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_object_from_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_object (value));
+
+  return (ecma_object_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_object_from_value */
+
+/**
+ * Get pointer to error reference from ecma value
+ *
+ * @return the pointer
+ */
+inline ecma_extended_primitive_t *JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_get_extended_primitive_from_value (ecma_value_t value) /**< ecma value */
+{
+#if ENABLED (JERRY_BUILTIN_BIGINT)
+  JERRY_ASSERT (value != ECMA_BIGINT_ZERO);
+#endif /* ENABLED (JERRY_BUILTIN_BIGINT) */
+  JERRY_ASSERT (ecma_get_value_type_field (value) == ECMA_TYPE_BIGINT
+                || ecma_get_value_type_field (value) == ECMA_TYPE_ERROR);
+
+  return (ecma_extended_primitive_t *) ecma_get_pointer_from_ecma_value (value);
+} /* ecma_get_extended_primitive_from_value */
+
+/**
+ * Invert a boolean value
+ *
+ * @return ecma value
+ */
+inline ecma_value_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+ecma_invert_boolean_value (ecma_value_t value) /**< ecma value */
+{
+  JERRY_ASSERT (ecma_is_value_boolean (value));
+
+  return (value ^ (1 << ECMA_DIRECT_SHIFT));
+} /* ecma_invert_boolean_value */
+
 ecma_value_t ecma_copy_value (ecma_value_t value);
 ecma_value_t ecma_fast_copy_value (ecma_value_t value);
 ecma_value_t ecma_copy_value_if_not_object (ecma_value_t value);
@@ -645,7 +862,6 @@ lit_magic_string_id_t ecma_get_typeof_lit_id (ecma_value_t value);
 /* ecma-helpers-string.c */
 #if ENABLED (JERRY_ESNEXT)
 ecma_string_t *ecma_new_symbol_from_descriptor_string (ecma_value_t string_desc);
-bool ecma_prop_name_is_symbol (ecma_string_t *string_p);
 ecma_length_t ecma_op_advance_string_index (ecma_string_t *str_p, ecma_length_t index_num, bool is_unicode);
 #endif /* ENABLED (JERRY_ESNEXT) */
 #if ENABLED (JERRY_BUILTIN_MAP) || ENABLED (JERRY_BUILTIN_SET)
