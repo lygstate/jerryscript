@@ -495,24 +495,6 @@ ecma_free_value (ecma_value_t value) /**< value description */
 } /* ecma_free_value */
 
 /**
- * Free the ecma value
- *
- * Note:
- *   this function is similar to ecma_free_value, but it is
- *   faster for direct values since no function call is performed.
- *   It also increases the binary size so it is recommended for
- *   critical code paths only.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_fast_free_value (ecma_value_t value) /**< value description */
-{
-  if (ecma_get_value_type_field (value) != ECMA_TYPE_DIRECT)
-  {
-    ecma_free_value (value);
-  }
-} /* ecma_fast_free_value */
-
-/**
  * Free the ecma value if not an object
  */
 void
@@ -523,30 +505,6 @@ ecma_free_value_if_not_object (ecma_value_t value) /**< value description */
     ecma_free_value (value);
   }
 } /* ecma_free_value_if_not_object */
-
-/**
- * Free an ecma-value object
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_free_object (ecma_value_t value) /**< value description */
-{
-  ecma_deref_object (ecma_get_object_from_value (value));
-} /* ecma_free_object */
-
-/**
- * Free an ecma-value number
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_free_number (ecma_value_t value) /**< value description */
-{
-  JERRY_ASSERT (ecma_is_value_number (value));
-
-  if (ecma_is_value_float_number (value))
-  {
-    ecma_number_t *number_p = (ecma_number_t *) ecma_get_pointer_from_ecma_value (value);
-    ecma_dealloc_number (number_p);
-  }
-} /* ecma_free_number */
 
 /**
  * Get the literal id associated with the given ecma_value type.

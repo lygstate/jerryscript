@@ -19,6 +19,7 @@
 #include "ecma-globals.h"
 #include "ecma-builtins.h"
 #include "ecma-gc.h"
+#include "ecma-alloc.h"
 #include "jmem.h"
 #include "lit-strings.h"
 
@@ -908,10 +909,57 @@ ecma_value_t ecma_update_float_number (ecma_value_t float_value, ecma_number_t n
 void ecma_value_assign_value (ecma_value_t *value_p, ecma_value_t ecma_value);
 void ecma_value_assign_number (ecma_value_t *value_p, ecma_number_t ecma_number);
 void ecma_free_value (ecma_value_t value);
-void ecma_fast_free_value (ecma_value_t value);
+
+/**
+ * Free the ecma value
+ *
+ * Note:
+ *   this function is similar to ecma_free_value, but it is
+ *   faster for direct values since no function call is performed.
+ *   It also increases the binary size so it is recommended for
+ *   critical code paths only.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_fast_free_value (ecma_value_t value) /**< value description */
+{
+  if (ecma_get_value_type_field (value) != ECMA_TYPE_DIRECT)
+  {
+    ecma_free_value (value);
+  }
+} /* ecma_fast_free_value */
+
 void ecma_free_value_if_not_object (ecma_value_t value);
-void ecma_free_object (ecma_value_t value);
-void ecma_free_number (ecma_value_t value);
+
+/**
+ * Free an ecma-value object
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_free_object (ecma_value_t value) /**< value description */
+{
+  ecma_deref_object (ecma_get_object_from_value (value));
+} /* ecma_free_object */
+
+/**
+ * Dealloc memory from an ecma-number
+ */
+void
+ecma_dealloc_number (ecma_number_t *number_p); /**< number to be freed */
+
+/**
+ * Free an ecma-value number
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_free_number (ecma_value_t value) /**< value description */
+{
+  JERRY_ASSERT (ecma_is_value_number (value));
+
+  if (ecma_is_value_float_number (value))
+  {
+    ecma_number_t *number_p = (ecma_number_t *) ecma_get_pointer_from_ecma_value (value);
+    ecma_dealloc_number (number_p);
+  }
+} /* ecma_free_number */
+
 lit_magic_string_id_t ecma_get_typeof_lit_id (ecma_value_t value);
 
 /* ecma-helpers-string.c */
