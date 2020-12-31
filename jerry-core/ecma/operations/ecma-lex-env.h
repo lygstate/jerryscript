@@ -19,6 +19,7 @@
 #include "ecma-globals.h"
 #include "ecma-reference.h"
 #include "jrt.h"
+#include "vm.h"
 
 /** \addtogroup ecma ECMA
  * @{

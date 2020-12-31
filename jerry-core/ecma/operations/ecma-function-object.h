@@ -18,6 +18,8 @@
 
 #include "ecma-globals.h"
 #include "ecma-builtins.h"
+#include "ecma-helpers.h"
+#include "ecma-exceptions.h"
 #include "ecma-builtin-handlers.h"
 #include "vm.h"
 
@@ -45,7 +47,23 @@ bool ecma_object_is_constructor (ecma_object_t *obj_p);
 #define ECMA_IS_VALID_CONSTRUCTOR ((char *) 0x1)
 
 char *ecma_object_check_constructor (ecma_object_t *obj_p);
-char *ecma_check_constructor (ecma_value_t value);
+
+/**
+ * Implement IsConstructor abstract operation.
+ *
+ * @return ECMA_IS_VALID_CONSTRUCTOR - if the input value is a constructor.
+ *         any other value - if the input value is not a valid constructor, the pointer contains the error message.
+ */
+inline char *JERRY_ATTR_ALWAYS_INLINE
+ecma_check_constructor (ecma_value_t value) /**< ecma object */
+{
+  if (!ecma_is_value_object (value))
+  {
+    return ECMA_ERR_MSG ("Invalid type for constructor call.");
+  }
+
+  return ecma_object_check_constructor (ecma_get_object_from_value (value));
+} /* ecma_check_constructor */
 
 ecma_object_t *
 ecma_op_create_simple_function_object (ecma_object_t *scope_p, const ecma_compiled_code_t *bytecode_data_p);

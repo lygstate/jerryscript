@@ -643,7 +643,20 @@ void *parser_malloc (parser_context_t *context_p, size_t size);
 void parser_free (void *ptr, size_t size);
 void *parser_malloc_local (parser_context_t *context_p, size_t size);
 void parser_free_local (void *ptr, size_t size);
-void parser_free_allocated_buffer (parser_context_t *context_p);
+
+/**
+ * Free the dynamically allocated buffer stored in the context
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+parser_free_allocated_buffer (parser_context_t *context_p) /**< context */
+{
+  if (context_p->u.allocated_buffer_p != NULL)
+  {
+    parser_free_local (context_p->u.allocated_buffer_p,
+                       context_p->allocated_buffer_size);
+    context_p->u.allocated_buffer_p = NULL;
+  }
+} /* parser_free_allocated_buffer */
 
 /* Parser byte stream. */
 

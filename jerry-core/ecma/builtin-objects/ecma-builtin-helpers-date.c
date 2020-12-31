@@ -567,22 +567,6 @@ ecma_date_time_clip (ecma_number_t time) /**< time value */
 } /* ecma_date_time_clip */
 
 /**
- * Helper function to calculate timezone offset.
- *
- * See also:
- *          ECMA-262 v5, 15.9.5.26
- *
- * @return timezone offset
- */
-inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE
-ecma_date_timezone_offset (ecma_number_t time) /**< time value */
-{
-  JERRY_ASSERT (!ecma_number_is_nan (time));
-
-  return (-ecma_date_local_time_zone_adjustment (time)) / ECMA_DATE_MS_PER_MINUTE;
-} /* ecma_date_timezone_offset */
-
-/**
  * Common function to convert date to string.
  *
  * @return ecma value

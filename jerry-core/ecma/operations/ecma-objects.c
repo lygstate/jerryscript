@@ -2998,21 +2998,6 @@ ecma_op_invoke_by_symbol_id (ecma_value_t object, /**< Object value */
 #endif /* ENABLED (JERRY_ESNEXT) */
 
 /**
- * 7.3.18 Abstract operation Invoke when property name is a magic string
- *
- * @return ecma_value result of the invoked function or raised error
- *         note: returned value must be freed with ecma_free_value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_invoke_by_magic_id (ecma_value_t object, /**< Object value */
-                            lit_magic_string_id_t magic_string_id, /**< Magic string ID */
-                            ecma_value_t *args_p, /**< Argument list */
-                            uint32_t args_len) /**< Argument list length */
-{
-  return ecma_op_invoke (object, ecma_get_magic_string (magic_string_id), args_p, args_len);
-} /* ecma_op_invoke_by_magic_id */
-
-/**
  * 7.3.18 Abstract operation Invoke
  *
  * @return ecma_value result of the invoked function or raised error

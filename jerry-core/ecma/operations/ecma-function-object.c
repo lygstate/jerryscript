@@ -242,23 +242,6 @@ ecma_object_check_constructor (ecma_object_t *obj_p) /**< ecma object */
 } /* ecma_object_check_constructor */
 
 /**
- * Implement IsConstructor abstract operation.
- *
- * @return ECMA_IS_VALID_CONSTRUCTOR - if the input value is a constructor.
- *         any other value - if the input value is not a valid constructor, the pointer contains the error message.
- */
-inline char *JERRY_ATTR_ALWAYS_INLINE
-ecma_check_constructor (ecma_value_t value) /**< ecma object */
-{
-  if (!ecma_is_value_object (value))
-  {
-    return ECMA_ERR_MSG ("Invalid type for constructor call.");
-  }
-
-  return ecma_object_check_constructor (ecma_get_object_from_value (value));
-} /* ecma_check_constructor */
-
-/**
  * Checks whether the given object implements [[Construct]].
  *
  * @return true - if the given object is constructor;
