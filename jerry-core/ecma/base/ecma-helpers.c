@@ -1083,20 +1083,6 @@ ecma_create_error_reference_from_context (void)
 } /* ecma_create_error_reference_from_context */
 
 /**
- * Create an error reference from a given object.
- *
- * Note:
- *   Reference of the value is taken.
- *
- * @return error reference value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_create_error_object_reference (ecma_object_t *object_p) /**< referenced object */
-{
-  return ecma_create_error_reference (ecma_make_object_value (object_p), true);
-} /* ecma_create_error_object_reference */
-
-/**
  * Raise error from the given error reference.
  *
  * Note: the error reference's ref count is also decreased
