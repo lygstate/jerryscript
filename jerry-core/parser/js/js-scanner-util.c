@@ -266,58 +266,6 @@ scanner_insert_info_before (parser_context_t *context_p, /**< context */
 } /* scanner_insert_info_before */
 
 /**
- * Release the next scanner info.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_release_next (parser_context_t *context_p, /**< context */
-                      size_t size) /**< size of the memory block */
-{
-  scanner_info_t *next_p = context_p->next_scanner_info_p->next_p;
-
-  jmem_heap_free_block (context_p->next_scanner_info_p, size);
-  context_p->next_scanner_info_p = next_p;
-} /* scanner_release_next */
-
-/**
- * Set the active scanner info to the next scanner info.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_set_active (parser_context_t *context_p) /**< context */
-{
-  scanner_info_t *scanner_info_p = context_p->next_scanner_info_p;
-
-  context_p->next_scanner_info_p = scanner_info_p->next_p;
-  scanner_info_p->next_p = context_p->active_scanner_info_p;
-  context_p->active_scanner_info_p = scanner_info_p;
-} /* scanner_set_active */
-
-/**
- * Set the next scanner info to the active scanner info.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_revert_active (parser_context_t *context_p) /**< context */
-{
-  scanner_info_t *scanner_info_p = context_p->active_scanner_info_p;
-
-  context_p->active_scanner_info_p = scanner_info_p->next_p;
-  scanner_info_p->next_p = context_p->next_scanner_info_p;
-  context_p->next_scanner_info_p = scanner_info_p;
-} /* scanner_revert_active */
-
-/**
- * Release the active scanner info.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_release_active (parser_context_t *context_p, /**< context */
-                        size_t size) /**< size of the memory block */
-{
-  scanner_info_t *next_p = context_p->active_scanner_info_p->next_p;
-
-  jmem_heap_free_block (context_p->active_scanner_info_p, size);
-  context_p->active_scanner_info_p = next_p;
-} /* scanner_release_active */
-
-/**
  * Release switch cases.
  */
 void
