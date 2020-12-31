@@ -1209,7 +1209,22 @@ ecma_char_t ecma_string_get_char_at_pos (const ecma_string_t *string_p, lit_utf8
 
 lit_magic_string_id_t ecma_get_string_magic (const ecma_string_t *string_p);
 
-lit_string_hash_t ecma_string_hash (const ecma_string_t *string_p);
+/**
+ * Try to calculate hash of the ecma-string
+ *
+ * @return calculated hash
+ */
+inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
+ecma_string_hash (const ecma_string_t *string_p) /**< ecma-string to calculate hash for */
+{
+  if (ECMA_IS_DIRECT_STRING (string_p))
+  {
+    return (lit_string_hash_t) ECMA_GET_DIRECT_STRING_VALUE (string_p);
+  }
+
+  return (lit_string_hash_t) string_p->u.hash;
+} /* ecma_string_hash */
+
 ecma_string_t *ecma_string_substr (const ecma_string_t *string_p, lit_utf8_size_t start_pos, lit_utf8_size_t end_pos);
 const lit_utf8_byte_t *ecma_string_trim_front (const lit_utf8_byte_t *start_p, const lit_utf8_byte_t *end_p);
 const lit_utf8_byte_t *ecma_string_trim_back (const lit_utf8_byte_t *start_p, const lit_utf8_byte_t *end_p);

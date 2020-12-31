@@ -2197,22 +2197,6 @@ ecma_get_string_magic (const ecma_string_t *string_p) /**< ecma-string */
 } /* ecma_get_string_magic */
 
 /**
- * Try to calculate hash of the ecma-string
- *
- * @return calculated hash
- */
-inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
-ecma_string_hash (const ecma_string_t *string_p) /**< ecma-string to calculate hash for */
-{
-  if (ECMA_IS_DIRECT_STRING (string_p))
-  {
-    return (lit_string_hash_t) ECMA_GET_DIRECT_STRING_VALUE (string_p);
-  }
-
-  return (lit_string_hash_t) string_p->u.hash;
-} /* ecma_string_hash */
-
-/**
  * Create a substring from an ecma string
  *
  * @return a newly consturcted ecma string with its value initialized to a copy of a substring of the first argument
