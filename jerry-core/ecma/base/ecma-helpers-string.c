@@ -1706,7 +1706,7 @@ ecma_compare_get_string_chars (const ecma_string_t *string_p, /**< ecma-string *
  * @return true - if strings are equal;
  *         false - otherwise
  */
-static bool JERRY_ATTR_NOINLINE
+bool JERRY_ATTR_NOINLINE
 ecma_compare_ecma_strings_longpath (const ecma_string_t *string1_p, /**< ecma-string */
                                     const ecma_string_t *string2_p) /**< ecma-string */
 {
@@ -1729,76 +1729,6 @@ ecma_compare_ecma_strings_longpath (const ecma_string_t *string1_p, /**< ecma-st
 
   return !memcmp ((char *) utf8_string1_p, (char *) utf8_string2_p, string1_size_and_length[0]);
 } /* ecma_compare_ecma_strings_longpath */
-
-/**
- * Compare two ecma-strings
- *
- * @return true - if strings are equal;
- *         false - otherwise
- */
-extern inline bool JERRY_ATTR_ALWAYS_INLINE
-ecma_compare_ecma_strings (const ecma_string_t *string1_p, /**< ecma-string */
-                           const ecma_string_t *string2_p) /**< ecma-string */
-{
-  JERRY_ASSERT (string1_p != NULL && string2_p != NULL);
-
-  /* Fast paths first. */
-  if (string1_p == string2_p)
-  {
-    return true;
-  }
-
-  /* Either string is direct, return with false. */
-  if (ECMA_IS_DIRECT_STRING (((uintptr_t) string1_p) | ((uintptr_t) string2_p)))
-  {
-    return false;
-  }
-
-  /* Also compares uint32 values in descriptor. */
-  if (string1_p->u.hash != string2_p->u.hash)
-  {
-    return false;
-  }
-
-  if (ECMA_STRING_GET_CONTAINER (string1_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC)
-  {
-    return ECMA_STRING_GET_CONTAINER (string2_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC;
-  }
-
-  return ecma_compare_ecma_strings_longpath (string1_p, string2_p);
-} /* ecma_compare_ecma_strings */
-
-/**
- * Compare two non-direct ecma-strings
- *
- * @return true - if strings are equal;
- *         false - otherwise
- */
-inline bool JERRY_ATTR_ALWAYS_INLINE
-ecma_compare_ecma_non_direct_strings (const ecma_string_t *string1_p, /**< ecma-string */
-                                      const ecma_string_t *string2_p) /**< ecma-string */
-{
-  JERRY_ASSERT (string1_p != NULL && string2_p != NULL);
-  JERRY_ASSERT (!ECMA_IS_DIRECT_STRING (string1_p) && !ECMA_IS_DIRECT_STRING (string2_p));
-
-  /* Fast paths first. */
-  if (string1_p == string2_p)
-  {
-    return true;
-  }
-
-  if (string1_p->u.hash != string2_p->u.hash)
-  {
-    return false;
-  }
-
-  if (ECMA_STRING_GET_CONTAINER (string1_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC)
-  {
-    return ECMA_STRING_GET_CONTAINER (string2_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC;
-  }
-
-  return ecma_compare_ecma_strings_longpath (string1_p, string2_p);
-} /* ecma_compare_ecma_non_direct_strings */
 
 /**
  * Relational compare of ecma-strings.
