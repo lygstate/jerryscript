@@ -687,7 +687,18 @@ void parser_stack_push_uint16 (parser_context_t *context_p, uint16_t uint16_valu
 uint16_t parser_stack_pop_uint16 (parser_context_t *context_p);
 void parser_stack_push (parser_context_t *context_p, const void *data_p, uint32_t length);
 void parser_stack_pop (parser_context_t *context_p, void *data_p, uint32_t length);
-void parser_stack_iterator_init (parser_context_t *context_p, parser_stack_iterator_t *iterator);
+
+/**
+ * Initialize stack iterator.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+parser_stack_iterator_init (parser_context_t *context_p, /**< context */
+                            parser_stack_iterator_t *iterator) /**< iterator */
+{
+  iterator->current_p = context_p->stack.first_p;
+  iterator->current_position = context_p->stack.last_position;
+} /* parser_stack_iterator_init */
+
 uint8_t parser_stack_iterator_read_uint8 (parser_stack_iterator_t *iterator);
 void parser_stack_iterator_skip (parser_stack_iterator_t *iterator, size_t length);
 void parser_stack_iterator_read (parser_stack_iterator_t *iterator, void *data_p, size_t length);
