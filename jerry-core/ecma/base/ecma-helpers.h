@@ -965,7 +965,21 @@ void ecma_set_named_accessor_property_getter (ecma_object_t *object_p, ecma_prop
                                               ecma_object_t *getter_p);
 void ecma_set_named_accessor_property_setter (ecma_object_t *object_p, ecma_property_value_t *prop_value_p,
                                               ecma_object_t *setter_p);
-bool ecma_is_property_writable (ecma_property_t property);
+/**
+ * Get property's 'Writable' attribute value
+ *
+ * @return true - property is writable,
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_is_property_writable (ecma_property_t property) /**< property */
+{
+  JERRY_ASSERT (ECMA_PROPERTY_GET_TYPE (property) == ECMA_PROPERTY_TYPE_NAMEDDATA
+                || ECMA_PROPERTY_GET_TYPE (property) == ECMA_PROPERTY_TYPE_VIRTUAL);
+
+  return (property & ECMA_PROPERTY_FLAG_WRITABLE) != 0;
+} /* ecma_is_property_writable */
+
 void ecma_set_property_writable_attr (ecma_property_t *property_p, bool is_writable);
 bool ecma_is_property_enumerable (ecma_property_t property);
 void ecma_set_property_enumerable_attr (ecma_property_t *property_p, bool is_enumerable);
