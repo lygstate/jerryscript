@@ -146,8 +146,43 @@ ecma_collection_t *ecma_op_object_own_property_keys (ecma_object_t *obj_p);
 ecma_collection_t *ecma_op_object_enumerate (ecma_object_t *obj_p);
 
 lit_magic_string_id_t ecma_object_get_class_name (ecma_object_t *obj_p);
-bool ecma_object_class_is (ecma_object_t *object_p, uint32_t class_id);
-bool ecma_object_is_regexp_object (ecma_value_t arg);
+
+/**
+ * Get value of an object if the class matches
+ *
+ * @return value of the object if the class matches
+ *         ECMA_VALUE_NOT_FOUND otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_object_class_is (ecma_object_t *object_p, /**< object */
+                      uint32_t class_id) /**< class id */
+{
+  if (ecma_get_object_type (object_p) == ECMA_OBJECT_TYPE_CLASS)
+  {
+    ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) object_p;
+
+    if (ext_object_p->u.class_prop.class_id == class_id)
+    {
+      return true;
+    }
+  }
+
+  return false;
+} /* ecma_object_class_is */
+
+/**
+ * Checks if the given argument has [[RegExpMatcher]] internal slot
+ *
+ * @return true - if the given argument is a regexp
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_object_is_regexp_object (ecma_value_t arg) /**< argument */
+{
+  return (ecma_is_value_object (arg)
+          && ecma_object_class_is (ecma_get_object_from_value (arg), LIT_MAGIC_STRING_REGEXP_UL));
+} /* ecma_object_is_regexp_object */
+
 ecma_value_t ecma_op_invoke (ecma_value_t object, ecma_string_t *property_name_p, ecma_value_t *args_p,
                              uint32_t args_len);
 
