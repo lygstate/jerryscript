@@ -1018,11 +1018,82 @@ const lit_utf8_byte_t *ecma_string_get_chars (const ecma_string_t *string_p,
                                               lit_utf8_size_t *length_p,
                                               lit_utf8_byte_t *uint32_buff_p,
                                               uint8_t *flags_p);
-bool ecma_compare_ecma_string_to_magic_id (const ecma_string_t *string_p, lit_magic_string_id_t id);
-bool ecma_string_is_empty (const ecma_string_t *string_p);
-bool ecma_string_is_length (const ecma_string_t *string_p);
 
-jmem_cpointer_t ecma_string_to_property_name (ecma_string_t *prop_name_p, ecma_property_t *name_type_p);
+/**
+ * Checks whether the string equals to the magic string id.
+ *
+ * @return true - if the string equals to the magic string id
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_compare_ecma_string_to_magic_id (const ecma_string_t *string_p, /**< property name */
+                                      lit_magic_string_id_t id) /**< magic string id */
+{
+  return (string_p == ecma_get_magic_string (id));
+} /* ecma_compare_ecma_string_to_magic_id */
+
+/**
+ * Checks whether ecma string is empty or not
+ *
+ * @return true - if the string is an empty string
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_string_is_empty (const ecma_string_t *string_p) /**< ecma-string */
+{
+  return ecma_compare_ecma_string_to_magic_id (string_p, LIT_MAGIC_STRING__EMPTY);
+} /* ecma_string_is_empty */
+
+/**
+ * Checks whether the string equals to "length".
+ *
+ * @return true - if the string equals to "length"
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_string_is_length (const ecma_string_t *string_p) /**< property name */
+{
+  return ecma_compare_ecma_string_to_magic_id (string_p, LIT_MAGIC_STRING_LENGTH);
+} /* ecma_string_is_length */
+
+/**
+ * Converts a property name into a string
+ *
+ * @return pointer to the converted ecma string
+ */
+static inline ecma_string_t * JERRY_ATTR_ALWAYS_INLINE
+ecma_property_to_string (ecma_property_t property, /**< property name type */
+                         jmem_cpointer_t prop_name_cp) /**< property name compressed pointer */
+{
+  uintptr_t property_string = ((uintptr_t) (property)) & (0x3 << ECMA_PROPERTY_NAME_TYPE_SHIFT);
+  property_string = (property_string >> ECMA_STRING_TYPE_CONVERSION_SHIFT) | ECMA_TYPE_DIRECT_STRING;
+  return (ecma_string_t *) (property_string | (((uintptr_t) prop_name_cp) << ECMA_DIRECT_STRING_SHIFT));
+} /* ecma_property_to_string */
+
+/**
+ * Converts a string into a property name
+ *
+ * @return the compressed pointer part of the name
+ */
+inline jmem_cpointer_t JERRY_ATTR_ALWAYS_INLINE
+ecma_string_to_property_name (ecma_string_t *prop_name_p, /**< property name */
+                              ecma_property_t *name_type_p) /**< [out] property name type */
+{
+  if (ECMA_IS_DIRECT_STRING (prop_name_p))
+  {
+    *name_type_p = (ecma_property_t) ECMA_DIRECT_STRING_TYPE_TO_PROP_NAME_TYPE (prop_name_p);
+    return (jmem_cpointer_t) ECMA_GET_DIRECT_STRING_VALUE (prop_name_p);
+  }
+
+  *name_type_p = ECMA_DIRECT_STRING_PTR << ECMA_PROPERTY_NAME_TYPE_SHIFT;
+
+  ecma_ref_ecma_string (prop_name_p);
+
+  jmem_cpointer_t prop_name_cp;
+  ECMA_SET_NON_NULL_POINTER (prop_name_cp, prop_name_p);
+  return prop_name_cp;
+} /* ecma_string_to_property_name */
+
 ecma_string_t *ecma_string_from_property_name (ecma_property_t property, jmem_cpointer_t prop_name_cp);
 lit_string_hash_t ecma_string_get_property_name_hash (ecma_property_t property, jmem_cpointer_t prop_name_cp);
 uint32_t ecma_string_get_property_index (ecma_property_t property, jmem_cpointer_t prop_name_cp);
