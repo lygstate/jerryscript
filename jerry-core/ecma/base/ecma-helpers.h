@@ -222,7 +222,7 @@ typedef enum
  *
  * @return type field
  */
-extern inline ecma_type_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+inline ecma_type_t JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_get_value_type_field (ecma_value_t value) /**< ecma value */
 {
   return value & ECMA_VALUE_TYPE_MASK;
@@ -233,7 +233,7 @@ ecma_get_value_type_field (ecma_value_t value) /**< ecma value */
  *
  * @return ecma value
  */
-static inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+inline ecma_value_t JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
 ecma_pointer_to_ecma_value (const void *ptr) /**< pointer */
 {
 #ifdef ECMA_VALUE_CAN_STORE_UINTPTR_VALUE_DIRECTLY
@@ -257,7 +257,7 @@ ecma_pointer_to_ecma_value (const void *ptr) /**< pointer */
  *
  * @return pointer
  */
-static inline void * JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+inline void * JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
 ecma_get_pointer_from_ecma_value (ecma_value_t value) /**< value */
 {
 #ifdef ECMA_VALUE_CAN_STORE_UINTPTR_VALUE_DIRECTLY
@@ -299,7 +299,7 @@ ecma_is_value_simple (ecma_value_t value) /**< ecma value */
  * @return true - if the value is equal to the given simple value,
  *         false - otherwise
  */
-static inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_equal_to_simple_value (ecma_value_t value, /**< ecma value */
                                      ecma_value_t simple_value) /**< simple value */
 {
@@ -448,7 +448,7 @@ ecma_is_value_float_number (ecma_value_t value) /**< ecma value */
  * @return true - if the value contains ecma-number value,
  *         false - otherwise
  */
-extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_number (ecma_value_t value) /**< ecma value */
 {
   return (ecma_is_value_integer_number (value)
@@ -464,7 +464,7 @@ JERRY_STATIC_ASSERT ((ECMA_TYPE_STRING | 0x4) == ECMA_TYPE_DIRECT_STRING,
  * @return true - if the value contains ecma-string value,
  *         false - otherwise
  */
-extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
+inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_string (ecma_value_t value) /**< ecma value */
 {
   return ((value & (ECMA_VALUE_TYPE_MASK - 0x4)) == ECMA_TYPE_STRING);
