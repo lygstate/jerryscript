@@ -20,6 +20,9 @@
 #include "ecma-builtins.h"
 
 #if ENABLED (JERRY_BUILTIN_TYPEDARRAY)
+extern const ecma_typedarray_getter_fn_t ecma_typedarray_getters[];
+extern const ecma_typedarray_setter_fn_t ecma_typedarray_setters[];
+extern const uint8_t ecma_typedarray_element_shift_sizes[];
 
 /** \addtogroup ecma ECMA
  * @{
@@ -28,14 +31,62 @@
  * @{
  */
 
-uint8_t ecma_typedarray_helper_get_shift_size (ecma_typedarray_type_t typedarray_id);
-ecma_typedarray_getter_fn_t ecma_get_typedarray_getter_fn (ecma_typedarray_type_t typedarray_id);
-ecma_typedarray_setter_fn_t ecma_get_typedarray_setter_fn (ecma_typedarray_type_t typedarray_id);
-ecma_value_t ecma_get_typedarray_element (lit_utf8_byte_t *src_p,
-                                          ecma_typedarray_type_t typedarray_id);
-ecma_value_t ecma_set_typedarray_element (lit_utf8_byte_t *dst_p,
-                                          ecma_value_t value,
-                                          ecma_typedarray_type_t typedarray_id);
+/**
+ * Get typedarray's getter function callback
+ *
+ * @return ecma_typedarray_getter_fn_t: the getter function for the given builtin TypedArray id
+ */
+inline ecma_typedarray_getter_fn_t JERRY_ATTR_ALWAYS_INLINE
+ecma_get_typedarray_getter_fn (ecma_typedarray_type_t typedarray_id)
+{
+  return ecma_typedarray_getters[typedarray_id];
+} /* ecma_get_typedarray_getter_fn */
+
+/**
+ * get typedarray's element value
+ *
+ * @return ecma_number_t: the value of the element
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_get_typedarray_element (lit_utf8_byte_t *src_p,
+                             ecma_typedarray_type_t typedarray_id)
+{
+  return ecma_typedarray_getters[typedarray_id](src_p);
+} /* ecma_get_typedarray_element */
+
+/**
+ * Get typedarray's setter function callback
+ *
+ * @return ecma_typedarray_setter_fn_t: the setter function for the given builtin TypedArray id
+ */
+inline ecma_typedarray_setter_fn_t JERRY_ATTR_ALWAYS_INLINE
+ecma_get_typedarray_setter_fn (ecma_typedarray_type_t typedarray_id)
+{
+  return ecma_typedarray_setters[typedarray_id];
+} /* ecma_get_typedarray_setter_fn */
+
+/**
+ * set typedarray's element value
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_set_typedarray_element (lit_utf8_byte_t *dst_p,
+                             ecma_value_t value,
+                             ecma_typedarray_type_t typedarray_id)
+{
+  return ecma_typedarray_setters[typedarray_id](dst_p, value);
+} /* ecma_set_typedarray_element */
+
+/**
+ * Get the element shift size of a TypedArray type.
+ *
+ * @return uint8_t
+ */
+inline uint8_t JERRY_ATTR_ALWAYS_INLINE
+ecma_typedarray_helper_get_shift_size (ecma_typedarray_type_t typedarray_id)
+{
+  return ecma_typedarray_element_shift_sizes[typedarray_id];
+} /* ecma_typedarray_helper_get_shift_size */
+
 bool ecma_typedarray_helper_is_typedarray (ecma_builtin_id_t builtin_id);
 ecma_typedarray_type_t ecma_get_typedarray_id (ecma_object_t *obj_p);
 ecma_builtin_id_t ecma_typedarray_helper_get_prototype_id (ecma_typedarray_type_t typedarray_id);

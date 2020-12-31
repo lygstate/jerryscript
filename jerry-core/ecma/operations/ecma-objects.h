@@ -18,6 +18,7 @@
 
 #include "ecma-builtins.h"
 #include "ecma-conversion.h"
+#include "ecma-proxy-object.h"
 #include "ecma-globals.h"
 
 /** \addtogroup ecma ECMA
@@ -91,15 +92,34 @@ ecma_collection_t *ecma_op_object_enumerate (ecma_object_t *obj_p);
 lit_magic_string_id_t ecma_object_get_class_name (ecma_object_t *obj_p);
 bool ecma_object_class_is (ecma_object_t *object_p, uint32_t class_id);
 bool ecma_object_is_regexp_object (ecma_value_t arg);
+ecma_value_t ecma_op_invoke (ecma_value_t object, ecma_string_t *property_name_p, ecma_value_t *args_p,
+                             uint32_t args_len);
+
 #if ENABLED (JERRY_ESNEXT)
 ecma_value_t ecma_op_is_concat_spreadable (ecma_value_t arg);
 ecma_value_t ecma_op_is_regexp (ecma_value_t arg);
 ecma_value_t ecma_op_species_constructor (ecma_object_t *this_value, ecma_builtin_id_t default_constructor_id);
-ecma_value_t ecma_op_invoke_by_symbol_id (ecma_value_t object, lit_magic_string_id_t magic_string_id,
-                                          ecma_value_t *args_p, uint32_t args_len);
+
+/**
+ * 7.3.18 Abstract operation Invoke when property name is a magic string
+ *
+ * @return ecma_value result of the invoked function or raised error
+ *         note: returned value must be freed with ecma_free_value
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_op_invoke_by_symbol_id (ecma_value_t object, /**< Object value */
+                             lit_magic_string_id_t symbol_id, /**< Symbol ID */
+                             ecma_value_t *args_p, /**< Argument list */
+                             uint32_t args_len) /**< Argument list length */
+{
+  ecma_string_t *symbol_p = ecma_op_get_global_symbol (symbol_id);
+  ecma_value_t ret_value = ecma_op_invoke (object, symbol_p, args_p, args_len);
+  ecma_deref_ecma_string (symbol_p);
+
+  return ret_value;
+} /* ecma_op_invoke_by_symbol_id */
+
 #endif /* ENABLED (JERRY_ESNEXT) */
-ecma_value_t ecma_op_invoke (ecma_value_t object, ecma_string_t *property_name_p, ecma_value_t *args_p,
-                             uint32_t args_len);
 
 /**
  * 7.3.18 Abstract operation Invoke when property name is a magic string

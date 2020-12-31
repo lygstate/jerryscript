@@ -32,9 +32,6 @@ ecma_op_create_symbol (const ecma_value_t *arguments_list_p, uint32_t arguments_
 ecma_value_t
 ecma_op_create_symbol_object (const ecma_value_t value);
 
-bool
-ecma_prop_name_is_symbol (ecma_string_t *string_p);
-
 ecma_value_t
 ecma_get_symbol_description (ecma_string_t *symbol_p);
 

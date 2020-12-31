@@ -97,8 +97,18 @@ void
 ecma_builtin_replace_substitute (ecma_replace_context_t *ctx_p);
 
 #if ENABLED (JERRY_ESNEXT)
-bool
-ecma_builtin_is_regexp_exec (ecma_extended_object_t *obj_p);
+/**
+ * Helper function to determine if method is the builtin exec method
+ *
+ * @return true, if function is the builtin exec method
+ *         false, otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_builtin_is_regexp_exec (ecma_extended_object_t *obj_p)
+{
+  return (ecma_get_object_is_builtin ((ecma_object_t *) obj_p)
+          && obj_p->u.built_in.routine_id == ECMA_REGEXP_PROTOTYPE_ROUTINE_EXEC);
+} /* ecma_builtin_is_regexp_exec */
 #endif /* ENABLED (JERRY_ESNEXT) */
 
 #if ENABLED (JERRY_BUILTIN_DATE)
