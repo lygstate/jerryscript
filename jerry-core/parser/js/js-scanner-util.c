@@ -1397,45 +1397,6 @@ scanner_add_custom_literal (parser_context_t *context_p, /**< context */
 } /* scanner_add_custom_literal */
 
 /**
- * Add the current literal token to the current literal pool.
- *
- * @return pointer to the literal
- */
-inline lexer_lit_location_t * JERRY_ATTR_ALWAYS_INLINE
-scanner_add_literal (parser_context_t *context_p, /**< context */
-                     scanner_context_t *scanner_context_p) /**< scanner context */
-{
-  return scanner_add_custom_literal (context_p,
-                                     scanner_context_p->active_literal_pool_p,
-                                     &context_p->token.lit_location);
-} /* scanner_add_literal */
-
-/**
- * Add the current literal token to the current literal pool and
- * set SCANNER_LITERAL_NO_REG if it is inside a with statement.
- *
- * @return pointer to the literal
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_add_reference (parser_context_t *context_p, /**< context */
-                       scanner_context_t *scanner_context_p) /**< scanner context */
-{
-  lexer_lit_location_t *lit_location_p = scanner_add_custom_literal (context_p,
-                                                                     scanner_context_p->active_literal_pool_p,
-                                                                     &context_p->token.lit_location);
-#if ENABLED (JERRY_ESNEXT)
-  lit_location_p->type |= SCANNER_LITERAL_IS_USED;
-#endif /* ENABLED (JERRY_ESNEXT) */
-
-  if (scanner_context_p->active_literal_pool_p->status_flags & SCANNER_LITERAL_POOL_IN_WITH)
-  {
-    lit_location_p->type |= SCANNER_LITERAL_NO_REG;
-  }
-
-  scanner_detect_eval_call (context_p, scanner_context_p);
-} /* scanner_add_reference */
-
-/**
  * Append an argument to the literal pool. If the argument is already present, make it a "hole".
  *
  * @return newly created literal

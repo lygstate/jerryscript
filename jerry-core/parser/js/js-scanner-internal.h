@@ -408,15 +408,54 @@ void scanner_construct_global_block (parser_context_t *context_p, scanner_contex
 #endif /* ENABLED (JERRY_ESNEXT) */
 lexer_lit_location_t *scanner_add_custom_literal (parser_context_t *context_p, scanner_literal_pool_t *literal_pool_p,
                                                   const lexer_lit_location_t *literal_location_p);
-lexer_lit_location_t *scanner_add_literal (parser_context_t *context_p, scanner_context_t *scanner_context_p);
-void scanner_add_reference (parser_context_t *context_p, scanner_context_t *scanner_context_p);
+
+void scanner_detect_eval_call (parser_context_t *context_p, scanner_context_t *scanner_context_p);
+
+/**
+ * Add the current literal token to the current literal pool.
+ *
+ * @return pointer to the literal
+ */
+inline lexer_lit_location_t * JERRY_ATTR_ALWAYS_INLINE
+scanner_add_literal (parser_context_t *context_p, /**< context */
+                     scanner_context_t *scanner_context_p) /**< scanner context */
+{
+  return scanner_add_custom_literal (context_p,
+                                     scanner_context_p->active_literal_pool_p,
+                                     &context_p->token.lit_location);
+} /* scanner_add_literal */
+
+/**
+ * Add the current literal token to the current literal pool and
+ * set SCANNER_LITERAL_NO_REG if it is inside a with statement.
+ *
+ * @return pointer to the literal
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+scanner_add_reference (parser_context_t *context_p, /**< context */
+                       scanner_context_t *scanner_context_p) /**< scanner context */
+{
+  lexer_lit_location_t *lit_location_p = scanner_add_custom_literal (context_p,
+                                                                     scanner_context_p->active_literal_pool_p,
+                                                                     &context_p->token.lit_location);
+#if ENABLED (JERRY_ESNEXT)
+  lit_location_p->type |= SCANNER_LITERAL_IS_USED;
+#endif /* ENABLED (JERRY_ESNEXT) */
+
+  if (scanner_context_p->active_literal_pool_p->status_flags & SCANNER_LITERAL_POOL_IN_WITH)
+  {
+    lit_location_p->type |= SCANNER_LITERAL_NO_REG;
+  }
+
+  scanner_detect_eval_call (context_p, scanner_context_p);
+} /* scanner_add_reference */
+
 lexer_lit_location_t *scanner_append_argument (parser_context_t *context_p, scanner_context_t *scanner_context_p);
 #if ENABLED (JERRY_ESNEXT)
 void scanner_detect_invalid_var (parser_context_t *context_p, scanner_context_t *scanner_context_p,
                                  lexer_lit_location_t *var_literal_p);
 void scanner_detect_invalid_let (parser_context_t *context_p, lexer_lit_location_t *let_literal_p);
 #endif /* ENABLED (JERRY_ESNEXT) */
-void scanner_detect_eval_call (parser_context_t *context_p, scanner_context_t *scanner_context_p);
 
 #if ENABLED (JERRY_ESNEXT)
 lexer_lit_location_t *scanner_push_class_declaration (parser_context_t *context_p,
