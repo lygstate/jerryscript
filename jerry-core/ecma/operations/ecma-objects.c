@@ -2964,7 +2964,7 @@ ecma_op_invoke (ecma_value_t object, /**< Object value */
  * @return ECMA_VALUE_FALSE - if the operation fails
  *         ECMA_VALUE_TRUE - otherwise
  */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_value_t
 ecma_op_ordinary_object_set_prototype_of (ecma_object_t *obj_p, /**< base object */
                                           ecma_value_t proto) /**< prototype object */
 {
