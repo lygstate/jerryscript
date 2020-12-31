@@ -142,7 +142,7 @@ ecma_ref_object (ecma_object_t *object_p) /**< object */
 /**
  * Decrease reference counter of an object
  */
-inline void JERRY_ATTR_ALWAYS_INLINE
+void
 ecma_deref_object (ecma_object_t *object_p) /**< object */
 {
   JERRY_ASSERT (object_p->type_flags_refs >= ECMA_OBJECT_REF_ONE);
