@@ -318,63 +318,6 @@ ecma_copy_value (ecma_value_t value)  /**< value description */
 } /* ecma_copy_value */
 
 /**
- * Copy ecma value.
- *
- * Note:
- *   this function is similar to ecma_copy_value, but it is
- *   faster for direct values since no function call is performed.
- *   It also increases the binary size so it is recommended for
- *   critical code paths only.
- *
- * @return copy of the given value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_fast_copy_value (ecma_value_t value)  /**< value description */
-{
-  return (ecma_get_value_type_field (value) == ECMA_TYPE_DIRECT) ? value : ecma_copy_value (value);
-} /* ecma_fast_copy_value */
-
-/**
- * Copy the ecma value if not an object
- *
- * @return copy of the given value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_copy_value_if_not_object (ecma_value_t value) /**< value description */
-{
-  if (!ecma_is_value_object (value))
-  {
-    return ecma_copy_value (value);
-  }
-
-  return value;
-} /* ecma_copy_value_if_not_object */
-
-/**
- * Increase reference counter of a value if it is an object.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_ref_if_object (ecma_value_t value) /**< value description */
-{
-  if (ecma_is_value_object (value))
-  {
-    ecma_ref_object (ecma_get_object_from_value (value));
-  }
-} /* ecma_ref_if_object */
-
-/**
- * Decrease reference counter of a value if it is an object.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_deref_if_object (ecma_value_t value) /**< value description */
-{
-  if (ecma_is_value_object (value))
-  {
-    ecma_deref_object (ecma_get_object_from_value (value));
-  }
-} /* ecma_deref_if_object */
-
-/**
  * Assign a new value to an ecma-value
  *
  * Note:
