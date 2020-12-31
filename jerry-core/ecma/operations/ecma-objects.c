@@ -379,46 +379,6 @@ ecma_op_object_get_own_property (ecma_object_t *object_p, /**< the object */
 } /* ecma_op_object_get_own_property */
 
 /**
- * Generic [[HasProperty]] operation
- *
- * See also:
- *          ECMAScript v6, 9.1.7.1
- *
- * @return ECMA_VALUE_ERROR - if the operation fails
- *         ECMA_VALUE_{TRUE_FALSE} - whether the property is found
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_object_has_property (ecma_object_t *object_p, /**< the object */
-                             ecma_string_t *property_name_p) /**< property name */
-{
-  while (true)
-  {
-#if ENABLED (JERRY_BUILTIN_PROXY)
-    if (ECMA_OBJECT_IS_PROXY (object_p))
-    {
-      return ecma_proxy_object_has (object_p, property_name_p);
-    }
-#endif /* ENABLED (JERRY_BUILTIN_PROXY) */
-
-    /* 2 - 3. */
-    if (ecma_op_ordinary_object_has_own_property (object_p, property_name_p))
-    {
-      return ECMA_VALUE_TRUE;
-    }
-
-    jmem_cpointer_t proto_cp = ecma_op_ordinary_object_get_prototype_of (object_p);
-
-    /* 7. */
-    if (proto_cp == JMEM_CP_NULL)
-    {
-      return ECMA_VALUE_FALSE;
-    }
-
-    object_p = ECMA_GET_NON_NULL_POINTER (ecma_object_t, proto_cp);
-  }
-} /* ecma_op_object_has_property */
-
-/**
  * Search the value corresponding to a property name
  *
  * Note: search includes prototypes
@@ -3030,23 +2990,6 @@ ecma_op_invoke (ecma_value_t object, /**< Object value */
 
   return call_result;
 } /* ecma_op_invoke */
-
-/**
- * Ordinary object [[GetPrototypeOf]] operation
- *
- * See also:
- *          ECMAScript v6, 9.1.1
- *
- * @return the value of the [[Prototype]] internal slot of the given object.
- */
-inline jmem_cpointer_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_ordinary_object_get_prototype_of (ecma_object_t *obj_p) /**< object */
-{
-  JERRY_ASSERT (!ecma_is_lexical_environment (obj_p));
-  JERRY_ASSERT (!ECMA_OBJECT_IS_PROXY (obj_p));
-
-  return obj_p->u2.prototype_cp;
-} /* ecma_op_ordinary_object_get_prototype_of */
 
 /**
  * Ordinary object [[SetPrototypeOf]] operation
