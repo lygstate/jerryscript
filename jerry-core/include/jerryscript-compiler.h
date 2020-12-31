@@ -31,7 +31,6 @@ extern "C"
  * Compiler-specific macros relevant for GCC.
  */
 #define JERRY_ATTR_ALIGNED(ALIGNMENT) __attribute__((aligned(ALIGNMENT)))
-#define JERRY_ATTR_ALWAYS_INLINE __attribute__((always_inline))
 #define JERRY_ATTR_CONST __attribute__((const))
 #define JERRY_ATTR_DEPRECATED __attribute__((deprecated))
 #define JERRY_ATTR_FORMAT(...) __attribute__((format(__VA_ARGS__)))
@@ -78,13 +77,6 @@ void * __cdecl _alloca (size_t _Size);
 #ifndef JERRY_ATTR_ALIGNED
 #define JERRY_ATTR_ALIGNED(ALIGNMENT)
 #endif /* !JERRY_ATTR_ALIGNED */
-
-/**
- * Function attribute to inline function to all call sites.
- */
-#ifndef JERRY_ATTR_ALWAYS_INLINE
-#define JERRY_ATTR_ALWAYS_INLINE
-#endif /* !JERRY_ATTR_ALWAYS_INLINE */
 
 /**
  * Function attribute to declare that function has no effect except the return
