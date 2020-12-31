@@ -876,9 +876,46 @@ void scanner_check_variables (parser_context_t *context_p);
 #endif /* ENABLED (JERRY_ESNEXT) */
 void scanner_create_variables (parser_context_t *context_p, uint32_t option_flags);
 
-void scanner_get_location (scanner_location_t *location_p, parser_context_t *context_p);
-void scanner_set_location (parser_context_t *context_p, scanner_location_t *location_p);
-uint16_t scanner_decode_map_to (parser_scope_stack_t *stack_item_p);
+/**
+ * Get location from context.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+scanner_get_location (scanner_location_t *location_p, /**< location */
+                      parser_context_t *context_p) /**< context */
+{
+  location_p->source_p = context_p->source_p;
+  location_p->line = context_p->line;
+  location_p->column = context_p->column;
+} /* scanner_get_location */
+
+/**
+ * Set context location.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+scanner_set_location (parser_context_t *context_p, /**< context */
+                      scanner_location_t *location_p) /**< location */
+{
+  context_p->source_p = location_p->source_p;
+  context_p->line = location_p->line;
+  context_p->column = location_p->column;
+} /* scanner_set_location */
+
+/**
+ * Get the real map_to value.
+ */
+inline uint16_t JERRY_ATTR_ALWAYS_INLINE
+scanner_decode_map_to (parser_scope_stack_t *stack_item_p) /**< scope stack item */
+{
+  JERRY_ASSERT (stack_item_p->map_from != PARSER_SCOPE_STACK_FUNC);
+
+#if ENABLED (JERRY_ESNEXT)
+  uint16_t value = (stack_item_p->map_to & PARSER_SCOPE_STACK_REGISTER_MASK);
+  return (value == 0) ? stack_item_p->map_from : (uint16_t) (value + (PARSER_REGISTER_START - 1));
+#else /* !ENABLED (JERRY_ESNEXT) */
+  return stack_item_p->map_to;
+#endif /* ENABLED (JERRY_ESNEXT) */
+} /* scanner_decode_map_to */
+
 #if ENABLED (JERRY_ESNEXT)
 uint16_t scanner_save_literal (parser_context_t *context_p, uint16_t ident_index);
 bool scanner_literal_is_const_reg (parser_context_t *context_p, uint16_t literal_index);
