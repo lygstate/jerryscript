@@ -935,8 +935,29 @@ void ecma_free_property (ecma_object_t *object_p, jmem_cpointer_t name_cp, ecma_
 
 void ecma_delete_property (ecma_object_t *object_p, ecma_property_value_t *prop_value_p);
 
-void ecma_named_data_property_assign_value (ecma_object_t *obj_p, ecma_property_value_t *prop_value_p,
-                                            ecma_value_t value);
+/**
+ * Check whether the object contains a property
+ */
+void
+ecma_assert_object_contains_the_property (const ecma_object_t *object_p, /**< ecma-object */
+                                          const ecma_property_value_t *prop_value_p, /**< property value */
+                                          ecma_property_types_t type); /**< expected property type */
+
+/**
+ * Assign value to named data property
+ *
+ * Note:
+ *      value previously stored in the property is freed
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_named_data_property_assign_value (ecma_object_t *obj_p, /**< object */
+                                       ecma_property_value_t *prop_value_p, /**< property value reference */
+                                       ecma_value_t value) /**< value to assign */
+{
+  ecma_assert_object_contains_the_property (obj_p, prop_value_p, ECMA_PROPERTY_TYPE_NAMEDDATA);
+
+  ecma_value_assign_value (&prop_value_p->value, value);
+} /* ecma_named_data_property_assign_value */
 
 ecma_getter_setter_pointers_t *
 ecma_get_named_accessor_property (const ecma_property_value_t *prop_value_p);
