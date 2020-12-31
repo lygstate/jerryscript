@@ -541,17 +541,6 @@ lit_cesu8_peek_prev (const lit_utf8_byte_t *buf_p) /**< [in,out] buffer with cha
 } /* lit_cesu8_peek_prev */
 
 /**
- * Increase cesu-8 encoded string pointer by one code unit.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-lit_utf8_incr (const lit_utf8_byte_t **buf_p) /**< [in,out] buffer with characters */
-{
-  JERRY_ASSERT (*buf_p);
-
-  *buf_p += lit_get_unicode_char_size_by_utf8_first_byte (**buf_p);
-} /* lit_utf8_incr */
-
-/**
  * Decrease cesu-8 encoded string pointer by one code unit.
  */
 void
