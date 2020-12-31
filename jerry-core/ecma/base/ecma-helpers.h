@@ -940,12 +940,6 @@ ecma_free_object (ecma_value_t value) /**< value description */
 } /* ecma_free_object */
 
 /**
- * Dealloc memory from an ecma-number
- */
-void
-ecma_dealloc_number (ecma_number_t *number_p); /**< number to be freed */
-
-/**
  * Free an ecma-value number
  */
 inline void JERRY_ATTR_ALWAYS_INLINE
