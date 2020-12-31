@@ -108,15 +108,34 @@ re_bytecode_size (re_compiler_ctx_t *re_ctx_p) /**< RegExp bytecode context */
   return (uint32_t) re_ctx_p->bytecode_size;
 } /* re_bytecode_size */
 
-void re_append_opcode (re_compiler_ctx_t *re_ctx_p, const re_opcode_t opcode);
 void re_append_byte (re_compiler_ctx_t *re_ctx_p, const uint8_t byte);
 void re_append_char (re_compiler_ctx_t *re_ctx_p, const lit_code_point_t cp);
 void re_append_value (re_compiler_ctx_t *re_ctx_p, const uint32_t value);
 
-void re_insert_opcode (re_compiler_ctx_t *re_ctx_p, const uint32_t offset, const re_opcode_t opcode);
 void re_insert_byte (re_compiler_ctx_t *re_ctx_p, const uint32_t offset, const uint8_t byte);
 void re_insert_char (re_compiler_ctx_t *re_ctx_p,  const uint32_t offset, const lit_code_point_t cp);
 void re_insert_value (re_compiler_ctx_t *re_ctx_p, const uint32_t offset, const uint32_t value);
+
+/**
+ * Append a RegExp opcode
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+re_append_opcode (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
+                  const re_opcode_t opcode) /**< input opcode */
+{
+  re_append_byte (re_ctx_p, (uint8_t) opcode);
+} /* re_append_opcode */
+
+/**
+ * Insert a RegExp opcode
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+re_insert_opcode (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
+                  const uint32_t offset, /**< distance from the start of the container */
+                  const re_opcode_t opcode) /**< input opcode */
+{
+  re_insert_byte (re_ctx_p, offset, (uint8_t) opcode);
+} /* re_insert_opcode */
 
 re_opcode_t re_get_opcode (const uint8_t **bc_p);
 uint8_t re_get_byte (const uint8_t **bc_p);

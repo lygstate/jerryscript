@@ -102,27 +102,6 @@ re_get_byte (const uint8_t **bc_p) /**< pointer to bytecode start */
 } /* re_get_byte */
 
 /**
- * Append a RegExp opcode
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-re_append_opcode (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
-                  const re_opcode_t opcode) /**< input opcode */
-{
-  re_append_byte (re_ctx_p, (uint8_t) opcode);
-} /* re_append_opcode */
-
-/**
- * Insert a RegExp opcode
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-re_insert_opcode (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
-                  const uint32_t offset, /**< distance from the start of the container */
-                  const re_opcode_t opcode) /**< input opcode */
-{
-  re_insert_byte (re_ctx_p, offset, (uint8_t) opcode);
-} /* re_insert_opcode */
-
-/**
  * Get a RegExp opcode and increase the bytecode position
  *
  * @return current RegExp opcode
