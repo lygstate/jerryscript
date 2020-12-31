@@ -1011,8 +1011,21 @@ ecma_substring_copy_to_utf8_buffer (const ecma_string_t *string_desc_p,
                                     lit_utf8_size_t end_pos,
                                     lit_utf8_byte_t *buffer_p,
                                     lit_utf8_size_t buffer_size);
-void ecma_string_to_utf8_bytes (const ecma_string_t *string_desc_p, lit_utf8_byte_t *buffer_p,
-                                lit_utf8_size_t buffer_size);
+/**
+ * Convert ecma-string's contents to a cesu-8 string and put it to the buffer.
+ * It is the caller's responsibility to make sure that the string fits in the buffer.
+ * Check if the size of the string is equal with the size of the buffer.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_string_to_utf8_bytes (const ecma_string_t *string_desc_p, /**< ecma-string descriptor */
+                           lit_utf8_byte_t *buffer_p, /**< destination buffer pointer
+                                                       * (can be NULL if buffer_size == 0) */
+                           lit_utf8_size_t buffer_size) /**< size of buffer */
+{
+  const lit_utf8_size_t size = ecma_string_copy_to_cesu8_buffer (string_desc_p, buffer_p, buffer_size);
+  JERRY_ASSERT (size == buffer_size);
+} /* ecma_string_to_utf8_bytes */
+
 const lit_utf8_byte_t *ecma_string_get_chars (const ecma_string_t *string_p,
                                               lit_utf8_size_t *size_p,
                                               lit_utf8_size_t *length_p,
