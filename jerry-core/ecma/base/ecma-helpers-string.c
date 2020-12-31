@@ -1589,24 +1589,6 @@ ecma_string_from_property_name (ecma_property_t property, /**< property name typ
 } /* ecma_string_from_property_name */
 
 /**
- * Get hash code of property name
- *
- * @return hash code of property name
- */
-inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
-ecma_string_get_property_name_hash (ecma_property_t property, /**< property name type */
-                                    jmem_cpointer_t prop_name_cp) /**< property name compressed pointer */
-{
-  if (ECMA_PROPERTY_GET_NAME_TYPE (property) == ECMA_DIRECT_STRING_PTR)
-  {
-    ecma_string_t *prop_name_p = ECMA_GET_NON_NULL_POINTER (ecma_string_t, prop_name_cp);
-    return prop_name_p->u.hash;
-  }
-
-  return (lit_string_hash_t) prop_name_cp;
-} /* ecma_string_get_property_name_hash */
-
-/**
  * Check if property name is array index.
  *
  * @return ECMA_STRING_NOT_ARRAY_INDEX if string is not array index

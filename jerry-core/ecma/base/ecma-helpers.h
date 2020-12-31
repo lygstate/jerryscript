@@ -1095,7 +1095,25 @@ ecma_string_to_property_name (ecma_string_t *prop_name_p, /**< property name */
 } /* ecma_string_to_property_name */
 
 ecma_string_t *ecma_string_from_property_name (ecma_property_t property, jmem_cpointer_t prop_name_cp);
-lit_string_hash_t ecma_string_get_property_name_hash (ecma_property_t property, jmem_cpointer_t prop_name_cp);
+
+/**
+ * Get hash code of property name
+ *
+ * @return hash code of property name
+ */
+inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
+ecma_string_get_property_name_hash (ecma_property_t property, /**< property name type */
+                                    jmem_cpointer_t prop_name_cp) /**< property name compressed pointer */
+{
+  if (ECMA_PROPERTY_GET_NAME_TYPE (property) == ECMA_DIRECT_STRING_PTR)
+  {
+    ecma_string_t *prop_name_p = ECMA_GET_NON_NULL_POINTER (ecma_string_t, prop_name_cp);
+    return prop_name_p->u.hash;
+  }
+
+  return (lit_string_hash_t) prop_name_cp;
+} /* ecma_string_get_property_name_hash */
+
 uint32_t ecma_string_get_property_index (ecma_property_t property, jmem_cpointer_t prop_name_cp);
 bool ecma_string_compare_to_property_name (ecma_property_t property, jmem_cpointer_t prop_name_cp,
                                            const ecma_string_t *string_p);
