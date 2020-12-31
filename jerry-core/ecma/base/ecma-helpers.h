@@ -1118,7 +1118,7 @@ ecma_compare_ecma_strings_longpath (const ecma_string_t *string1_p, /**< ecma-st
  * @return true - if strings are equal;
  *         false - otherwise
  */
-extern inline bool JERRY_ATTR_ALWAYS_INLINE
+inline bool JERRY_ATTR_ALWAYS_INLINE
 ecma_compare_ecma_strings (const ecma_string_t *string1_p, /**< ecma-string */
                            const ecma_string_t *string2_p) /**< ecma-string */
 {
