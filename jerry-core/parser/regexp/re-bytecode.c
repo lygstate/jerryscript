@@ -38,12 +38,6 @@ re_initialize_regexp_bytecode (re_compiler_ctx_t *re_ctx_p) /**< RegExp bytecode
   re_ctx_p->bytecode_size = initial_size;
 } /* re_initialize_regexp_bytecode */
 
-inline uint32_t JERRY_ATTR_ALWAYS_INLINE
-re_bytecode_size (re_compiler_ctx_t *re_ctx_p) /**< RegExp bytecode context */
-{
-  return (uint32_t) re_ctx_p->bytecode_size;
-} /* re_bytecode_size */
-
 /**
  * Append a new bytecode to the and of the bytecode container
  */

@@ -101,7 +101,12 @@ typedef struct
 } re_compiled_code_t;
 
 void re_initialize_regexp_bytecode (re_compiler_ctx_t *re_ctx_p);
-uint32_t re_bytecode_size (re_compiler_ctx_t *re_ctx_p);
+
+inline uint32_t JERRY_ATTR_ALWAYS_INLINE
+re_bytecode_size (re_compiler_ctx_t *re_ctx_p) /**< RegExp bytecode context */
+{
+  return (uint32_t) re_ctx_p->bytecode_size;
+} /* re_bytecode_size */
 
 void re_append_opcode (re_compiler_ctx_t *re_ctx_p, const re_opcode_t opcode);
 void re_append_byte (re_compiler_ctx_t *re_ctx_p, const uint8_t byte);
