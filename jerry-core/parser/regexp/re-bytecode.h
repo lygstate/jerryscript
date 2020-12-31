@@ -158,6 +158,22 @@ re_get_opcode (const uint8_t **bc_p) /**< pointer to bytecode start */
 } /* re_get_opcode */
 
 /**
+ * Decode 2 byte unsigned integer from bytecode
+ *
+ * @return uint16_t value
+ */
+uint16_t
+re_decode_u16 (const uint8_t *src_p); /**< source */
+
+/**
+ * Decode 4 byte unsigned integer from bytecode
+ *
+ * @return uint32_t value
+ */
+uint32_t
+re_decode_u32 (const uint8_t *src_p); /**< source */
+
+/**
  * Decode a character from the bytecode.
  *
  * @return decoded character

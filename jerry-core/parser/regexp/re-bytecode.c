@@ -121,7 +121,7 @@ re_encode_u32 (uint8_t *dest_p, /**< destination */
  *
  * @return uint16_t value
  */
-static uint16_t
+uint16_t
 re_decode_u16 (const uint8_t *src_p) /**< source */
 {
   uint16_t value = (uint16_t) (((uint16_t) *src_p++) << 8);
@@ -134,7 +134,7 @@ re_decode_u16 (const uint8_t *src_p) /**< source */
  *
  * @return uint32_t value
  */
-static uint32_t JERRY_ATTR_NOINLINE
+uint32_t JERRY_ATTR_NOINLINE
 re_decode_u32 (const uint8_t *src_p) /**< source */
 {
   uint32_t value = (uint32_t) (((uint32_t) *src_p++) << 24);
