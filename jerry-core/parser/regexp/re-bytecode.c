@@ -203,25 +203,6 @@ re_insert_value (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
 } /* re_insert_value */
 
 /**
- * Read an encoded value from the bytecode.
- *
- * @return decoded value
- */
-inline uint32_t JERRY_ATTR_ALWAYS_INLINE
-re_get_value (const uint8_t **bc_p) /** refence to bytecode pointer */
-{
-  uint32_t value = *(*bc_p)++;
-  if (JERRY_LIKELY (value <= RE_VALUE_1BYTE_MAX))
-  {
-    return value;
-  }
-
-  value = re_decode_u32 (*bc_p);
-  *bc_p += sizeof (uint32_t);
-  return value;
-} /* re_get_value */
-
-/**
  * Append a character to the RegExp bytecode
  */
 void
@@ -277,35 +258,6 @@ re_insert_char (re_compiler_ctx_t *re_ctx_p, /**< RegExp bytecode context */
   JERRY_ASSERT (cp <= LIT_UTF16_CODE_UNIT_MAX);
   re_encode_u16 (dest_p, (ecma_char_t) cp);
 } /* re_insert_char */
-
-/**
- * Decode a character from the bytecode.
- *
- * @return decoded character
- */
-inline lit_code_point_t JERRY_ATTR_ALWAYS_INLINE
-re_get_char (const uint8_t **bc_p, /**< reference to bytecode pointer */
-             bool unicode) /**< full unicode mode */
-{
-  lit_code_point_t cp;
-
-#if !ENABLED (JERRY_ESNEXT)
-  JERRY_UNUSED (unicode);
-#else /* ENABLED (JERRY_ESNEXT) */
-  if (unicode)
-  {
-    cp = re_decode_u32 (*bc_p);
-    *bc_p += sizeof (lit_code_point_t);
-  }
-  else
-#endif /* ENABLED (JERRY_ESNEXT) */
-  {
-    cp = re_decode_u16 (*bc_p);
-    *bc_p += sizeof (ecma_char_t);
-  }
-
-  return cp;
-} /* re_get_char */
 
 #if ENABLED (JERRY_REGEXP_DUMP_BYTE_CODE)
 static uint32_t

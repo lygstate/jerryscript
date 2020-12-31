@@ -157,8 +157,53 @@ re_get_opcode (const uint8_t **bc_p) /**< pointer to bytecode start */
   return (re_opcode_t) re_get_byte (bc_p);
 } /* re_get_opcode */
 
-lit_code_point_t re_get_char (const uint8_t **bc_p, bool unicode);
-uint32_t re_get_value (const uint8_t **bc_p);
+/**
+ * Decode a character from the bytecode.
+ *
+ * @return decoded character
+ */
+inline lit_code_point_t JERRY_ATTR_ALWAYS_INLINE
+re_get_char (const uint8_t **bc_p, /**< reference to bytecode pointer */
+             bool unicode) /**< full unicode mode */
+{
+  lit_code_point_t cp;
+
+#if !ENABLED (JERRY_ESNEXT)
+  JERRY_UNUSED (unicode);
+#else /* ENABLED (JERRY_ESNEXT) */
+  if (unicode)
+  {
+    cp = re_decode_u32 (*bc_p);
+    *bc_p += sizeof (lit_code_point_t);
+  }
+  else
+#endif /* ENABLED (JERRY_ESNEXT) */
+  {
+    cp = re_decode_u16 (*bc_p);
+    *bc_p += sizeof (ecma_char_t);
+  }
+
+  return cp;
+} /* re_get_char */
+
+/**
+ * Read an encoded value from the bytecode.
+ *
+ * @return decoded value
+ */
+inline uint32_t JERRY_ATTR_ALWAYS_INLINE
+re_get_value (const uint8_t **bc_p) /** refence to bytecode pointer */
+{
+  uint32_t value = *(*bc_p)++;
+  if (JERRY_LIKELY (value <= RE_VALUE_1BYTE_MAX))
+  {
+    return value;
+  }
+
+  value = re_decode_u32 (*bc_p);
+  *bc_p += sizeof (uint32_t);
+  return value;
+} /* re_get_value */
 
 #if ENABLED (JERRY_REGEXP_DUMP_BYTE_CODE)
 void re_dump_bytecode (re_compiler_ctx_t *bc_ctx);
