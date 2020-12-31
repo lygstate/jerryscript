@@ -981,7 +981,23 @@ ecma_is_property_writable (ecma_property_t property) /**< property */
 } /* ecma_is_property_writable */
 
 void ecma_set_property_writable_attr (ecma_property_t *property_p, bool is_writable);
-bool ecma_is_property_enumerable (ecma_property_t property);
+
+/**
+ * Get property's 'Enumerable' attribute value
+ *
+ * @return true - property is enumerable,
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_is_property_enumerable (ecma_property_t property) /**< property */
+{
+  JERRY_ASSERT (ECMA_PROPERTY_GET_TYPE (property) == ECMA_PROPERTY_TYPE_NAMEDDATA
+                || ECMA_PROPERTY_GET_TYPE (property) == ECMA_PROPERTY_TYPE_NAMEDACCESSOR
+                || ECMA_PROPERTY_GET_TYPE (property) == ECMA_PROPERTY_TYPE_VIRTUAL);
+
+  return (property & ECMA_PROPERTY_FLAG_ENUMERABLE) != 0;
+} /* ecma_is_property_enumerable */
+
 void ecma_set_property_enumerable_attr (ecma_property_t *property_p, bool is_enumerable);
 bool ecma_is_property_configurable (ecma_property_t property);
 void ecma_set_property_configurable_attr (ecma_property_t *property_p, bool is_configurable);
