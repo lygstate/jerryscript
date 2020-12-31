@@ -1278,7 +1278,32 @@ ecma_value_t ecma_number_parse_int (const lit_utf8_byte_t *string_buff,
                                     ecma_value_t radix);
 ecma_value_t ecma_number_parse_float (const lit_utf8_byte_t *string_buff,
                                       lit_utf8_size_t string_buff_size);
-ecma_value_t ecma_integer_multiply (ecma_integer_value_t left_integer, ecma_integer_value_t right_integer);
+
+/**
+ * ECMA-integer number multiplication.
+ *
+ * @return number - result of multiplication.
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_integer_multiply (ecma_integer_value_t left_integer, /**< left operand */
+                       ecma_integer_value_t right_integer) /**< right operand */
+{
+#if defined (__GNUC__) || defined (__clang__)
+  /* Check if left_integer is power of 2 */
+  if (JERRY_UNLIKELY ((left_integer & (left_integer - 1)) == 0))
+  {
+    /* Right shift right_integer with log2 (left_integer) */
+    return ecma_make_integer_value (right_integer << (__builtin_ctz ((unsigned int) left_integer)));
+  }
+  else if (JERRY_UNLIKELY ((right_integer & (right_integer - 1)) == 0))
+  {
+    /* Right shift left_integer with log2 (right_integer) */
+    return ecma_make_integer_value (left_integer << (__builtin_ctz ((unsigned int) right_integer)));
+  }
+#endif /* defined (__GNUC__) || defined (__clang__) */
+  return ecma_make_integer_value (left_integer * right_integer);
+} /* ecma_integer_multiply */
+
 lit_utf8_size_t ecma_number_to_decimal (ecma_number_t num, lit_utf8_byte_t *out_digits_p, int32_t *out_decimal_exp_p);
 
 /* ecma-helpers-collection.c */

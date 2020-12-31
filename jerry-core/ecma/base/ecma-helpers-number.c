@@ -684,31 +684,6 @@ ecma_number_pow (ecma_number_t x, /**< left operand */
 } /* ecma_number_pow */
 
 /**
- * ECMA-integer number multiplication.
- *
- * @return number - result of multiplication.
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_integer_multiply (ecma_integer_value_t left_integer, /**< left operand */
-                       ecma_integer_value_t right_integer) /**< right operand */
-{
-#if defined (__GNUC__) || defined (__clang__)
-  /* Check if left_integer is power of 2 */
-  if (JERRY_UNLIKELY ((left_integer & (left_integer - 1)) == 0))
-  {
-    /* Right shift right_integer with log2 (left_integer) */
-    return ecma_make_integer_value (right_integer << (__builtin_ctz ((unsigned int) left_integer)));
-  }
-  else if (JERRY_UNLIKELY ((right_integer & (right_integer - 1)) == 0))
-  {
-    /* Right shift left_integer with log2 (right_integer) */
-    return ecma_make_integer_value (left_integer << (__builtin_ctz ((unsigned int) right_integer)));
-  }
-#endif /* defined (__GNUC__) || defined (__clang__) */
-  return ecma_make_integer_value (left_integer * right_integer);
-} /* ecma_integer_multiply */
-
-/**
  * The Number object's 'parseInt' routine
  *
  * See also:
