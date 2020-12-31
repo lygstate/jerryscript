@@ -101,9 +101,49 @@ lit_utf8_size_t lit_get_utf8_length_of_cesu8_string (const lit_utf8_byte_t *cesu
                                                      lit_utf8_size_t cesu8_buf_size);
 
 /* hash */
-lit_string_hash_t lit_utf8_string_calc_hash (const lit_utf8_byte_t *utf8_buf_p, lit_utf8_size_t utf8_buf_size);
-lit_string_hash_t lit_utf8_string_hash_combine (lit_string_hash_t hash_basis, const lit_utf8_byte_t *utf8_buf_p,
-                                                lit_utf8_size_t utf8_buf_size);
+
+/**
+ * Calc hash using the specified hash_basis.
+ *
+ * NOTE:
+ *   This is implementation of FNV-1a hash function, which is released into public domain.
+ *   Constants used, are carefully picked primes by the authors.
+ *   More info: http://www.isthe.com/chongo/tech/comp/fnv/
+ *
+ * @return ecma-string's hash
+ */
+inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
+lit_utf8_string_hash_combine (lit_string_hash_t hash_basis, /**< hash to be combined with */
+                              const lit_utf8_byte_t *utf8_buf_p, /**< characters buffer */
+                              lit_utf8_size_t utf8_buf_size) /**< number of characters in the buffer */
+{
+  JERRY_ASSERT (utf8_buf_p != NULL || utf8_buf_size == 0);
+
+  uint32_t hash = hash_basis;
+
+  for (uint32_t i = 0; i < utf8_buf_size; i++)
+  {
+    /* 16777619 is 32 bit FNV_prime = 2^24 + 2^8 + 0x93 = 16777619 */
+    hash = (hash ^ utf8_buf_p[i]) * 16777619;
+  }
+
+  return (lit_string_hash_t) hash;
+} /* lit_utf8_string_hash_combine */
+
+/**
+ * Calculate hash from the buffer.
+ *
+ * @return ecma-string's hash
+ */
+inline lit_string_hash_t JERRY_ATTR_ALWAYS_INLINE
+lit_utf8_string_calc_hash (const lit_utf8_byte_t *utf8_buf_p, /**< characters buffer */
+                           lit_utf8_size_t utf8_buf_size) /**< number of characters in the buffer */
+{
+  JERRY_ASSERT (utf8_buf_p != NULL || utf8_buf_size == 0);
+
+  /* 32 bit offset_basis for FNV = 2166136261 */
+  return lit_utf8_string_hash_combine ((lit_string_hash_t) 2166136261, utf8_buf_p, utf8_buf_size);
+} /* lit_utf8_string_calc_hash */
 
 /* code unit access */
 ecma_char_t lit_utf8_string_code_unit_at (const lit_utf8_byte_t *utf8_buf_p, lit_utf8_size_t utf8_buf_size,
