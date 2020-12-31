@@ -1019,8 +1019,43 @@ ecma_is_property_configurable (ecma_property_t property) /**< property */
 void ecma_set_property_configurable_attr (ecma_property_t *property_p, bool is_configurable);
 
 #if ENABLED (JERRY_LCACHE)
-bool ecma_is_property_lcached (ecma_property_t *property_p);
-void ecma_set_property_lcached (ecma_property_t *property_p, bool is_lcached);
+
+/**
+ * Check whether the property is registered in LCache
+ *
+ * @return true / false
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_is_property_lcached (ecma_property_t *property_p) /**< property */
+{
+  JERRY_ASSERT (ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_NAMEDDATA
+                || ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_NAMEDACCESSOR
+                || ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_INTERNAL);
+
+  return (*property_p & ECMA_PROPERTY_FLAG_LCACHED) != 0;
+} /* ecma_is_property_lcached */
+
+/**
+ * Set value of flag indicating whether the property is registered in LCache
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_set_property_lcached (ecma_property_t *property_p, /**< property */
+                           bool is_lcached) /**< new value for lcached flag */
+{
+  JERRY_ASSERT (ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_NAMEDDATA
+                || ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_NAMEDACCESSOR
+                || ECMA_PROPERTY_GET_TYPE (*property_p) == ECMA_PROPERTY_TYPE_INTERNAL);
+
+  if (is_lcached)
+  {
+    *property_p = (uint8_t) (*property_p | ECMA_PROPERTY_FLAG_LCACHED);
+  }
+  else
+  {
+    *property_p = (uint8_t) (*property_p & ~ECMA_PROPERTY_FLAG_LCACHED);
+  }
+} /* ecma_set_property_lcached */
+
 #endif /* ENABLED (JERRY_LCACHE) */
 
 ecma_property_descriptor_t ecma_make_empty_property_descriptor (void);
