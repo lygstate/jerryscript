@@ -47,18 +47,6 @@ ecma_new_collection (void)
 } /* ecma_new_collection */
 
 /**
- * Deallocate a collection of ecma values without freeing it's values
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-ecma_collection_destroy (ecma_collection_t *collection_p) /**< value collection */
-{
-  JERRY_ASSERT (collection_p != NULL);
-
-  jmem_heap_free_block (collection_p->buffer_p, ECMA_COLLECTION_ALLOCATED_SIZE (collection_p->capacity));
-  jmem_heap_free_block (collection_p, sizeof (ecma_collection_t));
-} /* ecma_collection_destroy */
-
-/**
  * Free the object collection elements and deallocate the collection
  */
 void

@@ -1394,7 +1394,19 @@ ecma_collection_t *ecma_new_collection (void);
 void ecma_collection_push_back (ecma_collection_t *collection_p, ecma_value_t value);
 void ecma_collection_reserve (ecma_collection_t *collection_p, uint32_t count);
 void ecma_collection_append (ecma_collection_t *collection_p, const ecma_value_t *buffer_p, uint32_t count);
-void ecma_collection_destroy (ecma_collection_t *collection_p);
+
+/**
+ * Deallocate a collection of ecma values without freeing it's values
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_collection_destroy (ecma_collection_t *collection_p) /**< value collection */
+{
+  JERRY_ASSERT (collection_p != NULL);
+
+  jmem_heap_free_block (collection_p->buffer_p, ECMA_COLLECTION_ALLOCATED_SIZE (collection_p->capacity));
+  jmem_heap_free_block (collection_p, sizeof (ecma_collection_t));
+} /* ecma_collection_destroy */
+
 void ecma_collection_free (ecma_collection_t *collection_p);
 void ecma_collection_free_if_not_object (ecma_collection_t *collection_p);
 void ecma_collection_free_objects (ecma_collection_t *collection_p);
