@@ -17,6 +17,7 @@
 #define ECMA_ARRAY_OBJECT_H
 
 #include "ecma-globals.h"
+#include "ecma-helpers.h"
 
 /** \addtogroup ecma ECMA
  * @{
@@ -73,11 +74,32 @@ ecma_op_new_array_object_from_buffer (const ecma_value_t *args_p, uint32_t lengt
 ecma_value_t
 ecma_op_new_array_object_from_collection (ecma_collection_t *collection_p, bool unref_objects);
 
-bool
-ecma_op_object_is_fast_array (ecma_object_t *object_p);
+/**
+ * Check whether the given array object is fast-access mode array
+ *
+ * @return true - if the array object is fast-access mode array
+ *         false, otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_op_array_is_fast_array (ecma_extended_object_t *array_p) /**< ecma-array-object */
+{
+  JERRY_ASSERT (ecma_get_object_type ((ecma_object_t *) array_p) == ECMA_OBJECT_TYPE_ARRAY);
 
-bool
-ecma_op_array_is_fast_array (ecma_extended_object_t *array_p);
+  return array_p->u.array.length_prop_and_hole_count & ECMA_FAST_ARRAY_FLAG;
+} /* ecma_op_array_is_fast_array */
+
+/**
+ * Check whether the given object is fast-access mode array
+ *
+ * @return true - if the object is fast-access mode array
+ *         false, otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_op_object_is_fast_array (ecma_object_t *object_p) /**< ecma-object */
+{
+  return (ecma_get_object_type (object_p) == ECMA_OBJECT_TYPE_ARRAY &&
+          ecma_op_array_is_fast_array ((ecma_extended_object_t *) object_p));
+} /* ecma_op_object_is_fast_array */
 
 uint32_t
 ecma_fast_array_get_hole_count (ecma_object_t *obj_p);

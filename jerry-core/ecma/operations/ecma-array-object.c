@@ -88,33 +88,6 @@ ecma_op_alloc_array_object (uint32_t length) /**< length of the new array */
 } /* ecma_op_alloc_array_object */
 
 /**
- * Check whether the given object is fast-access mode array
- *
- * @return true - if the object is fast-access mode array
- *         false, otherwise
- */
-inline bool JERRY_ATTR_ALWAYS_INLINE
-ecma_op_object_is_fast_array (ecma_object_t *object_p) /**< ecma-object */
-{
-  return (ecma_get_object_type (object_p) == ECMA_OBJECT_TYPE_ARRAY &&
-          ecma_op_array_is_fast_array ((ecma_extended_object_t *) object_p));
-} /* ecma_op_object_is_fast_array */
-
-/**
- * Check whether the given array object is fast-access mode array
- *
- * @return true - if the array object is fast-access mode array
- *         false, otherwise
- */
-inline bool JERRY_ATTR_ALWAYS_INLINE
-ecma_op_array_is_fast_array (ecma_extended_object_t *array_p) /**< ecma-array-object */
-{
-  JERRY_ASSERT (ecma_get_object_type ((ecma_object_t *) array_p) == ECMA_OBJECT_TYPE_ARRAY);
-
-  return array_p->u.array.length_prop_and_hole_count & ECMA_FAST_ARRAY_FLAG;
-} /* ecma_op_array_is_fast_array */
-
-/**
  * Allocate a new array object with the given length
  *
  * Note: The returned array can be normal of fast access mode
