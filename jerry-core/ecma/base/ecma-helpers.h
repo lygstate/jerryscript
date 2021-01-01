@@ -1295,8 +1295,28 @@ ecma_string_hash (const ecma_string_t *string_p) /**< ecma-string to calculate h
 ecma_string_t *ecma_string_substr (const ecma_string_t *string_p, lit_utf8_size_t start_pos, lit_utf8_size_t end_pos);
 const lit_utf8_byte_t *ecma_string_trim_front (const lit_utf8_byte_t *start_p, const lit_utf8_byte_t *end_p);
 const lit_utf8_byte_t *ecma_string_trim_back (const lit_utf8_byte_t *start_p, const lit_utf8_byte_t *end_p);
-void ecma_string_trim_helper (const lit_utf8_byte_t **utf8_str_p,
-                              lit_utf8_size_t *utf8_str_size);
+
+/**
+ * Helper function for trimming.
+ *
+ * Used by:
+ *        - ecma_string_trim
+ *        - ecma_utf8_string_to_number
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+ecma_string_trim_helper (const lit_utf8_byte_t **utf8_str_p, /**< [in, out] current string position */
+                         lit_utf8_size_t *utf8_str_size)  /**< [in, out] size of the given string */
+{
+  const lit_utf8_byte_t *end_p = *utf8_str_p + *utf8_str_size;
+  const lit_utf8_byte_t *start_p = *utf8_str_p;
+
+  const lit_utf8_byte_t *new_start_p = ecma_string_trim_front (start_p, end_p);
+  const lit_utf8_byte_t *new_end_p = ecma_string_trim_back (new_start_p, end_p);
+
+  *utf8_str_size = (lit_utf8_size_t) (new_end_p - new_start_p);
+  *utf8_str_p = new_start_p;
+} /* ecma_string_trim_helper */
+
 ecma_string_t *ecma_string_trim (const ecma_string_t *string_p);
 #if ENABLED (JERRY_ESNEXT)
 ecma_value_t ecma_string_pad (ecma_value_t original_string_p,
