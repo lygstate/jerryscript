@@ -71,8 +71,27 @@ ecma_op_create_simple_function_object (ecma_object_t *scope_p, const ecma_compil
 ecma_object_t *
 ecma_op_create_external_function_object (ecma_native_handler_t handler_cb);
 
-const ecma_compiled_code_t *
-ecma_op_function_get_compiled_code (ecma_extended_object_t *function_p);
+/**
+ * Get compiled code of a function object.
+ *
+ * @return compiled code
+ */
+inline const ecma_compiled_code_t * JERRY_ATTR_ALWAYS_INLINE
+ecma_op_function_get_compiled_code (ecma_extended_object_t *function_p) /**< function pointer */
+{
+#if ENABLED (JERRY_SNAPSHOT_EXEC)
+  if (JERRY_LIKELY (function_p->u.function.bytecode_cp != ECMA_NULL_POINTER))
+  {
+    return ECMA_GET_INTERNAL_VALUE_POINTER (const ecma_compiled_code_t,
+                                            function_p->u.function.bytecode_cp);
+  }
+
+  return ((ecma_static_function_t *) function_p)->bytecode_p;
+#else /* !ENABLED (JERRY_SNAPSHOT_EXEC) */
+  return ECMA_GET_INTERNAL_VALUE_POINTER (const ecma_compiled_code_t,
+                                          function_p->u.function.bytecode_cp);
+#endif /* ENABLED (JERRY_SNAPSHOT_EXEC) */
+} /* ecma_op_function_get_compiled_code */
 
 #if ENABLED (JERRY_BUILTIN_REALMS)
 ecma_global_object_t *

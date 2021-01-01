@@ -708,28 +708,6 @@ ecma_op_create_native_handler (ecma_native_handler_id_t id, /**< handler id */
 
 #endif /* ENABLED (JERRY_ESNEXT) */
 
-/**
- * Get compiled code of a function object.
- *
- * @return compiled code
- */
-inline const ecma_compiled_code_t * JERRY_ATTR_ALWAYS_INLINE
-ecma_op_function_get_compiled_code (ecma_extended_object_t *function_p) /**< function pointer */
-{
-#if ENABLED (JERRY_SNAPSHOT_EXEC)
-  if (JERRY_LIKELY (function_p->u.function.bytecode_cp != ECMA_NULL_POINTER))
-  {
-    return ECMA_GET_INTERNAL_VALUE_POINTER (const ecma_compiled_code_t,
-                                            function_p->u.function.bytecode_cp);
-  }
-
-  return ((ecma_static_function_t *) function_p)->bytecode_p;
-#else /* !ENABLED (JERRY_SNAPSHOT_EXEC) */
-  return ECMA_GET_INTERNAL_VALUE_POINTER (const ecma_compiled_code_t,
-                                          function_p->u.function.bytecode_cp);
-#endif /* ENABLED (JERRY_SNAPSHOT_EXEC) */
-} /* ecma_op_function_get_compiled_code */
-
 #if ENABLED (JERRY_BUILTIN_REALMS)
 
 /**

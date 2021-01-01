@@ -1155,21 +1155,6 @@ ecma_op_typedarray_from (ecma_value_t items_val, /**< the source array-like obje
 } /* ecma_op_typedarray_from */
 
 /**
- * Get the arraybuffer of the typedarray object
- *
- * @return the pointer to the internal arraybuffer
- */
-inline ecma_object_t * JERRY_ATTR_ALWAYS_INLINE
-ecma_typedarray_get_arraybuffer (ecma_object_t *typedarray_p) /**< the pointer to the typedarray object */
-{
-  JERRY_ASSERT (ecma_object_is_typedarray (typedarray_p));
-
-  ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) typedarray_p;
-
-  return ecma_get_object_from_value (ext_object_p->u.pseudo_array.u2.arraybuffer);
-} /* ecma_typedarray_get_arraybuffer */
-
-/**
  * Get the element size shift in the typedarray object
  *
  * @return the size shift of the element, size is 1 << shift

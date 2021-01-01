@@ -18,6 +18,7 @@
 
 #include "ecma-globals.h"
 #include "ecma-builtins.h"
+#include "ecma-helpers.h"
 
 #if ENABLED (JERRY_BUILTIN_TYPEDARRAY)
 extern const ecma_typedarray_getter_fn_t ecma_typedarray_getters[];
@@ -103,7 +104,23 @@ uint32_t ecma_typedarray_get_length (ecma_object_t *typedarray_p);
 uint32_t ecma_typedarray_get_offset (ecma_object_t *typedarray_p);
 lit_utf8_byte_t *ecma_typedarray_get_buffer (ecma_object_t *typedarray_p);
 uint8_t ecma_typedarray_get_element_size_shift (ecma_object_t *typedarray_p);
-ecma_object_t *ecma_typedarray_get_arraybuffer (ecma_object_t *typedarray_p);
+bool ecma_object_is_typedarray (ecma_object_t *obj_p);
+
+/**
+ * Get the arraybuffer of the typedarray object
+ *
+ * @return the pointer to the internal arraybuffer
+ */
+inline ecma_object_t * JERRY_ATTR_ALWAYS_INLINE
+ecma_typedarray_get_arraybuffer (ecma_object_t *typedarray_p) /**< the pointer to the typedarray object */
+{
+  JERRY_ASSERT (ecma_object_is_typedarray (typedarray_p));
+
+  ecma_extended_object_t *ext_object_p = (ecma_extended_object_t *) typedarray_p;
+
+  return ecma_get_object_from_value (ext_object_p->u.pseudo_array.u2.arraybuffer);
+} /* ecma_typedarray_get_arraybuffer */
+
 ecma_value_t ecma_op_create_typedarray (const ecma_value_t *arguments_list_p,
                                         uint32_t arguments_list_len,
                                         ecma_object_t *proto_p,
@@ -112,7 +129,6 @@ ecma_value_t ecma_op_create_typedarray (const ecma_value_t *arguments_list_p,
 ecma_value_t
 ecma_typedarray_iterators_helper (ecma_value_t this_arg, ecma_iterator_kind_t kind);
 
-bool ecma_object_is_typedarray (ecma_object_t *obj_p);
 bool ecma_is_typedarray (ecma_value_t target);
 void ecma_op_typedarray_list_lazy_property_names (ecma_object_t *obj_p,
                                                   ecma_collection_t *prop_names_p,
