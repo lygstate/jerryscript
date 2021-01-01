@@ -50,16 +50,6 @@ parser_malloc (parser_context_t *context_p, /**< context */
 } /* parser_malloc */
 
 /**
- * Free memory allocated by parser_malloc.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-parser_free (void *ptr, /**< pointer to free */
-             size_t size) /**< size of the memory block */
-{
-  jmem_heap_free_block (ptr, size);
-} /* parser_free */
-
-/**
  * Allocate local memory for short term use.
  *
  * @return allocated memory.

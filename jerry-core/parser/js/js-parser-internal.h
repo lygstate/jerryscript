@@ -640,7 +640,17 @@ typedef struct
 /* Memory management.
  * Note: throws an error if unsuccessful. */
 void *parser_malloc (parser_context_t *context_p, size_t size);
-void parser_free (void *ptr, size_t size);
+
+/**
+ * Free memory allocated by parser_malloc.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+parser_free (void *ptr, /**< pointer to free */
+             size_t size) /**< size of the memory block */
+{
+  jmem_heap_free_block (ptr, size);
+} /* parser_free */
+
 void *parser_malloc_local (parser_context_t *context_p, size_t size);
 void parser_free_local (void *ptr, size_t size);
 
