@@ -799,27 +799,6 @@ ecma_op_object_get_length (ecma_object_t *object_p, /**< the object */
   return len_number;
 } /* ecma_op_object_get_length */
 
-/**
- * [[Get]] operation of ecma object where the property name is a magic string
- *
- * This function returns the value of a named property, or undefined
- * if the property is not found in the prototype chain. If the property
- * is an accessor, it calls the "get" callback function and returns
- * with its result (including error throws).
- *
- * See also:
- *          ECMA-262 v5, 8.6.2; ECMA-262 v5, Table 8
- *
- * @return ecma value
- *         Returned value must be freed with ecma_free_value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_object_get_by_magic_id (ecma_object_t *object_p, /**< the object */
-                                lit_magic_string_id_t property_id) /**< property magic string id */
-{
-  return ecma_op_object_get (object_p, ecma_get_magic_string (property_id));
-} /* ecma_op_object_get_by_magic_id */
-
 #if ENABLED (JERRY_ESNEXT)
 
 /**
