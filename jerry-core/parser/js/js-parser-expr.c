@@ -133,7 +133,7 @@ static bool parser_process_group_expression (parser_context_t *context_p, size_t
 /**
  * Generate byte code for operators with lvalue.
  */
-static inline void
+static inline void JERRY_ATTR_ALWAYS_INLINE
 parser_push_result (parser_context_t *context_p) /**< context */
 {
   if (CBC_NO_RESULT_OPERATION (context_p->last_cbc_opcode))
