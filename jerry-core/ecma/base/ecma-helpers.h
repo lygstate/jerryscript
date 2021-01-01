@@ -1128,8 +1128,7 @@ ecma_string_get_property_name_hash (ecma_property_t property, /**< property name
 } /* ecma_string_get_property_name_hash */
 
 uint32_t ecma_string_get_property_index (ecma_property_t property, jmem_cpointer_t prop_name_cp);
-bool ecma_string_compare_to_property_name (ecma_property_t property, jmem_cpointer_t prop_name_cp,
-                                           const ecma_string_t *string_p);
+
 /**
  * Long path part of ecma-string to ecma-string comparison routine
  *
@@ -1212,6 +1211,31 @@ ecma_compare_ecma_non_direct_strings (const ecma_string_t *string1_p, /**< ecma-
 
   return ecma_compare_ecma_strings_longpath (string1_p, string2_p);
 } /* ecma_compare_ecma_non_direct_strings */
+
+/**
+ * Compare a property name to a string
+ *
+ * @return true if they are equals
+ *         false otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_string_compare_to_property_name (ecma_property_t property, /**< property name type */
+                                      jmem_cpointer_t prop_name_cp, /**< property name compressed pointer */
+                                      const ecma_string_t *string_p) /**< other string */
+{
+  if (ECMA_PROPERTY_GET_NAME_TYPE (property) != ECMA_DIRECT_STRING_PTR)
+  {
+    return ecma_property_to_string (property, prop_name_cp) == string_p;
+  }
+
+  if (ECMA_IS_DIRECT_STRING (string_p))
+  {
+    return false;
+  }
+
+  ecma_string_t *prop_name_p = ECMA_GET_NON_NULL_POINTER (ecma_string_t, prop_name_cp);
+  return ecma_compare_ecma_non_direct_strings (prop_name_p, string_p);
+} /* ecma_string_compare_to_property_name */
 
 bool ecma_compare_ecma_strings_relational (const ecma_string_t *string1_p, const ecma_string_t *string2_p);
 lit_utf8_size_t ecma_string_get_length (const ecma_string_t *string_p);
