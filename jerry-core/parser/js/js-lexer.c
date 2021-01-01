@@ -3635,28 +3635,6 @@ lexer_current_is_literal (parser_context_t *context_p, /**< context */
 } /* lexer_current_is_literal */
 
 /**
- * Compares the current identifier or string to an expected string.
- *
- * Note:
- *   Escape sequences are not allowed.
- *
- * @return true if they are the same, false otherwise
- */
-inline bool JERRY_ATTR_ALWAYS_INLINE
-lexer_compare_literal_to_string (parser_context_t *context_p, /**< context */
-                                 const char *string_p, /**< string */
-                                 size_t string_length) /**< string length */
-{
-  JERRY_ASSERT (context_p->token.type == LEXER_LITERAL
-                && (context_p->token.lit_location.type == LEXER_IDENT_LITERAL
-                    || context_p->token.lit_location.type == LEXER_STRING_LITERAL));
-
-  /* Checking has_escape is unnecessary because memcmp will fail if escape sequences are present. */
-  return (context_p->token.lit_location.length == string_length
-          && memcmp (context_p->token.lit_location.char_p, string_p, string_length) == 0);
-} /* lexer_compare_literal_to_string */
-
-/**
  * Convert binary lvalue token to binary token
  * e.g. += -> +
  *      ^= -> ^
