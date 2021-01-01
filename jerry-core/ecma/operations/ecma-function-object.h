@@ -35,7 +35,32 @@ ecma_value_t ecma_op_function_form_name (ecma_string_t *prop_name_p, char *prefi
 #endif /* ENABLED (JERRY_ESNEXT) */
 
 bool ecma_op_is_callable (ecma_value_t value);
-bool ecma_op_object_is_callable (ecma_object_t *obj_p);
+
+/**
+ * IsCallable operation.
+ *
+ * See also: ECMA-262 v5, 9.11
+ *
+ * @return true - if the given object is callable;
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_op_object_is_callable (ecma_object_t *obj_p) /**< ecma object */
+{
+  JERRY_ASSERT (!ecma_is_lexical_environment (obj_p));
+
+  const ecma_object_type_t type = ecma_get_object_type (obj_p);
+
+#if ENABLED (JERRY_BUILTIN_PROXY)
+  if (ECMA_OBJECT_TYPE_IS_PROXY (type))
+  {
+    return ECMA_GET_FIRST_BIT_FROM_POINTER_TAG (obj_p->u1.property_list_cp) != 0;
+  }
+#endif /* ENABLED (JERRY_BUILTIN_PROXY) */
+
+  return type >= ECMA_OBJECT_TYPE_FUNCTION;
+} /* ecma_op_object_is_callable */
+
 bool ecma_is_constructor (ecma_value_t value);
 bool ecma_object_is_constructor (ecma_object_t *obj_p);
 
