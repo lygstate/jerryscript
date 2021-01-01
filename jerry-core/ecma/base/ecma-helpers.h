@@ -1329,7 +1329,23 @@ void ecma_number_unpack (ecma_number_t num, bool *sign_p, uint32_t *biased_exp_p
 ecma_number_t ecma_number_make_nan (void);
 ecma_number_t ecma_number_make_infinity (bool sign);
 bool ecma_number_is_nan (ecma_number_t num);
-bool ecma_number_is_negative (ecma_number_t num);
+uint32_t ecma_number_get_sign_field (ecma_number_t num);
+
+/**
+ * Check if ecma-number is negative
+ *
+ * @return true - if sign bit of ecma-number is set
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_number_is_negative (ecma_number_t num) /**< ecma-number */
+{
+  JERRY_ASSERT (!ecma_number_is_nan (num));
+
+  /* IEEE-754 2008, 3.4 */
+  return (ecma_number_get_sign_field (num) != 0);
+} /* ecma_number_is_negative */
+
 bool ecma_number_is_zero (ecma_number_t num);
 bool ecma_number_is_infinity (ecma_number_t num);
 bool ecma_number_is_finite (ecma_number_t num);

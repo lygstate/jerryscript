@@ -202,7 +202,7 @@ ecma_number_get_biased_exponent_field (ecma_number_t num) /**< ecma-number */
  *
  * @return 0 or 1 - value of sign bit
  */
-static uint32_t
+uint32_t
 ecma_number_get_sign_field (ecma_number_t num) /**< ecma-number */
 {
   bool sign;
@@ -275,21 +275,6 @@ ecma_number_make_infinity (bool sign) /**< true - for negative Infinity,
 #endif /* ENABLED (JERRY_NUMBER_TYPE_FLOAT64) */
   return f.as_ecma_number_t;
 } /* ecma_number_make_infinity */
-
-/**
- * Check if ecma-number is negative
- *
- * @return true - if sign bit of ecma-number is set
- *         false - otherwise
- */
-inline bool JERRY_ATTR_ALWAYS_INLINE
-ecma_number_is_negative (ecma_number_t num) /**< ecma-number */
-{
-  JERRY_ASSERT (!ecma_number_is_nan (num));
-
-  /* IEEE-754 2008, 3.4 */
-  return (ecma_number_get_sign_field (num) != 0);
-} /* ecma_number_is_negative */
 
 /**
  * Check if ecma-number is zero

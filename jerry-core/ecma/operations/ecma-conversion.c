@@ -266,22 +266,6 @@ ecma_op_to_boolean (ecma_value_t value) /**< ecma value */
 } /* ecma_op_to_boolean */
 
 /**
- * ToNumber operation.
- *
- * See also:
- *          ECMA-262 v5, 9.3
- *
- * @return ecma value
- *         Returned value must be freed with ecma_free_value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_to_number (ecma_value_t value, /**< ecma value */
-                   ecma_number_t *number_p) /**< [out] ecma number */
-{
-  return ecma_op_to_numeric (value, number_p, ECMA_TO_NUMERIC_NO_OPTS);
-} /* ecma_op_to_number */
-
-/**
  * Helper to get the numeric value of an ecma value
  *
  * See also:

@@ -703,27 +703,6 @@ ecma_op_object_find (ecma_object_t *object_p, /**< the object */
 } /* ecma_op_object_find */
 
 /**
- * [[Get]] operation of ecma object
- *
- * This function returns the value of a named property, or undefined
- * if the property is not found in the prototype chain. If the property
- * is an accessor, it calls the "get" callback function and returns
- * with its result (including error throws).
- *
- * See also:
- *          ECMA-262 v5, 8.6.2; ECMA-262 v5, Table 8
- *
- * @return ecma value
- *         Returned value must be freed with ecma_free_value
- */
-inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
-ecma_op_object_get (ecma_object_t *object_p, /**< the object */
-                    ecma_string_t *property_name_p) /**< property name */
-{
-  return ecma_op_object_get_with_receiver (object_p, property_name_p, ecma_make_object_value (object_p));
-} /* ecma_op_object_get */
-
-/**
  * [[Get]] operation of ecma object with the specified receiver
  *
  * This function returns the value of a named property, or undefined

@@ -54,8 +54,24 @@ bool ecma_op_same_value_zero (ecma_value_t x, ecma_value_t y, bool strict_equali
 #endif /* ENABLED (JERRY_BUILTIN_MAP) */
 ecma_value_t ecma_op_to_primitive (ecma_value_t value, ecma_preferred_type_hint_t preferred_type);
 bool ecma_op_to_boolean (ecma_value_t value);
-ecma_value_t ecma_op_to_number (ecma_value_t value, ecma_number_t *number_p);
 ecma_value_t ecma_op_to_numeric (ecma_value_t value, ecma_number_t *number_p, ecma_to_numeric_options_t options);
+
+/**
+ * ToNumber operation.
+ *
+ * See also:
+ *          ECMA-262 v5, 9.3
+ *
+ * @return ecma value
+ *         Returned value must be freed with ecma_free_value
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_op_to_number (ecma_value_t value, /**< ecma value */
+                   ecma_number_t *number_p) /**< [out] ecma number */
+{
+  return ecma_op_to_numeric (value, number_p, ECMA_TO_NUMERIC_NO_OPTS);
+} /* ecma_op_to_number */
+
 ecma_string_t *ecma_op_to_string (ecma_value_t value);
 ecma_string_t *ecma_op_to_property_key (ecma_value_t value);
 ecma_value_t ecma_op_to_object (ecma_value_t value);
