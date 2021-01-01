@@ -989,7 +989,37 @@ void ecma_ref_ecma_string (ecma_string_t *string_p);
 void ecma_deref_ecma_string (ecma_string_t *string_p);
 void ecma_destroy_ecma_string (ecma_string_t *string_p);
 ecma_number_t ecma_string_to_number (const ecma_string_t *str_p);
-uint32_t ecma_string_get_array_index (const ecma_string_t *str_p);
+
+/**
+ * Check if string is array index.
+ *
+ * @return ECMA_STRING_NOT_ARRAY_INDEX if string is not array index
+ *         the array index otherwise
+ */
+inline uint32_t JERRY_ATTR_ALWAYS_INLINE
+ecma_string_get_array_index (const ecma_string_t *str_p) /**< ecma-string */
+{
+  if (ECMA_IS_DIRECT_STRING (str_p))
+  {
+    if (ECMA_IS_DIRECT_STRING_WITH_TYPE (str_p, ECMA_DIRECT_STRING_UINT))
+    {
+      /* Value cannot be equal to the maximum value of a 32 bit unsigned number. */
+      return (uint32_t) ECMA_GET_DIRECT_STRING_VALUE (str_p);
+    }
+
+    return ECMA_STRING_NOT_ARRAY_INDEX;
+  }
+
+  if (ECMA_STRING_GET_CONTAINER (str_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC)
+  {
+    /* When the uint32_number is equal to the maximum value of 32 bit unsigned integer number,
+     * it is also an invalid array index. The comparison to ECMA_STRING_NOT_ARRAY_INDEX will
+     * be true in this case. */
+    return str_p->u.uint32_number;
+  }
+
+  return ECMA_STRING_NOT_ARRAY_INDEX;
+} /* ecma_string_get_array_index */
 
 lit_utf8_size_t JERRY_ATTR_WARN_UNUSED_RESULT
 ecma_string_copy_to_cesu8_buffer (const ecma_string_t *string_desc_p,

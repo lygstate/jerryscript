@@ -992,37 +992,6 @@ ecma_string_to_number (const ecma_string_t *string_p) /**< ecma-string */
 } /* ecma_string_to_number */
 
 /**
- * Check if string is array index.
- *
- * @return ECMA_STRING_NOT_ARRAY_INDEX if string is not array index
- *         the array index otherwise
- */
-inline uint32_t JERRY_ATTR_ALWAYS_INLINE
-ecma_string_get_array_index (const ecma_string_t *str_p) /**< ecma-string */
-{
-  if (ECMA_IS_DIRECT_STRING (str_p))
-  {
-    if (ECMA_IS_DIRECT_STRING_WITH_TYPE (str_p, ECMA_DIRECT_STRING_UINT))
-    {
-      /* Value cannot be equal to the maximum value of a 32 bit unsigned number. */
-      return (uint32_t) ECMA_GET_DIRECT_STRING_VALUE (str_p);
-    }
-
-    return ECMA_STRING_NOT_ARRAY_INDEX;
-  }
-
-  if (ECMA_STRING_GET_CONTAINER (str_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC)
-  {
-    /* When the uint32_number is equal to the maximum value of 32 bit unsigned integer number,
-     * it is also an invalid array index. The comparison to ECMA_STRING_NOT_ARRAY_INDEX will
-     * be true in this case. */
-    return str_p->u.uint32_number;
-  }
-
-  return ECMA_STRING_NOT_ARRAY_INDEX;
-} /* ecma_string_get_array_index */
-
-/**
  * Convert ecma-string's contents to a cesu-8 string and put it to the buffer.
  * It is the caller's responsibility to make sure that the string fits in the buffer.
  *
