@@ -1969,22 +1969,6 @@ lexer_check_next_characters (parser_context_t *context_p, /**< context */
 } /* lexer_check_next_characters */
 
 /**
- * Consumes the next character. The character cannot be a white space.
- *
- * @return consumed character
- */
-inline uint8_t JERRY_ATTR_ALWAYS_INLINE
-lexer_consume_next_character (parser_context_t *context_p) /**< context */
-{
-  JERRY_ASSERT (context_p->source_p < context_p->source_end_p);
-
-  context_p->token.flags &= (uint8_t) ~LEXER_NO_SKIP_SPACES;
-
-  PARSER_PLUS_EQUAL_LC (context_p->column, 1);
-  return *context_p->source_p++;
-} /* lexer_consume_next_character */
-
-/**
  * Checks whether the next character can be the start of a post primary expression
  *
  * Note:

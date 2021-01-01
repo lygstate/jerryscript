@@ -779,7 +779,23 @@ void lexer_next_token (parser_context_t *context_p);
 bool lexer_check_next_character (parser_context_t *context_p, lit_utf8_byte_t character);
 bool lexer_check_next_characters (parser_context_t *context_p, lit_utf8_byte_t character1,
                                   lit_utf8_byte_t character2);
-uint8_t lexer_consume_next_character (parser_context_t *context_p);
+
+/**
+ * Consumes the next character. The character cannot be a white space.
+ *
+ * @return consumed character
+ */
+inline uint8_t JERRY_ATTR_ALWAYS_INLINE
+lexer_consume_next_character (parser_context_t *context_p) /**< context */
+{
+  JERRY_ASSERT (context_p->source_p < context_p->source_end_p);
+
+  context_p->token.flags &= (uint8_t) ~LEXER_NO_SKIP_SPACES;
+
+  PARSER_PLUS_EQUAL_LC (context_p->column, 1);
+  return *context_p->source_p++;
+} /* lexer_consume_next_character */
+
 bool lexer_check_post_primary_exp (parser_context_t *context_p);
 #if ENABLED (JERRY_ESNEXT)
 void lexer_skip_empty_statements (parser_context_t *context_p);
