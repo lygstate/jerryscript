@@ -1074,7 +1074,7 @@ ecma_string_is_length (const ecma_string_t *string_p) /**< property name */
  *
  * @return pointer to the converted ecma string
  */
-static inline ecma_string_t * JERRY_ATTR_ALWAYS_INLINE
+inline ecma_string_t * JERRY_ATTR_ALWAYS_INLINE
 ecma_property_to_string (ecma_property_t property, /**< property name type */
                          jmem_cpointer_t prop_name_cp) /**< property name compressed pointer */
 {
