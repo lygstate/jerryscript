@@ -1277,25 +1277,6 @@ ecma_compiled_code_resolve_arguments_start (const ecma_compiled_code_t *bytecode
 #if ENABLED (JERRY_ESNEXT)
 
 /**
- * Resolve the position of the function name of the compiled code
- *
- * @return position of the function name of the compiled code
- */
-inline ecma_value_t * JERRY_ATTR_ALWAYS_INLINE
-ecma_compiled_code_resolve_function_name (const ecma_compiled_code_t *bytecode_header_p) /**< compiled code */
-{
-  JERRY_ASSERT (bytecode_header_p != NULL);
-  ecma_value_t *base_p = ecma_compiled_code_resolve_arguments_start (bytecode_header_p);
-
-  if (CBC_FUNCTION_GET_TYPE (bytecode_header_p->status_flags) != CBC_FUNCTION_CONSTRUCTOR)
-  {
-    base_p--;
-  }
-
-  return base_p;
-} /* ecma_compiled_code_resolve_function_name */
-
-/**
  * Get the extended info from a byte code
  *
  * @return extended info value
