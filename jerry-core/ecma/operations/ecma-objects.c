@@ -2749,7 +2749,7 @@ ecma_builtin_is (ecma_object_t *object_p, /**< pointer to an object */
  * @return true  - if class name is an object
  *         false - otherwise
  */
-static inline bool
+static inline bool JERRY_ATTR_ALWAYS_INLINE
 ecma_object_check_class_name_is_object (ecma_object_t *obj_p) /**< object */
 {
 #ifndef JERRY_NDEBUG
@@ -3374,7 +3374,7 @@ ecma_op_ordinary_object_set_prototype_of (ecma_object_t *obj_p, /**< base object
  * @return true  - if object is extensible
  *         false - otherwise
  */
-extern inline bool JERRY_ATTR_PURE
+extern inline bool JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
 ecma_op_ordinary_object_is_extensible (ecma_object_t *object_p) /**< object */
 {
   JERRY_ASSERT (!ECMA_OBJECT_IS_PROXY (object_p));
