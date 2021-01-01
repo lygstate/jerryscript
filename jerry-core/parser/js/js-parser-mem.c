@@ -632,7 +632,7 @@ parser_stack_pop (parser_context_t *context_p, /**< context */
  *
  * @return byte
  */
-inline uint8_t
+uint8_t
 parser_stack_iterator_read_uint8 (parser_stack_iterator_t *iterator) /**< iterator */
 {
   JERRY_ASSERT (iterator->current_position > 0 && iterator->current_position <= PARSER_STACK_PAGE_SIZE);
