@@ -41,6 +41,7 @@ extern "C"
 #define JERRY_ATTR_PURE __attribute__((pure))
 #define JERRY_ATTR_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
+#define JERRY_ALWAYS_INLINE inline __attribute__((always_inline))
 #define JERRY_LIKELY(x) __builtin_expect(!!(x), 1)
 #define JERRY_UNLIKELY(x) __builtin_expect(!!(x), 0)
 
@@ -54,6 +55,8 @@ extern "C"
 #define JERRY_ATTR_DEPRECATED __declspec(deprecated)
 #define JERRY_ATTR_NOINLINE __declspec(noinline)
 #define JERRY_ATTR_NORETURN __declspec(noreturn)
+
+#define JERRY_ALWAYS_INLINE __forceinline
 
 /*
  * Microsoft Visual C/C++ Compiler doesn't support for VLA, using _alloca
@@ -143,6 +146,16 @@ void * __cdecl _alloca (size_t _Size);
 #ifndef JERRY_ATTR_WARN_UNUSED_RESULT
 #define JERRY_ATTR_WARN_UNUSED_RESULT
 #endif /* !JERRY_ATTR_WARN_UNUSED_RESULT */
+
+/**
+ * Macro to setup function attributes to force inline function to all call sites.
+ * Before it's usage `static` or `extern` modifier must be used.
+ * Because in msvc, inline without `extern` would cause the function don't generate
+ * symbol and then cause linkage error.
+ */
+#ifndef JERRY_ALWAYS_INLINE
+#define JERRY_ALWAYS_INLINE(x) inline
+#endif /* !JERRY_ALWAYS_INLINE */
 
 /**
  * Helper to predict that a condition is likely.
