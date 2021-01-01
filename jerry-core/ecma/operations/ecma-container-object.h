@@ -18,6 +18,7 @@
 
 #include "ecma-globals.h"
 #include "ecma-builtins.h"
+#include "ecma-iterator-object.h"
 
 #if ENABLED (JERRY_BUILTIN_CONTAINER)
 
@@ -70,10 +71,32 @@ ecma_value_t ecma_op_container_delete_weak (ecma_extended_object_t *map_object_p
 void ecma_op_container_unref_weak (ecma_object_t *object_p, ecma_value_t ref_holder);
 void ecma_op_container_remove_weak_entry (ecma_object_t *container_p, ecma_value_t key_arg);
 void ecma_op_container_free_entries (ecma_object_t *object_p);
-ecma_value_t ecma_op_container_create_iterator (ecma_value_t this_arg,
-                                                ecma_builtin_id_t proto_id,
-                                                ecma_pseudo_array_type_t iterator_type,
-                                                ecma_iterator_kind_t kind);
+
+/**
+ * The Create{Set, Map}Iterator Abstract operation
+ *
+ * See also:
+ *          ECMA-262 v6, 23.1.5.1
+ *          ECMA-262 v6, 23.2.5.1
+ *
+ * Note:
+ *     Returned value must be freed with ecma_free_value.
+ *
+ * @return Map/Set iterator object, if success
+ *         error - otherwise
+ */
+inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+ecma_op_container_create_iterator (ecma_value_t this_arg, /**< this argument */
+                                   ecma_builtin_id_t proto_id, /**< prototype builtin id */
+                                   ecma_pseudo_array_type_t iterator_type, /**< iterator type */
+                                   ecma_iterator_kind_t kind) /**< iterator kind */
+{
+  return ecma_op_create_iterator_object (this_arg,
+                                         ecma_builtin_get (proto_id),
+                                         iterator_type,
+                                         kind);
+} /* ecma_op_container_create_iterator */
+
 ecma_value_t ecma_op_container_iterator_next (ecma_value_t this_val, ecma_pseudo_array_type_t iterator_type);
 ecma_value_t ecma_builtin_container_dispatch_routine (uint16_t builtin_routine_id, ecma_value_t this_arg,
                                                       const ecma_value_t arguments_list_p[],
