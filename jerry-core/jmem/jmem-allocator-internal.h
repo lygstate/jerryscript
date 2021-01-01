@@ -50,7 +50,20 @@
 void jmem_heap_init (void);
 void jmem_heap_finalize (void);
 bool jmem_is_heap_pointer (const void *pointer);
-void *jmem_heap_alloc_block_internal (const size_t size);
+
+void *
+jmem_heap_gc_and_alloc_block (const size_t size, /**< required memory size */
+                              jmem_pressure_t max_pressure); /**< pressure limit */
+
+/**
+ * Internal method for allocating a memory block.
+ */
+inline void * JERRY_ATTR_HOT JERRY_ATTR_ALWAYS_INLINE
+jmem_heap_alloc_block_internal (const size_t size) /**< required memory size */
+{
+  return jmem_heap_gc_and_alloc_block (size, JMEM_PRESSURE_FULL);
+} /* jmem_heap_alloc_block_internal */
+
 void jmem_heap_free_block_internal (void *ptr, const size_t size);
 
 /**

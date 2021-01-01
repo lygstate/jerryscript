@@ -267,7 +267,7 @@ jmem_heap_alloc (const size_t size) /**< size of requested block */
  * @return NULL, if the required memory size is 0 or not enough memory
  *         pointer to the allocated memory block, if allocation is successful
  */
-static void *
+void *
 jmem_heap_gc_and_alloc_block (const size_t size, /**< required memory size */
                               jmem_pressure_t max_pressure) /**< pressure limit */
 {
@@ -300,15 +300,6 @@ jmem_heap_gc_and_alloc_block (const size_t size, /**< required memory size */
 
   return data_space_p;
 } /* jmem_heap_gc_and_alloc_block */
-
-/**
- * Internal method for allocating a memory block.
- */
-inline void * JERRY_ATTR_HOT JERRY_ATTR_ALWAYS_INLINE
-jmem_heap_alloc_block_internal (const size_t size) /**< required memory size */
-{
-  return jmem_heap_gc_and_alloc_block (size, JMEM_PRESSURE_FULL);
-} /* jmem_heap_alloc_block_internal */
 
 /**
  * Allocation of memory block, reclaiming unused memory if there is not enough.
