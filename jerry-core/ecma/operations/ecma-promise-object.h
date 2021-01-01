@@ -18,6 +18,7 @@
 
 #if ENABLED (JERRY_BUILTIN_PROMISE)
 #include "ecma-globals.h"
+#include "ecma-objects.h"
 
 /** \addtogroup ecma ECMA
  * @{
@@ -102,7 +103,18 @@ typedef struct
  *   bit 2 is set: async function callback
  */
 
-bool ecma_is_promise (ecma_object_t *obj_p);
+/**
+ * Check if an object is promise.
+ *
+ * @return true - if the object is a promise.
+ *         false - otherwise.
+ */
+inline bool JERRY_ATTR_ALWAYS_INLINE
+ecma_is_promise (ecma_object_t *obj_p) /**< points to object */
+{
+  return ecma_object_class_is (obj_p, LIT_MAGIC_STRING_PROMISE_UL);
+} /* ecma_is_promise */
+
 ecma_value_t ecma_op_create_promise_object (ecma_value_t executor, ecma_promise_executor_type_t type);
 uint16_t ecma_promise_get_flags (ecma_object_t *promise_p);
 ecma_value_t ecma_promise_get_result (ecma_object_t *promise_p);
