@@ -300,7 +300,24 @@ ecma_op_invoke_by_magic_id (ecma_value_t object, /**< Object value */
 } /* ecma_op_invoke_by_magic_id */
 
 ecma_value_t ecma_op_ordinary_object_set_prototype_of (ecma_object_t *base_p, ecma_value_t proto);
-bool JERRY_ATTR_PURE ecma_op_ordinary_object_is_extensible (ecma_object_t *object_p);
+
+/**
+ * [[IsExtensible]] operation for Ordinary object.
+ *
+ * See also:
+ *          ECMAScript v6, 9.1.2
+ *
+ * @return true  - if object is extensible
+ *         false - otherwise
+ */
+inline bool JERRY_ATTR_PURE JERRY_ATTR_ALWAYS_INLINE
+ecma_op_ordinary_object_is_extensible (ecma_object_t *object_p) /**< object */
+{
+  JERRY_ASSERT (!ECMA_OBJECT_IS_PROXY (object_p));
+
+  return (object_p->type_flags_refs & ECMA_OBJECT_FLAG_EXTENSIBLE) != 0;
+} /* ecma_op_ordinary_object_is_extensible */
+
 void ecma_op_ordinary_object_prevent_extensions (ecma_object_t *object_p);
 
 #if ENABLED (JERRY_BUILTIN_PROXY)
