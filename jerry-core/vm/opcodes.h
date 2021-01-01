@@ -219,8 +219,22 @@ opfunc_add_computed_field (ecma_value_t class_object, ecma_value_t name);
 ecma_value_t
 opfunc_create_implicit_class_constructor (uint8_t opcode);
 
-void
-opfunc_set_home_object (ecma_object_t *func_p, ecma_object_t *parent_env_p);
+/**
+ * Set the [[HomeObject]] attribute of the given functon object
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+opfunc_set_home_object (ecma_object_t *func_p, /**< function object */
+                        ecma_object_t *parent_env_p) /**< parent environment */
+{
+  JERRY_ASSERT (ecma_is_lexical_environment (parent_env_p));
+
+  if (ecma_get_object_type (func_p) == ECMA_OBJECT_TYPE_FUNCTION)
+  {
+    JERRY_ASSERT (!ecma_get_object_is_builtin (func_p));
+
+    ECMA_SET_NON_NULL_POINTER_TAG (((ecma_extended_object_t *) func_p)->u.function.scope_cp, parent_env_p, 0);
+  }
+} /* opfunc_set_home_object */
 
 void
 opfunc_push_class_environment (vm_frame_ctx_t *frame_ctx_p,  ecma_value_t **vm_stack_top, ecma_value_t class_name);
