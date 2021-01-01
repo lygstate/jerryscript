@@ -393,7 +393,16 @@ void scanner_raise_redeclaration_error (parser_context_t *context_p);
 #endif /* ENABLED (JERRY_ESNEXT) */
 
 void *scanner_malloc (parser_context_t *context_p, size_t size);
-void scanner_free (void *ptr, size_t size);
+
+/**
+ * Free memory allocated by scanner_malloc.
+ */
+inline void JERRY_ATTR_ALWAYS_INLINE
+scanner_free (void *ptr, /**< pointer to free */
+              size_t size) /**< size of the memory block */
+{
+  jmem_heap_free_block (ptr, size);
+} /* scanner_free */
 
 size_t scanner_get_stream_size (scanner_info_t *info_p, size_t size);
 scanner_info_t *scanner_insert_info (parser_context_t *context_p, const uint8_t *source_p, size_t size);

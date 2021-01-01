@@ -113,16 +113,6 @@ scanner_malloc (parser_context_t *context_p, /**< context */
 } /* scanner_malloc */
 
 /**
- * Free memory allocated by scanner_malloc.
- */
-inline void JERRY_ATTR_ALWAYS_INLINE
-scanner_free (void *ptr, /**< pointer to free */
-              size_t size) /**< size of the memory block */
-{
-  jmem_heap_free_block (ptr, size);
-} /* scanner_free */
-
-/**
  * Count the size of a stream after an info block.
  *
  * @return the size in bytes
