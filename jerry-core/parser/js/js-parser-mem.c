@@ -644,7 +644,7 @@ parser_stack_pop (parser_context_t *context_p, /**< context */
 /**
  * Initialize stack iterator.
  */
-extern inline void
+extern inline void JERRY_ATTR_ALWAYS_INLINE
 parser_stack_iterator_init (parser_context_t *context_p, /**< context */
                             parser_stack_iterator_t *iterator) /**< iterator */
 {
@@ -657,7 +657,7 @@ parser_stack_iterator_init (parser_context_t *context_p, /**< context */
  *
  * @return byte
  */
-extern inline uint8_t
+extern inline uint8_t JERRY_ATTR_ALWAYS_INLINE
 parser_stack_iterator_read_uint8 (parser_stack_iterator_t *iterator) /**< iterator */
 {
   JERRY_ASSERT (iterator->current_position > 0 && iterator->current_position <= PARSER_STACK_PAGE_SIZE);
