@@ -317,21 +317,6 @@ ecma_date_week_day (ecma_number_t time) /**< time value */
 } /* ecma_date_week_day */
 
 /**
- * Helper function to get the local time zone offset at a given UTC timestamp.
- * You can add this number to the given UTC timestamp to get local time.
- *
- * See also:
- *          ECMA-262 v5, 15.9.1.9
- *
- * @return local time zone adjustment
- */
-inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE
-ecma_date_local_time_zone_adjustment (ecma_number_t time) /**< time value */
-{
-  return jerry_port_get_local_time_zone_adjustment (time, true);
-} /* ecma_date_local_time_zone_adjustment */
-
-/**
  * Helper function to get UTC time from local time.
  *
  * See also:
