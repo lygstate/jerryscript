@@ -119,8 +119,42 @@ ecma_op_function_get_compiled_code (ecma_extended_object_t *function_p) /**< fun
 } /* ecma_op_function_get_compiled_code */
 
 #if ENABLED (JERRY_BUILTIN_REALMS)
-ecma_global_object_t *
-ecma_op_function_get_realm (const ecma_compiled_code_t *bytecode_header_p);
+
+/**
+ * Get realm from a byte code.
+ *
+ * Note:
+ *   Does not increase the reference counter.
+ *
+ * @return pointer to realm (global) object
+ */
+inline ecma_global_object_t * JERRY_ATTR_ALWAYS_INLINE
+ecma_op_function_get_realm (const ecma_compiled_code_t *bytecode_header_p) /**< byte code header */
+{
+  ecma_value_t realm_value;
+
+  if (bytecode_header_p->status_flags & CBC_CODE_FLAGS_UINT16_ARGUMENTS)
+  {
+    cbc_uint16_arguments_t *args_p = (cbc_uint16_arguments_t *) bytecode_header_p;
+    realm_value = args_p->realm_value;
+  }
+  else
+  {
+    cbc_uint8_arguments_t *args_p = (cbc_uint8_arguments_t *) bytecode_header_p;
+    realm_value = args_p->realm_value;
+  }
+
+#if ENABLED (JERRY_SNAPSHOT_EXEC)
+  if (JERRY_LIKELY (realm_value != JMEM_CP_NULL))
+  {
+    return ECMA_GET_INTERNAL_VALUE_POINTER (ecma_global_object_t, realm_value);
+  }
+
+  return (ecma_global_object_t *) ecma_builtin_get_global ();
+#else /* !ENABLED (JERRY_SNAPSHOT_EXEC) */
+  return ECMA_GET_INTERNAL_VALUE_POINTER (ecma_global_object_t, realm_value);
+#endif /* ENABLED (JERRY_SNAPSHOT_EXEC) */
+} /* ecma_op_function_get_realm */
 
 ecma_global_object_t *
 ecma_op_function_get_function_realm (ecma_object_t *func_obj_p);
