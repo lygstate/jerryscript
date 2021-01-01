@@ -585,29 +585,6 @@ lit_utf8_string_code_unit_at (const lit_utf8_byte_t *utf8_buf_p, /**< utf-8 stri
 } /* lit_utf8_string_code_unit_at */
 
 /**
- * Get CESU-8 encoded size of character
- *
- * @return number of bytes occupied in CESU-8
- */
-inline lit_utf8_size_t JERRY_ATTR_ALWAYS_INLINE
-lit_get_unicode_char_size_by_utf8_first_byte (const lit_utf8_byte_t first_byte) /**< buffer with characters */
-{
-  if ((first_byte & LIT_UTF8_1_BYTE_MASK) == LIT_UTF8_1_BYTE_MARKER)
-  {
-    return 1;
-  }
-  else if ((first_byte & LIT_UTF8_2_BYTE_MASK) == LIT_UTF8_2_BYTE_MARKER)
-  {
-    return 2;
-  }
-  else
-  {
-    JERRY_ASSERT ((first_byte & LIT_UTF8_3_BYTE_MASK) == LIT_UTF8_3_BYTE_MARKER);
-    return 3;
-  }
-} /* lit_get_unicode_char_size_by_utf8_first_byte */
-
-/**
  * Convert code unit to cesu-8 representation
  *
  * @return byte count required to represent the code unit
