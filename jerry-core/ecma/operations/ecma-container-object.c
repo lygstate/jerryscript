@@ -44,7 +44,7 @@
  *
  * @return pointer to the internal buffer
  */
-static inline ecma_collection_t * JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE ecma_collection_t *
 ecma_op_create_internal_buffer (void)
 {
   ecma_collection_t *collection_p = ecma_new_collection ();
@@ -80,7 +80,7 @@ ecma_op_internal_buffer_append (ecma_collection_t *container_p, /**< internal co
 /**
  * Update the value of a given entry.
  */
-static inline void JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE void
 ecma_op_internal_buffer_update (ecma_value_t *entry_p, /**< entry pointer */
                                 ecma_value_t value_arg, /**< value argument */
                                 lit_magic_string_id_t lit_id) /**< class id */
@@ -972,7 +972,7 @@ ecma_op_container_remove_weak_entry (ecma_object_t *object_p, /**< internal cont
  * @return Map/Set iterator object, if success
  *         error - otherwise
  */
-extern inline ecma_value_t JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE ecma_value_t
 ecma_op_container_create_iterator (ecma_value_t this_arg, /**< this argument */
                                    ecma_builtin_id_t proto_id, /**< prototype builtin id */
                                    ecma_pseudo_array_type_t iterator_type, /**< iterator type */

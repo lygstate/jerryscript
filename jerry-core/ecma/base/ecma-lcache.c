@@ -56,7 +56,7 @@
 /**
  * Invalidate specified LCache entry
  */
-static inline void JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE void
 ecma_lcache_invalidate_entry (ecma_lcache_hash_entry_t *entry_p) /**< entry to invalidate */
 {
   JERRY_ASSERT (entry_p != NULL);
@@ -72,7 +72,7 @@ ecma_lcache_invalidate_entry (ecma_lcache_hash_entry_t *entry_p) /**< entry to i
  *
  * @return row index
  */
-static inline size_t JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE size_t
 ecma_lcache_row_index (jmem_cpointer_t object_cp, /**< compressed pointer to object */
                        jmem_cpointer_t name_cp) /**< compressed pointer to property name */
 {
@@ -136,7 +136,7 @@ insert:
  * @return a pointer to an ecma_property_t if the lookup is successful
  *         NULL otherwise
  */
-extern inline ecma_property_t * JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE ecma_property_t *
 ecma_lcache_lookup (const ecma_object_t *object_p, /**< object */
                     const ecma_string_t *prop_name_p) /**< property's name */
 {

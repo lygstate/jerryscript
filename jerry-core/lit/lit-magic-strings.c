@@ -28,7 +28,7 @@
  * @return number of the strings, if there were registered,
  *         zero - otherwise.
  */
-extern inline uint32_t JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE uint32_t
 lit_get_magic_string_ex_count (void)
 {
   return JERRY_CONTEXT (lit_magic_string_ex_count);

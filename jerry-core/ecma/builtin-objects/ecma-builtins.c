@@ -319,7 +319,7 @@ ecma_builtin_is_global (ecma_object_t *object_p) /**< pointer to an object */
  *
  * @return pointer to the global object
  */
-extern inline ecma_object_t * JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE ecma_object_t *
 ecma_builtin_get_global (void)
 {
   JERRY_ASSERT (JERRY_CONTEXT (global_object_p) != NULL);
@@ -333,7 +333,7 @@ ecma_builtin_get_global (void)
  * @return true - if the function object is a built-in routine
  *         false - otherwise
  */
-extern inline bool JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE bool
 ecma_builtin_function_is_routine (ecma_object_t *func_obj_p) /**< function object */
 {
   JERRY_ASSERT (ecma_get_object_type (func_obj_p) == ECMA_OBJECT_TYPE_NATIVE_FUNCTION);
@@ -705,7 +705,7 @@ ecma_builtin_get_from_realm (ecma_global_object_t *global_object_p, /**< global 
  *
  * @return pointer to the object's instance
  */
-static inline ecma_object_t * JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE ecma_object_t *
 ecma_builtin_get_from_builtin (ecma_object_t *builtin_object_p, /**< built-in object */
                                ecma_builtin_id_t builtin_id) /**< id of built-in to check on */
 {
