@@ -22,6 +22,7 @@ import hashlib
 import os
 import platform
 import subprocess
+import threading
 import sys
 import settings
 
@@ -32,6 +33,9 @@ else:
     import util
 
 OUTPUT_DIR = os.path.join(settings.PROJECT_DIR, 'build', 'tests')
+
+# All run_check proc must finished in 15 minutes, may increase in future
+JERRY_CHECK_TIMEOUT = 15 * 60
 
 Options = collections.namedtuple('Options', ['name', 'build_args', 'test_args', 'skip'])
 Options.__new__.__defaults__ = ([], [], False)
@@ -350,7 +354,10 @@ def run_check(runnable, env=None):
         env = full_env
 
     proc = subprocess.Popen(runnable, env=env)
+    timer = threading.Timer(JERRY_CHECK_TIMEOUT, proc.kill)
+    timer.start()
     proc.wait()
+    timer.cancel()
     return proc.returncode
 
 def run_jerry_debugger_tests(options):
