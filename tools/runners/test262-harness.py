@@ -827,7 +827,9 @@ class TestSuite(object):
         if not tests:
             return True
         for test in tests:
-            if test in rel_path:
+            # logging.warn(os.path.normpath(test))
+            # logging.warn(os.path.normpath(rel_path))
+            if os.path.normpath(test) in os.path.normpath(rel_path):
                 return True
         return False
 
