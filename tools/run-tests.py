@@ -82,7 +82,7 @@ JERRY_UNITTESTS_OPTIONS = [
 JERRY_TESTS_OPTIONS = [
     Options('jerry_tests-es.next',
             OPTIONS_COMMON + OPTIONS_PROFILE_ESNEXT + OPTIONS_STACK_LIMIT + OPTIONS_GC_MARK_LIMIT
-            + OPTIONS_MEM_STRESS),
+            + OPTIONS_MEM_STRESS + ['--line-info=on', '--error-messages=on']),
     Options('jerry_tests-es5.1',
             OPTIONS_COMMON + OPTIONS_PROFILE_ES51 + OPTIONS_STACK_LIMIT + OPTIONS_GC_MARK_LIMIT),
     Options('jerry_tests-es5.1-snapshot',
