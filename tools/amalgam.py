@@ -289,9 +289,13 @@ def amalgamate_jerry_core(output_dir):
 def amalgamate_jerry_port_default(output_dir):
     amalgamate(
         base_dir=JERRY_PORT,
+        input_files=[
+            os.path.join(ROOT_DIR, 'third-party', 'cwalk', 'cwalk.c')
+        ],
         output_file=os.path.join(output_dir, 'jerryscript-port-default.c'),
         append_c_files=True,
         remove_includes=[
+            'cwalk.h',
             'jerryscript-port.h',
             'jerryscript-port-default.h',
             'jerryscript-debugger.h',
@@ -304,7 +308,10 @@ def amalgamate_jerry_port_default(output_dir):
 
     amalgamate(
         base_dir=JERRY_PORT,
-        input_files=[os.path.join(JERRY_PORT, 'include', 'jerryscript-port-default.h')],
+        input_files=[
+            os.path.join(ROOT_DIR, 'third-party', 'cwalk', 'cwalk.h'),
+            os.path.join(JERRY_PORT, 'include', 'jerryscript-port-default.h')
+        ],
         output_file=os.path.join(output_dir, 'jerryscript-port-default.h'),
         remove_includes=[
             'jerryscript-port.h',

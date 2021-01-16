@@ -16,11 +16,14 @@ cmake_minimum_required (VERSION 2.8.12)
 set(JERRY_PORT_DEFAULT_NAME jerry-port-default)
 project (${JERRY_PORT_DEFAULT_NAME} C)
 
+set(THIRD_PARTY_CWALK "${CMAKE_CURRENT_SOURCE_DIR}/../../third-party/cwalk")
+
 # Include directories
 set(INCLUDE_PORT_DEFAULT "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Source directories
 set(SOURCE_PORT_DEFAULT
+  ${THIRD_PARTY_CWALK}/cwalk.c
   default-date.c
   default-debugger.c
   default-external-context.c
@@ -77,7 +80,7 @@ endif()
 # Default Jerry port implementation library
 add_library(${JERRY_PORT_DEFAULT_NAME} ${SOURCE_PORT_DEFAULT})
 target_include_directories(${JERRY_PORT_DEFAULT_NAME} PUBLIC ${INCLUDE_PORT_DEFAULT})
-target_include_directories(${JERRY_PORT_DEFAULT_NAME} PRIVATE ${INCLUDE_CORE_PUBLIC})
+target_include_directories(${JERRY_PORT_DEFAULT_NAME} PRIVATE ${INCLUDE_CORE_PUBLIC} ${THIRD_PARTY_CWALK})
 target_include_directories(${JERRY_PORT_DEFAULT_NAME} PRIVATE ${INCLUDE_EXT_PUBLIC})
 target_compile_definitions(${JERRY_PORT_DEFAULT_NAME} PRIVATE ${DEFINES_PORT_DEFAULT})
 target_link_libraries(${JERRY_PORT_DEFAULT_NAME} jerry-core) # FIXME: remove this dependency as soon as possible

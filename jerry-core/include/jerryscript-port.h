@@ -22,6 +22,14 @@
 
 #include "jerryscript-types.h"
 
+#if defined (_WIN32)
+#define JERRY_MODULE_MAX_PATH 65536u
+#elif defined (__unix__) || defined (__APPLE__)
+#define JERRY_MODULE_MAX_PATH 4096u
+#else
+#define JERRY_MODULE_MAX_PATH 255u
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -215,6 +223,41 @@ uint8_t *jerry_port_read_source (const char *file_name_p, size_t *out_size_p);
  * @param buffer_p The pointer the allocated buffer.
  */
 void jerry_port_release_source (uint8_t *buffer_p);
+
+/**
+ * Convert UTF16 string to UTF8 string
+ *
+ * @param in_wide_str_p input utf16 str
+ * @param in_wide_str_size input utf16 size
+ * @param out_str_p output utf8 str
+ * @param out_str_size input utf8 capacity
+ * @return the converted utf8 string length
+ */
+size_t jerry_convert_utf16_to_utf8 (
+    const uint16_t *in_wide_str_p,
+    size_t in_wide_str_size,
+    char *out_str_p,
+    size_t out_str_size);
+
+/**
+ * Get the current working directory
+ *
+ * Note:
+ *      refer to https://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
+ *
+ * @param out_buf_p Pointer to the output buffer where the normalized path should be written.
+ * @param out_buf_size Size of the output buffer.
+ *
+ * @return the working directory path
+ */
+char *jerry_port_get_cwd (char *out_buf_p,
+                          size_t out_buf_size);
+
+jerry_char_t *
+jerry_port_normalize_path (const jerry_char_t *in_path_p, /**< path to the referenced module */
+                           size_t in_path_length, /**< length of the path */
+                           const jerry_char_t *base_path_p, /**< base path */
+                           size_t base_path_length); /**< length of the base path */
 
 /**
  * Default module resolver.

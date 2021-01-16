@@ -21,7 +21,7 @@
 
 #if JERRY_MODULE_SYSTEM
 
-#define ECMA_MODULE_MAX_PATH 255u
+#define ECMA_MODULE_MAX_PATH JERRY_MODULE_MAX_PATH
 
 /**
  * Module status flags.

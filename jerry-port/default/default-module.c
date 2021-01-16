@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+#if !defined (_WIN32)
+#include <unistd.h>
+#else
+#include <direct.h>
+#include <Windows.h>
+#endif /* !defined (_WIN32) */
 #include <limits.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -21,10 +27,114 @@
 
 #include "jerryscript-port.h"
 #include "jerryscript-port-default.h"
+#include "cwalk.h"
 
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
 #endif
+
+/**
+ * Convert utf16 string to utf8 string
+ * @return the utf8 string length
+ */
+size_t
+jerry_convert_utf16_to_utf8 (const uint16_t *in_wide_str_p,
+                             size_t in_wide_str_size,
+                             char *out_str_p,
+                             size_t out_str_size)
+{
+#if defined (_WIN32)
+  size_t utf8_len = (size_t) WideCharToMultiByte (
+      CP_UTF8, 0, (wchar_t *) in_wide_str_p, (int) in_wide_str_size,
+      NULL, 0, NULL, NULL);
+
+  if (out_str_p != NULL && utf8_len < out_str_size)
+  {
+    WideCharToMultiByte (
+        CP_UTF8, 0, (wchar_t *) in_wide_str_p, (int) in_wide_str_size,
+        out_str_p, (int) utf8_len, 0, 0);
+    out_str_p[utf8_len] = 0;
+  }
+  return utf8_len;
+#else
+  (void) (in_wide_str_p);
+  (void) (in_wide_str_size);
+  (void) (out_str_p);
+  (void) (out_str_size);
+  return 0;
+#endif
+} /* jerry_convert_utf16_to_utf8 */
+
+/**
+ * Get the current working directory
+ *
+ * @return the working directory path
+ */
+char *
+jerry_port_get_cwd (char *out_buf_p,     /**< output buffer */
+                    size_t out_buf_size) /**< size of output buffer */
+{
+  char *out_cwd_p = NULL;
+#if defined (_WIN32)
+  wchar_t *cwd_wide_p = _wgetcwd (NULL, 0);
+  if (cwd_wide_p != NULL)
+  {
+    if (out_buf_p != NULL)
+    {
+      /* Try copy into out_buf_p, if the length are not enough,
+        then setting out_cwd_p to NULL */
+      size_t utf8_len = jerry_convert_utf16_to_utf8 (
+          cwd_wide_p, wcslen (cwd_wide_p), out_buf_p, out_buf_size);
+      if (utf8_len < out_buf_size)
+      {
+        out_cwd_p = out_buf_p;
+      }
+    }
+    else
+    {
+      /* Try allocating out_cwd_p, if failed, then setting out_cwd_p to NULL */
+      size_t utf8_len = jerry_convert_utf16_to_utf8 (
+          cwd_wide_p, wcslen (cwd_wide_p), NULL, 0);
+      out_cwd_p = malloc (utf8_len + 1);
+      jerry_convert_utf16_to_utf8 (
+          cwd_wide_p, wcslen (cwd_wide_p), out_cwd_p, utf8_len + 1);
+    }
+    /* cwd_wide_p will free in any condition */
+    free (cwd_wide_p);
+  }
+#else
+  char *cwd_p = getcwd (NULL, 0);
+  if (cwd_p != NULL)
+  {
+    if (out_buf_p != NULL)
+    {
+      size_t cwd_p_len = strlen (cwd_p);
+      if (cwd_p_len < out_buf_size)
+      {
+        memcpy (out_buf_p, cwd_p, cwd_p_len);
+        out_buf_p[cwd_p_len] = 0;
+        out_cwd_p = out_buf_p;
+      }
+      /* Free cwd_p only when out_buf_p are not NULL */
+      free (cwd_p);
+    }
+    else
+    {
+      out_cwd_p = cwd_p;
+    }
+  }
+#endif
+  if (out_cwd_p == NULL && out_buf_p == NULL)
+  {
+    out_cwd_p = malloc (2);
+    if (out_cwd_p != NULL)
+    {
+      out_cwd_p[0] = '/';
+      out_cwd_p[1] = 0;
+    }
+  }
+  return out_cwd_p;
+} /* jerry_port_get_cwd  */
 
 /**
  * Determines the size of the given file.
@@ -136,67 +246,51 @@ jerry_port_get_directory_end (const jerry_char_t *path_p) /**< path */
  * @return a newly allocated buffer with the normalized path if the operation is successful,
  *         NULL otherwise
  */
-static jerry_char_t *
+jerry_char_t *
 jerry_port_normalize_path (const jerry_char_t *in_path_p, /**< path to the referenced module */
                            size_t in_path_length, /**< length of the path */
                            const jerry_char_t *base_path_p, /**< base path */
                            size_t base_path_length) /**< length of the base path */
 {
   char *path_p;
+  char *base_path_pz;
+  char *in_path_pz = malloc (in_path_length + 1);
+  if (in_path_pz == NULL)
+  {
+    return NULL;
+  }
+  memcpy (in_path_pz, in_path_p, in_path_length);
+  in_path_pz[in_path_length] = '\0';
 
   if (base_path_length > 0)
   {
-    path_p = (char *) malloc (base_path_length + in_path_length + 1);
-
-    if (path_p == NULL)
+    base_path_pz = malloc (base_path_length + 1);
+    if (base_path_pz != NULL)
     {
-      return NULL;
+      memcpy (base_path_pz, base_path_p, base_path_length);
+      base_path_pz[base_path_length] = '\0';
     }
-
-    memcpy (path_p, base_path_p, base_path_length);
-    memcpy (path_p + base_path_length, in_path_p, in_path_length);
-    path_p[base_path_length + in_path_length] = '\0';
   }
   else
   {
-    path_p = (char *) malloc (in_path_length + 1);
-
-    if (path_p == NULL)
-    {
-      return NULL;
-    }
-
-    memcpy (path_p, in_path_p, in_path_length);
-    path_p[in_path_length] = '\0';
+    base_path_pz = jerry_port_get_cwd (NULL, 0);
   }
 
-#if defined (_WIN32)
-  char full_path[_MAX_PATH];
-
-  if (_fullpath (full_path, path_p, _MAX_PATH) != NULL)
+  if (base_path_pz == NULL)
   {
-    free (path_p);
-
-    size_t full_path_len = strlen (full_path);
-
-    path_p = (char *) malloc (full_path_len + 1);
-
-    if (path_p == NULL)
-    {
-      return NULL;
-    }
-
-    memcpy (path_p, full_path, full_path_len + 1);
+    free (in_path_pz);
+    return NULL;
   }
-#elif defined (__unix__) || defined (__APPLE__)
-  char *norm_p = realpath (path_p, NULL);
 
-  if (norm_p != NULL)
+  size_t path_p_len = cwk_path_get_absolute (base_path_pz, in_path_pz, NULL, 0);
+  path_p = (char *) malloc (path_p_len + 1);
+  if (path_p != NULL)
   {
-    free (path_p);
-    path_p = norm_p;
+    cwk_path_get_absolute (base_path_pz, in_path_pz, path_p, path_p_len + 1);
+    path_p[path_p_len] = '\0';
   }
-#endif /* _WIN32 */
+  free (base_path_pz);
+  free (in_path_pz);
 
   return (jerry_char_t *) path_p;
 } /* jerry_port_normalize_path */
