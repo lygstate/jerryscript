@@ -70,7 +70,8 @@ JERRY_UNITTESTS_OPTIONS = [
 # Test options for jerry-tests
 JERRY_TESTS_OPTIONS = [
     Options('jerry_tests',
-            OPTIONS_COMMON +  OPTIONS_STACK_LIMIT + OPTIONS_GC_MARK_LIMIT + OPTIONS_MEM_STRESS),
+            OPTIONS_COMMON +  OPTIONS_STACK_LIMIT + OPTIONS_GC_MARK_LIMIT + OPTIONS_MEM_STRESS
+            + ['--line-info=on', '--error-messages=on']),
     Options('jerry_tests-snapshot',
             OPTIONS_COMMON + OPTIONS_SNAPSHOT + OPTIONS_STACK_LIMIT + OPTIONS_GC_MARK_LIMIT,
             ['--snapshot']),
