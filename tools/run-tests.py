@@ -372,7 +372,7 @@ def run_jerry_debugger_tests(options):
                 if test_file.endswith(".cmd"):
                     test_case, _ = os.path.splitext(test_file)
                     test_case_path = os.path.join(settings.DEBUGGER_TESTS_DIR, test_case)
-                    test_cmd = [
+                    test_cmd = util.get_python_cmd_prefix() + [
                         settings.DEBUGGER_TEST_RUNNER_SCRIPT,
                         get_binary_path(build_dir_path),
                         channel,
