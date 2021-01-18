@@ -71,7 +71,11 @@ check_double (const char *expr, double computed, double expected)
     if (diff <= 1) /* tolerate 1 bit of differene in the last place */
     {
       result = true;
-      if (diff != 0)
+      if (isinf (expected) && diff != 0)
+      {
+        result = false;
+      }
+      else if (diff != 0)
       {
         printf ("APPROX ");
       }
