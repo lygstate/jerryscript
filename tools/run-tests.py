@@ -245,12 +245,14 @@ def report_command(cmd_type, cmd, env=None):
         sys.stderr.write(''.join('%s%s=%r \\%s\n' % (TERM_BLUE, var, val, TERM_NORMAL)
                                  for var, val in sorted(env.items())))
     sys.stderr.write('%s%s%s\n' % (TERM_BLUE, (' \\%s\n\t%s' % (TERM_NORMAL, TERM_BLUE)).join(cmd), TERM_NORMAL))
+    sys.stderr.flush()
 
 def report_skip(job):
     sys.stderr.write('%sSkipping: %s' % (TERM_YELLOW, job.name))
     if job.skip:
         sys.stderr.write(' (%s)' % job.skip)
     sys.stderr.write('%s\n' % TERM_NORMAL)
+    sys.stderr.flush()
 
 def create_binary(job, options):
     build_args = job.build_args[:]
@@ -281,6 +283,7 @@ def create_binary(job, options):
     if binary_key in BINARY_CACHE:
         ret, build_dir_path = BINARY_CACHE[binary_key]
         sys.stderr.write('(skipping: already built at %s with returncode %d)\n' % (build_dir_path, ret))
+        sys.stderr.flush()
         return ret, build_dir_path
 
     try:
@@ -318,6 +321,7 @@ def iterate_test_runner_jobs(jobs, options):
 
         if build_dir_path in tested_paths:
             sys.stderr.write('(skipping: already tested with %s)\n' % build_dir_path)
+            sys.stderr.flush()
             continue
         else:
             tested_paths.add(build_dir_path)
@@ -327,6 +331,7 @@ def iterate_test_runner_jobs(jobs, options):
 
         if bin_hash in tested_hashes:
             sys.stderr.write('(skipping: already tested with equivalent %s)\n' % tested_hashes[bin_hash])
+            sys.stderr.flush()
             continue
         else:
             tested_hashes[bin_hash] = build_dir_path
