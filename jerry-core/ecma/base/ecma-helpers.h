@@ -492,6 +492,7 @@ uint8_t *ecma_compiled_code_get_line_info (const ecma_compiled_code_t *bytecode_
 ecma_value_t ecma_get_source_name (const ecma_compiled_code_t *bytecode_p);
 #if (JERRY_STACK_LIMIT != 0)
 uintptr_t ecma_get_current_stack_usage (void);
+#define ECMA_STACK_USAGE_OVERFLOW(target) (ecma_get_current_stack_usage () > (target))
 #endif /* (JERRY_STACK_LIMIT != 0) */
 
 /* ecma-helpers-external-pointers.c */
