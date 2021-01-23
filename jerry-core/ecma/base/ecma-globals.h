@@ -2272,7 +2272,7 @@ typedef struct
 #define ECMA_CHECK_STACK_USAGE() \
 do \
 { \
-  if (ecma_get_current_stack_usage () > CONFIG_MEM_STACK_LIMIT) \
+  if (JERRY_UNLIKELY( ecma_stack_usage_overflow (CONFIG_MEM_STACK_LIMIT))) \
   { \
     return ecma_raise_range_error (ECMA_ERR_MSG ("Maximum call stack size exceeded")); \
   } \

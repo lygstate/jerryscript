@@ -541,7 +541,7 @@ ecma_collection_t *ecma_compiled_code_get_tagged_template_collection (const ecma
 #endif /* JERRY_ESNEXT */
 ecma_value_t ecma_get_resource_name (const ecma_compiled_code_t *bytecode_p);
 #if (JERRY_STACK_LIMIT != 0)
-uintptr_t ecma_get_current_stack_usage (void);
+bool ecma_stack_usage_overflow (uintptr_t ptr);
 #endif /* (JERRY_STACK_LIMIT != 0) */
 
 /* ecma-helpers-external-pointers.c */
