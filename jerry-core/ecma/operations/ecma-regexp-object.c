@@ -659,7 +659,7 @@ ecma_regexp_run (ecma_regexp_ctx_t *re_ctx_p, /**< RegExp matcher context */
                  const lit_utf8_byte_t *str_curr_p) /**< input string pointer */
 {
 #if (JERRY_STACK_LIMIT != 0)
-  if (JERRY_UNLIKELY (ecma_get_current_stack_usage () > CONFIG_MEM_STACK_LIMIT))
+  if (JERRY_UNLIKELY (ecma_stack_usage_overflow (CONFIG_MEM_STACK_LIMIT)))
   {
     return ECMA_RE_OUT_OF_STACK;
   }

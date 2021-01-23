@@ -1829,12 +1829,22 @@ ecma_get_resource_name (const ecma_compiled_code_t *bytecode_p) /**< compiled co
  *
  * @return current stack usage in bytes
  */
-uintptr_t JERRY_ATTR_NOINLINE
+static uintptr_t JERRY_ATTR_NOINLINE
 ecma_get_current_stack_usage (void)
 {
   volatile int __sp;
   return (uintptr_t) (JERRY_CONTEXT (stack_base) - (uintptr_t) &__sp);
 } /* ecma_get_current_stack_usage */
+
+bool JERRY_ATTR_ALWAYS_INLINE
+ecma_stack_usage_overflow (uintptr_t target)
+{
+  if (JERRY_UNLIKELY (ecma_get_current_stack_usage () > target))
+  {
+    return true;
+  }
+  return false;
+} /* ecma_stack_usage_overflow */
 
 #endif /* (JERRY_STACK_LIMIT != 0) */
 
