@@ -1863,6 +1863,8 @@ jerry_value_to_bigint (const jerry_value_t value) /**< input value */
 #endif /* JERRY_BUILTIN_BIGINT */
 } /* jerry_value_to_bigint */
 
+jerry_value_t global_check_release = -1;
+
 /**
  * Convert any number to integer number.
  *
@@ -1952,6 +1954,9 @@ jerry_value_t
 jerry_acquire_value (jerry_value_t value) /**< API value */
 {
   jerry_assert_api_available ();
+  if (value == global_check_release) {
+    jerry_assert_api_available ();
+  }
 
   if (JERRY_UNLIKELY (ecma_is_value_error_reference (value)))
   {

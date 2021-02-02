@@ -164,6 +164,8 @@ typedef uint32_t jerry_length_t;
  */
 typedef uint32_t jerry_value_t;
 
+extern jerry_value_t global_check_release;
+
 /**
  * Description of ECMA property descriptor.
  */
