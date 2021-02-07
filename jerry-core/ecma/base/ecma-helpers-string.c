@@ -842,12 +842,18 @@ ecma_concat_ecma_strings (ecma_string_t *string1_p, /**< first ecma-string */
   return result_p;
 } /* ecma_concat_ecma_strings */
 
+jerry_value_t ecma_deref_ecma_string_marked = -1;
+
 /**
  * Increase reference counter of ecma-string.
  */
 void
 ecma_ref_ecma_string (ecma_string_t *string_p) /**< string descriptor */
 {
+  if (ecma_deref_ecma_string_marked != -1 && ecma_get_string_from_value (ecma_deref_ecma_string_marked) == string_p)
+  {
+    printf("Testing\n");
+  }
   JERRY_ASSERT (string_p != NULL);
 
   if (ECMA_IS_DIRECT_STRING (string_p))
@@ -882,6 +888,10 @@ ecma_ref_ecma_string (ecma_string_t *string_p) /**< string descriptor */
 void
 ecma_deref_ecma_string (ecma_string_t *string_p) /**< ecma-string */
 {
+  if (ecma_deref_ecma_string_marked != -1 && ecma_get_string_from_value (ecma_deref_ecma_string_marked) == string_p)
+  {
+    printf("Testing\n");
+  }
   JERRY_ASSERT (string_p != NULL);
 
   if (ECMA_IS_DIRECT_STRING (string_p))
