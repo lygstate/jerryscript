@@ -97,7 +97,7 @@ ecma_date_parse_special_char (const lit_utf8_byte_t **str_p, /**< pointer to the
   return false;
 } /* ecma_date_parse_special_char */
 
-static inline bool JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE bool
 ecma_date_check_two_chars (const lit_utf8_byte_t *str_p, /**< pointer to the cesu8 string */
                            const lit_utf8_byte_t *str_end_p, /**< pointer to the end of the string */
                            ecma_char_t expected_char1, /**< first expected character */

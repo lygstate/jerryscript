@@ -115,7 +115,7 @@ scanner_malloc (parser_context_t *context_p, /**< context */
 /**
  * Free memory allocated by scanner_malloc.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_free (void *ptr, /**< pointer to free */
               size_t size) /**< size of the memory block */
 {
@@ -268,7 +268,7 @@ scanner_insert_info_before (parser_context_t *context_p, /**< context */
 /**
  * Release the next scanner info.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_release_next (parser_context_t *context_p, /**< context */
                       size_t size) /**< size of the memory block */
 {
@@ -281,7 +281,7 @@ scanner_release_next (parser_context_t *context_p, /**< context */
 /**
  * Set the active scanner info to the next scanner info.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_set_active (parser_context_t *context_p) /**< context */
 {
   scanner_info_t *scanner_info_p = context_p->next_scanner_info_p;
@@ -294,7 +294,7 @@ scanner_set_active (parser_context_t *context_p) /**< context */
 /**
  * Set the next scanner info to the active scanner info.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_revert_active (parser_context_t *context_p) /**< context */
 {
   scanner_info_t *scanner_info_p = context_p->active_scanner_info_p;
@@ -307,7 +307,7 @@ scanner_revert_active (parser_context_t *context_p) /**< context */
 /**
  * Release the active scanner info.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_release_active (parser_context_t *context_p, /**< context */
                         size_t size) /**< size of the memory block */
 {
@@ -540,7 +540,7 @@ JERRY_STATIC_ASSERT (PARSER_MAXIMUM_IDENT_LENGTH <= UINT8_MAX,
 /**
  * Checks whether a literal is equal to "arguments".
  */
-static inline bool JERRY_ATTR_ALWAYS_INLINE
+static JERRY_ALWAYS_INLINE bool
 scanner_literal_is_arguments (lexer_lit_location_t *literal_p) /**< literal */
 {
   return lexer_compare_identifier_to_string (literal_p, (const uint8_t *) "arguments", 9);
@@ -1440,7 +1440,7 @@ scanner_add_custom_literal (parser_context_t *context_p, /**< context */
  *
  * @return pointer to the literal
  */
-extern inline lexer_lit_location_t * JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE lexer_lit_location_t *
 scanner_add_literal (parser_context_t *context_p, /**< context */
                      scanner_context_t *scanner_context_p) /**< scanner context */
 {
@@ -1455,7 +1455,7 @@ scanner_add_literal (parser_context_t *context_p, /**< context */
  *
  * @return pointer to the literal
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_add_reference (parser_context_t *context_p, /**< context */
                        scanner_context_t *scanner_context_p) /**< scanner context */
 {
@@ -2862,7 +2862,7 @@ scanner_create_variables (parser_context_t *context_p, /**< context */
 /**
  * Get location from context.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_get_location (scanner_location_t *location_p, /**< location */
                       parser_context_t *context_p) /**< context */
 {
@@ -2874,7 +2874,7 @@ scanner_get_location (scanner_location_t *location_p, /**< location */
 /**
  * Set context location.
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 scanner_set_location (parser_context_t *context_p, /**< context */
                       scanner_location_t *location_p) /**< location */
 {
@@ -2886,7 +2886,7 @@ scanner_set_location (parser_context_t *context_p, /**< context */
 /**
  * Get the real map_to value.
  */
-extern inline uint16_t JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE uint16_t
 scanner_decode_map_to (parser_scope_stack_t *stack_item_p) /**< scope stack item */
 {
   JERRY_ASSERT (stack_item_p->map_from != PARSER_SCOPE_STACK_FUNC);

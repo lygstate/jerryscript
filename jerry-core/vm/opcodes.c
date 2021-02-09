@@ -1173,7 +1173,7 @@ opfunc_create_implicit_class_constructor (uint8_t opcode) /**< current cbc opcod
 /**
  * Set the [[HomeObject]] attribute of the given functon object
  */
-extern inline void JERRY_ATTR_ALWAYS_INLINE
+extern JERRY_ALWAYS_INLINE void
 opfunc_set_home_object (ecma_object_t *func_p, /**< function object */
                         ecma_object_t *parent_env_p) /**< parent environment */
 {
