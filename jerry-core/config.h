@@ -91,6 +91,10 @@
 # define JERRY_BUILTIN_GLOBAL_THIS JERRY_ESNEXT
 #endif /* !defined (JERRY_BUILTIN_GLOBAL_THIS) */
 
+#ifndef JERRY_BUILTIN_OBJECT_PROTOTYPE
+# define JERRY_BUILTIN_OBJECT_PROTOTYPE JERRY_ESNEXT
+#endif /* !defined (JERRY_BUILTIN_OBJECT_PROTOTYPE) */
+
 #ifndef JERRY_BUILTIN_MAP
 # define JERRY_BUILTIN_MAP JERRY_ESNEXT
 #endif /* !defined (JERRY_BUILTIN_MAP) */
@@ -584,15 +588,13 @@
 # error "Invalid value for JERRY_MODULE_SYSTEM macro."
 #endif
 #if (JERRY_ESNEXT == 0) \
-&& ((JERRY_BUILTIN_DATAVIEW == 1) \
-|| (JERRY_BUILTIN_MAP == 1) \
+&& ((JERRY_BUILTIN_MAP == 1) \
 || (JERRY_BUILTIN_SET == 1) \
 || (JERRY_BUILTIN_WEAKMAP == 1) \
 || (JERRY_BUILTIN_WEAKSET == 1) \
-|| (JERRY_BUILTIN_PROMISE == 1) \
 || (JERRY_BUILTIN_PROXY == 1) \
 || (JERRY_BUILTIN_REFLECT == 1) \
-|| (JERRY_BUILTIN_TYPEDARRAY == 1))
+)
 # error "JERRY_ESNEXT should be enabled too to enable JERRY_BUILTIN_xxxxx macro."
 #endif
 #if (JERRY_ESNEXT == 0) && (JERRY_MODULE_SYSTEM == 1)

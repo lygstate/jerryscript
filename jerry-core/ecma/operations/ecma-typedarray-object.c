@@ -1007,6 +1007,7 @@ ecma_op_typedarray_from (ecma_value_t items_val, /**< the source array-like obje
     func_object_p = ecma_get_object_from_value (map_fn_val);
   }
 
+#if JERRY_ESNEXT
   /* 6 */
   ecma_value_t using_iterator = ecma_op_get_method_by_symbol_id (items_val, LIT_GLOBAL_SYMBOL_ITERATOR);
 
@@ -1125,6 +1126,7 @@ ecma_op_typedarray_from (ecma_value_t items_val, /**< the source array-like obje
 
     return ret_value;
   }
+#endif /* JERRY_ESNEXT */
 
   /* 10 */
   ecma_value_t arraylike_object_val = ecma_op_to_object (items_val);
@@ -1472,6 +1474,7 @@ ecma_op_create_typedarray (const ecma_value_t *arguments_list_p, /**< the arg li
   return ret;
 } /* ecma_op_create_typedarray */
 
+#if JERRY_ESNEXT
 /**
  * Helper function for typedArray.prototype object's {'keys', 'values', 'entries', '@@iterator'}
  * routines common parts.
@@ -1500,7 +1503,7 @@ ecma_typedarray_iterators_helper (ecma_value_t this_arg, /**< this argument */
                                          ECMA_PSEUDO_ARRAY_ITERATOR,
                                          kind);
 } /* ecma_typedarray_iterators_helper */
-
+#endif /* JERRY_ESNEXT */
 /**
  * Check if the object is typedarray
  *

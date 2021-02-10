@@ -145,9 +145,9 @@ struct jerry_context_t
 #if JERRY_BUILTIN_BIGINT
   jmem_cpointer_t bigint_list_first_cp; /**< first item of the literal bigint list */
 #endif /* JERRY_BUILTIN_BIGINT */
-#if JERRY_ESNEXT
+#if JERRY_BUILTIN_SYMBOL
   jmem_cpointer_t global_symbols_cp[ECMA_BUILTIN_GLOBAL_SYMBOL_COUNT]; /**< global symbols */
-#endif /* JERRY_ESNEXT */
+#endif /* JERRY_BUILTIN_SYMBOL */
 
 #if JERRY_MODULE_SYSTEM
   ecma_module_t *module_list_p;         /**< current module context */
@@ -224,14 +224,14 @@ struct jerry_context_t
   ecma_lcache_hash_entry_t lcache[ECMA_LCACHE_HASH_ROWS_COUNT][ECMA_LCACHE_HASH_ROW_LENGTH];
 #endif /* JERRY_LCACHE */
 
-#if JERRY_ESNEXT
+#if JERRY_BUILTIN_OBJECT_PROTOTYPE
   /**
    * Allowed values and it's meaning:
    * * NULL (0x0): the current "new.target" is undefined, that is the execution is inside a normal method.
    * * Any other valid function object pointer: the current "new.target" is valid and it is constructor call.
    */
   ecma_object_t *current_new_target_p;
-#endif /* JERRY_ESNEXT */
+#endif /* JERRY_BUILTIN_OBJECT_PROTOTYPE */
 };
 
 #if JERRY_EXTERNAL_CONTEXT

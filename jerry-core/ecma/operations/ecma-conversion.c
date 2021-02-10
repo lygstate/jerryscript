@@ -135,7 +135,6 @@ ecma_op_same_value (ecma_value_t x, /**< ecma value */
   return false;
 } /* ecma_op_same_value */
 
-#if JERRY_BUILTIN_MAP
 /**
  * SameValueZero operation.
  *
@@ -182,7 +181,6 @@ ecma_op_same_value_zero (ecma_value_t x, /**< ecma value */
 
   return ecma_op_same_value (x, y);
 } /* ecma_op_same_value_zero */
-#endif /* JERRY_BUILTIN_MAP */
 
 /**
  * ToPrimitive operation.
@@ -1043,7 +1041,6 @@ ecma_op_to_length (ecma_value_t value, /**< ecma value */
 #endif /* JERRY_ESNEXT */
 } /* ecma_op_to_length */
 
-#if JERRY_ESNEXT
 /**
  * ToIndex operation.
  *
@@ -1084,6 +1081,7 @@ ecma_op_to_index (ecma_value_t value, /**< ecma value */
   return ECMA_VALUE_EMPTY;
 } /* ecma_op_to_index */
 
+#if JERRY_ESNEXT
 /**
  * CreateListFromArrayLike operation.
  * Different types are not handled yet.

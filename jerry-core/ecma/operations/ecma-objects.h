@@ -40,12 +40,12 @@ ecma_value_t ecma_op_object_get_with_receiver (ecma_object_t *object_p, ecma_str
 ecma_value_t ecma_op_object_get_length (ecma_object_t *object_p, ecma_length_t *length_p);
 ecma_value_t ecma_op_object_get_by_index (ecma_object_t *object_p, ecma_length_t index);
 ecma_value_t ecma_op_object_get_by_magic_id (ecma_object_t *object_p, lit_magic_string_id_t property_id);
-#if JERRY_ESNEXT
+#if JERRY_BUILTIN_SYMBOL
 ecma_string_t *ecma_op_get_global_symbol (lit_magic_string_id_t property_id);
 ecma_value_t ecma_op_object_get_by_symbol_id (ecma_object_t *object_p, lit_magic_string_id_t property_id);
 ecma_value_t ecma_op_get_method_by_symbol_id (ecma_value_t value, lit_magic_string_id_t symbol_id);
 ecma_value_t ecma_op_get_method_by_magic_id (ecma_value_t value, lit_magic_string_id_t magic_id);
-#endif /* JERRY_ESNEXT */
+#endif /* JERRY_BUILTIN_SYMBOL */
 ecma_value_t ecma_op_object_put_with_receiver (ecma_object_t *object_p, ecma_string_t *property_name_p,
                                                ecma_value_t value, ecma_value_t receiver, bool is_throw);
 ecma_value_t ecma_op_object_put (ecma_object_t *object_p, ecma_string_t *property_name_p, ecma_value_t value,

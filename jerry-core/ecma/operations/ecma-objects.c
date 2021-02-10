@@ -179,10 +179,12 @@ ecma_op_object_get_own_property (ecma_object_t *object_p, /**< the object */
       /* ES2015 9.4.5.1 */
       if (ecma_object_is_typedarray (object_p))
       {
+#if JERRY_BUILTIN_SYMBOL
         if (ecma_prop_name_is_symbol (property_name_p))
         {
           break;
         }
+#endif /* JERRY_BUILTIN_SYMBOL */
 
         uint32_t array_index = ecma_string_get_array_index (property_name_p);
 
@@ -531,10 +533,12 @@ ecma_op_object_find_own (ecma_value_t base_value, /**< base value */
       /* ES2015 9.4.5.4 */
       if (ecma_object_is_typedarray (object_p))
       {
+#if JERRY_BUILTIN_SYMBOL
         if (ecma_prop_name_is_symbol (property_name_p))
         {
           break;
         }
+#endif /* JERRY_BUILTIN_SYMBOL */
 
         uint32_t array_index = ecma_string_get_array_index (property_name_p);
 
@@ -879,7 +883,7 @@ ecma_op_object_get_by_magic_id (ecma_object_t *object_p, /**< the object */
   return ecma_op_object_get (object_p, ecma_get_magic_string (property_id));
 } /* ecma_op_object_get_by_magic_id */
 
-#if JERRY_ESNEXT
+#if JERRY_BUILTIN_SYMBOL
 
 /**
  * Descriptor string for each global symbol
@@ -1046,7 +1050,7 @@ ecma_op_get_method_by_magic_id (ecma_value_t value, /**< ecma value */
 {
   return ecma_op_get_method (value, ecma_get_magic_string (magic_id));
 } /* ecma_op_get_method_by_magic_id */
-#endif /* JERRY_ESNEXT */
+#endif /* JERRY_BUILTIN_SYMBOL */
 
 /**
  * [[Put]] ecma general object's operation specialized for property index
@@ -1318,11 +1322,12 @@ ecma_op_object_put_with_receiver (ecma_object_t *object_p, /**< the object */
       /* ES2015 9.4.5.5 */
       if (ecma_object_is_typedarray (object_p))
       {
+#if JERRY_BUILTIN_SYMBOL
         if (ecma_prop_name_is_symbol (property_name_p))
         {
           break;
         }
-
+#endif /* JERRY_BUILTIN_SYMBOL */
         uint32_t array_index = ecma_string_get_array_index (property_name_p);
 
         if (array_index != ECMA_STRING_NOT_ARRAY_INDEX)
@@ -1788,12 +1793,14 @@ ecma_op_object_define_own_property (ecma_object_t *obj_p, /**< the object */
       /* ES2015 9.4.5.3 */
       if (ecma_object_is_typedarray (obj_p))
       {
+#if JERRY_BUILTIN_SYMBOL
         if (ecma_prop_name_is_symbol (property_name_p))
         {
           return ecma_op_general_object_define_own_property (obj_p,
                                                              property_name_p,
                                                              property_desc_p);
         }
+#endif /* JERRY_BUILTIN_SYMBOL */
         uint32_t array_index = ecma_string_get_array_index (property_name_p);
 
         if (array_index != ECMA_STRING_NOT_ARRAY_INDEX)
@@ -2998,7 +3005,9 @@ ecma_op_is_regexp (ecma_value_t arg) /**< argument */
 
   return ecma_make_boolean_value (ecma_object_is_regexp_object (arg));
 } /* ecma_op_is_regexp */
+#endif /* JERRY_ESNEXT */
 
+#if JERRY_BUILTIN_SYMBOL
 /**
  * SpeciesConstructor operation
  * See also:
@@ -3053,7 +3062,9 @@ ecma_op_species_constructor (ecma_object_t *this_value, /**< This Value */
 
   return species;
 } /* ecma_op_species_constructor */
+#endif /* JERRY_BUILTIN_SYMBOL */
 
+#if JERRY_ESNEXT
 /**
  * 7.3.18 Abstract operation Invoke when property name is a magic string
  *

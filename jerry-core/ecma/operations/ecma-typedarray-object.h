@@ -58,8 +58,10 @@ ecma_value_t ecma_op_create_typedarray (const ecma_value_t *arguments_list_p,
                                         ecma_object_t *proto_p,
                                         uint8_t element_size_shift,
                                         ecma_typedarray_type_t typedarray_id);
+#if JERRY_ESNEXT
 ecma_value_t
 ecma_typedarray_iterators_helper (ecma_value_t this_arg, ecma_iterator_kind_t kind);
+#endif /* JERRY_ESNEXT */
 
 bool ecma_object_is_typedarray (ecma_object_t *obj_p);
 bool ecma_is_typedarray (ecma_value_t target);

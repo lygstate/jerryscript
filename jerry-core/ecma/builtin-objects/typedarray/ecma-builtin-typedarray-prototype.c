@@ -1832,6 +1832,7 @@ ecma_builtin_typedarray_prototype_dispatch_routine (uint8_t builtin_routine_id, 
     {
       return ecma_builtin_typedarray_prototype_to_locale_string (&info);
     }
+#if JERRY_ESNEXT
     case ECMA_TYPEDARRAY_PROTOTYPE_ROUTINE_KEYS:
     case ECMA_TYPEDARRAY_PROTOTYPE_ROUTINE_ENTRIES:
     {
@@ -1840,6 +1841,7 @@ ecma_builtin_typedarray_prototype_dispatch_routine (uint8_t builtin_routine_id, 
 
       return ecma_typedarray_iterators_helper (this_arg, iter_id);
     }
+#endif /* JERRY_ESNEXT */
     case ECMA_TYPEDARRAY_PROTOTYPE_ROUTINE_BUFFER_GETTER:
     {
       ecma_object_t *buffer_p = ecma_typedarray_get_arraybuffer (typedarray_p);

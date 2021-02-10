@@ -206,7 +206,7 @@ ecma_new_ecma_string_from_magic_string_ex_id (lit_magic_string_ex_id_t id) /**< 
   return string_desc_p;
 } /* ecma_new_ecma_string_from_magic_string_ex_id */
 
-#if JERRY_ESNEXT
+#if JERRY_BUILTIN_SYMBOL
 /**
  * Allocate new ecma-string and fill it with reference to the symbol descriptor
  *
@@ -243,7 +243,7 @@ ecma_prop_name_is_symbol (ecma_string_t *string_p) /**< ecma-string */
   return (!ECMA_IS_DIRECT_STRING (string_p)
           && ECMA_STRING_GET_CONTAINER (string_p) == ECMA_STRING_CONTAINER_SYMBOL);
 } /* ecma_prop_name_is_symbol */
-#endif /* JERRY_ESNEXT */
+#endif /* JERRY_BUILTIN_SYMBOL */
 
 /**
  * Allocate new UTF8 ecma-string and fill it with characters from the given utf8 buffer

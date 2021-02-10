@@ -49,9 +49,7 @@ typedef enum
 
 bool ecma_op_require_object_coercible (ecma_value_t value);
 bool ecma_op_same_value (ecma_value_t x, ecma_value_t y);
-#if JERRY_BUILTIN_MAP
 bool ecma_op_same_value_zero (ecma_value_t x, ecma_value_t y, bool strict_equality);
-#endif /* JERRY_BUILTIN_MAP */
 ecma_value_t ecma_op_to_primitive (ecma_value_t value, ecma_preferred_type_hint_t preferred_type);
 bool ecma_op_to_boolean (ecma_value_t value);
 ecma_value_t ecma_op_to_number (ecma_value_t value, ecma_number_t *number_p);
@@ -65,8 +63,8 @@ ecma_value_t ecma_op_create_class_object (ecma_builtin_id_t proto_id,
                                           uint16_t lit_id);
 ecma_value_t ecma_op_to_integer (ecma_value_t value, ecma_number_t *number_p);
 ecma_value_t ecma_op_to_length (ecma_value_t value, ecma_length_t *length);
-#if JERRY_ESNEXT
 ecma_value_t ecma_op_to_index (ecma_value_t value, ecma_number_t *index);
+#if JERRY_ESNEXT
 ecma_collection_t *ecma_op_create_list_from_array_like (ecma_value_t arr, bool prop_names_only);
 #endif /* JERRY_ESNEXT */
 
