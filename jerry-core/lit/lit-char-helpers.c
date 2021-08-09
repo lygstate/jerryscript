@@ -523,7 +523,7 @@ lit_char_hex_lookup (const lit_utf8_byte_t *buf_p, /**< buffer */
  */
 uint32_t
 lit_parse_decimal (const lit_utf8_byte_t **buffer_p, /**< [in/out] character buffer */
-                   const lit_utf8_byte_t *buffer_end_p) /**< buffer end */
+                   const lit_utf8_byte_t *const buffer_end_p) /**< buffer end */
 {
   const lit_utf8_byte_t *current_p = *buffer_p;
   JERRY_ASSERT (lit_char_is_decimal_digit (*current_p));
