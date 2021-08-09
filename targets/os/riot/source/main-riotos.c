@@ -97,6 +97,24 @@ test_jerry (int argc, char **argv)
 const shell_command_t shell_commands[] = { { "test", "Jerryscript Hello World test", test_jerry },
                                            { NULL, NULL, NULL } };
 
+char*
+getcwd (char* _DstBuf, int _SizeInBytes)
+{
+  if (_DstBuf != NULL)
+  {
+    if (_SizeInBytes < 2)
+    {
+      return NULL;
+    }
+  }
+  else
+  {
+    _DstBuf = malloc (2);
+  }
+  strcpy (_DstBuf, "/");
+  return _DstBuf;
+}
+
 int
 main (void)
 {

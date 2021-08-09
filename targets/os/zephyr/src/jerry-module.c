@@ -44,17 +44,11 @@ jerry_port_get_directory_end (const jerry_char_t *path_p) /**< path */
   return 0;
 } /* jerry_port_get_directory_end */
 
-/**
- * Normalize a file path.
- *
- * @return a newly allocated buffer with the normalized path if the operation is successful,
- *         NULL otherwise
- */
-static jerry_char_t *
-jerry_port_normalize_path (const jerry_char_t *in_path_p, /**< path to the referenced module */
-                           size_t in_path_length, /**< length of the path */
-                           const jerry_char_t *base_path_p, /**< base path */
-                           size_t base_path_length) /**< length of the base path */
+jerry_char_t *
+jerry_port_normalize_path (const jerry_char_t *in_path_p,
+                           size_t in_path_length,
+                           const jerry_char_t *base_path_p,
+                           size_t base_path_length)
 {
   char *path_p;
 

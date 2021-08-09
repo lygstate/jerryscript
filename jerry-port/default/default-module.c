@@ -18,6 +18,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(_WIN32)
+#include <windows.h>
+
+#include <direct.h>
+#else /* !defined (_WIN32) */
+#include <unistd.h>
+#endif /* defined (_WIN32) */
+
 #include "jerryscript-port-default.h"
 #include "jerryscript-port.h"
 
@@ -26,6 +34,39 @@
 #ifndef S_ISDIR
 #define S_ISDIR(mode) (((mode) &S_IFMT) == S_IFDIR)
 #endif /* !defined(S_ISDIR) */
+
+/**
+ * Get the current working directory
+ *
+ * @return The current working directory path
+ */
+char *
+jerry_port_get_cwd (char *out_buf_p, /**< output buffer */
+                    size_t out_buf_size) /**< size of output buffer */
+{
+  char *out_cwd_p = NULL;
+  char *cwd_p = getcwd (NULL, 0);
+  if (cwd_p != NULL)
+  {
+    if (out_buf_p != NULL)
+    {
+      size_t cwd_p_len = strlen (cwd_p);
+      if (cwd_p_len < out_buf_size)
+      {
+        memcpy (out_buf_p, cwd_p, cwd_p_len);
+        out_buf_p[cwd_p_len] = 0;
+        out_cwd_p = out_buf_p;
+      }
+      /* Free cwd_p only when out_buf_p are not NULL */
+      free (cwd_p);
+    }
+    else
+    {
+      out_cwd_p = cwd_p;
+    }
+  }
+  return out_cwd_p;
+} /* jerry_port_get_cwd */
 
 /**
  * Determines the size of the given file.
@@ -131,17 +172,11 @@ jerry_port_get_directory_end (const jerry_char_t *path_p) /**< path */
   return 0;
 } /* jerry_port_get_directory_end */
 
-/**
- * Normalize a file path.
- *
- * @return a newly allocated buffer with the normalized path if the operation is successful,
- *         NULL otherwise
- */
-static jerry_char_t *
-jerry_port_normalize_path (const jerry_char_t *in_path_p, /**< path to the referenced module */
-                           size_t in_path_length, /**< length of the path */
-                           const jerry_char_t *base_path_p, /**< base path */
-                           size_t base_path_length) /**< length of the base path */
+jerry_char_t *
+jerry_port_normalize_path (const jerry_char_t *in_path_p,
+                           size_t in_path_length,
+                           const jerry_char_t *base_path_p,
+                           size_t base_path_length)
 {
   char *path_p;
 
