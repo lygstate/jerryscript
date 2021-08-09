@@ -2260,7 +2260,7 @@ scanner_check_variables (parser_context_t *context_p) /**< context */
       }
       else
       {
-        memcpy (&literal.char_p, data_p + 2 + 1, sizeof (uintptr_t));
+        memcpy ((uintptr_t *) (&literal.char_p), data_p + 2 + 1, sizeof (uintptr_t));
         next_data_p += 2 + 1 + sizeof (uintptr_t);
       }
     }
@@ -2497,7 +2497,7 @@ scanner_create_variables (parser_context_t *context_p, /**< context */
       }
       else
       {
-        memcpy (&literal.char_p, data_p + 2 + 1, sizeof (uintptr_t));
+        memcpy ((uintptr_t *) (&literal.char_p), data_p + 2 + 1, sizeof (uintptr_t));
         next_data_p += 2 + 1 + sizeof (uintptr_t);
       }
     }
