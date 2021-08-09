@@ -4,5 +4,5 @@ jerry-main/*
 jerry-math/*
 targets/*
 tests/*
-third-party/*
+third-party/valgrind/*
 tools/*
