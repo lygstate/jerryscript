@@ -245,7 +245,7 @@ endif()
 if(USING_MSVC)
   jerry_add_link_flags(/OPT:NOREF)
   # Disable MSVC warning 4996 globally because it stops us from using standard C functions.
-  jerry_add_compile_flags(/wd4996)
+  jerry_add_compile_flags(/wd4996 /wd4146)
 
   if(ENABLE_STATIC_CRT)
     # Replace the existing /MD and /MDd values with /MT and /MTd.
