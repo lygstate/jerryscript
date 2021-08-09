@@ -55,6 +55,7 @@ int
 main (int argc,
       char **argv)
 {
+  int need_restart = 0;
   union
   {
     double d;
@@ -90,18 +91,25 @@ main (int argc,
 #endif /* defined (JERRY_EXTERNAL_CONTEXT) && (JERRY_EXTERNAL_CONTEXT == 1) */
 
 restart:
+  need_restart = 0;
   main_init_engine (&arguments);
   int return_code = JERRY_STANDALONE_EXIT_CODE_FAIL;
-  jerry_value_t ret_value;
+  jerry_char_t *file_path_p = NULL;
+  jerry_value_t ret_value = jerry_create_undefined ();
 
   for (uint32_t source_index = 0; source_index < arguments.source_count; source_index++)
   {
     main_source_t *source_file_p = sources_p + source_index;
-    const char *file_path_p = argv[source_file_p->path_index];
+    const char *file_path_in_p = argv[source_file_p->path_index];
+    file_path_p = jerry_port_normalize_path ((const jerry_char_t *) (file_path_in_p), strlen (file_path_in_p), NULL, 0);
+    if (file_path_p == NULL)
+    {
+      goto exit;
+    }
 
     if (source_file_p->type == SOURCE_MODULE)
     {
-      jerry_value_t specifier = jerry_create_string_from_utf8 ((const jerry_char_t *) file_path_p);
+      jerry_value_t specifier = jerry_create_string_from_utf8 (file_path_p);
       jerry_value_t referrer = jerry_create_undefined ();
       ret_value = jerry_port_module_resolve (specifier, referrer, NULL);
       jerry_release_value (referrer);
@@ -144,7 +152,7 @@ restart:
     }
 
     size_t source_size;
-    uint8_t *source_p = jerry_port_read_source (file_path_p, &source_size);
+    uint8_t *source_p = jerry_port_read_source ((char *) file_path_p, &source_size);
 
     if (source_p == NULL)
     {
@@ -178,8 +186,8 @@ restart:
 
         jerry_parse_options_t parse_options;
         parse_options.options = JERRY_PARSE_HAS_RESOURCE;
-        parse_options.resource_name = jerry_create_string_sz ((const jerry_char_t *) file_path_p,
-                                                              (jerry_size_t) strlen (file_path_p));
+        parse_options.resource_name = jerry_create_string_sz (file_path_p,
+                                                              (jerry_size_t) strlen ((const char*)file_path_p));
 
         ret_value = jerry_parse (source_p,
                                  source_size,
@@ -203,9 +211,8 @@ restart:
     {
       if (main_is_value_reset (ret_value))
       {
-        jerry_cleanup ();
-
-        goto restart;
+        need_restart = 1;
+        goto exit;
       }
 
       main_print_unhandled_exception (ret_value);
@@ -213,6 +220,9 @@ restart:
     }
 
     jerry_release_value (ret_value);
+    ret_value = jerry_create_undefined ();
+    free (file_path_p);
+    file_path_p = NULL;
   }
 
   if (arguments.option_flags & OPT_FLAG_WAIT_SOURCE)
@@ -242,8 +252,8 @@ restart:
       if (receive_status == JERRY_DEBUGGER_CONTEXT_RESET_RECEIVED
           || main_is_value_reset (ret_value))
       {
-        jerry_cleanup ();
-        goto restart;
+        need_restart = 1;
+        goto exit;
       }
 
       assert (receive_status == JERRY_DEBUGGER_SOURCE_RECEIVED);
@@ -388,6 +398,15 @@ restart:
 
 exit:
   jerry_cleanup ();
+  if (file_path_p != NULL)
+  {
+    free (file_path_p);
+    file_path_p = NULL;
+  }
+  if (need_restart)
+  {
+    goto restart;
+  }
 
 #if defined (JERRY_EXTERNAL_CONTEXT) && (JERRY_EXTERNAL_CONTEXT == 1)
   free (context_p);
