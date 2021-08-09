@@ -62,7 +62,7 @@ set(DOCTESTS                OFF CACHE BOOL "Build doc tests?")
 
 # Optional build settings
 set(BUILD_SHARED_LIBS         OFF CACHE BOOL "Build shared libraries?")
-set(ENABLE_AMALGAM            OFF CACHE BOOL "Enable amalgamated build?")
+set(ENABLE_AMALGAM            ON CACHE BOOL "Enable amalgamated build?")
 set(ENABLE_LTO                ON  CACHE BOOL "Enable LTO build?")
 set(ENABLE_STRIP              ON  CACHE BOOL "Enable stripping all symbols from release binary?")
 set(ENABLE_COMPILE_COMMANDS   ON  CACHE BOOL "Enable generating compile_commands.json?")
