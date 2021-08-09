@@ -21,7 +21,7 @@
  * Provide a 'print' implementation for scripts.
  *
  * The routine converts all of its arguments to strings and outputs them
- * char-by-char using jerry_port_print_char.
+ * char-by-char using jerry_port_print_string.
  *
  * The NUL character is output as "\u0000", other characters are output
  * bytewise.
@@ -31,7 +31,7 @@
  *      output. This allows more flexibility but also extends the core
  *      JerryScript engine port API. Applications that want to use
  *      `jerryx_handler_print` must ensure that their port implementation also
- *      provides `jerry_port_print_char`.
+ *      provides `jerry_port_print_string`.
  *
  * @return undefined - if all arguments could be converted to strings,
  *         error - otherwise.
@@ -43,7 +43,8 @@ jerryx_handler_print (const jerry_call_info_t *call_info_p, /**< call informatio
 {
   (void) call_info_p; /* unused */
 
-  const char * const null_str = "\\u0000";
+  const char null_str[] = "\\u0000";
+  const char eol_str[] = "\n";
 
   jerry_value_t ret_val = jerry_create_undefined ();
 
@@ -77,7 +78,7 @@ jerryx_handler_print (const jerry_call_info_t *call_info_p, /**< call informatio
                                                                       substr_pos,
                                                                       length,
                                                                       substr_buf,
-                                                                      256 - 1);
+                                                                      sizeof (substr_buf) - 2);
 
       jerry_char_t *buf_end_p = substr_buf + substr_size;
 
@@ -95,21 +96,23 @@ jerryx_handler_print (const jerry_call_info_t *call_info_p, /**< call informatio
       {
         *buf_end_p++ = (arg_index < args_cnt - 1) ? ' ' : '\n';
       }
+      *buf_end_p = '\0';
 
-      for (jerry_char_t *buf_p = substr_buf; buf_p < buf_end_p; buf_p++)
-      {
-        char chr = (char) *buf_p;
-
-        if (chr != '\0')
-        {
-          jerry_port_print_char (chr);
-          continue;
+      jerry_char_t *buf_p = substr_buf;
+      for (;;) {
+        jerry_char_t *bufz_p = buf_p;
+        while (bufz_p < buf_end_p) {
+          if (*bufz_p == '\0') {
+            break;
+          }
+          ++bufz_p;
         }
-
-        for (jerry_size_t null_index = 0; null_str[null_index] != '\0'; null_index++)
-        {
-          jerry_port_print_char (null_str[null_index]);
+        jerry_port_print_string ((const char *) buf_p, (size_t) (bufz_p - buf_p));
+        if (bufz_p >= buf_end_p) {
+          break;
         }
+        jerry_port_print_string (null_str, sizeof (null_str) - 1);
+        buf_p = bufz_p + 1;
       }
     }
     while (substr_pos < length);
@@ -119,7 +122,7 @@ jerryx_handler_print (const jerry_call_info_t *call_info_p, /**< call informatio
 
   if (args_cnt == 0 || jerry_value_is_error (ret_val))
   {
-    jerry_port_print_char ('\n');
+    jerry_port_print_string (eol_str, sizeof (eol_str) - 1);
   }
 
   return ret_val;

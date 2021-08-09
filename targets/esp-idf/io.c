@@ -95,30 +95,16 @@ jerry_port_log (jerry_log_level_t level, /**< message log level */
   }
 } /* jerry_port_log */
 
-#if defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1)
-
-#define DEBUG_BUFFER_SIZE (256)
-static char debug_buffer[DEBUG_BUFFER_SIZE];
-static int debug_buffer_index = 0;
-
-#endif /* defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1) */
-
 /**
- * Default implementation of jerry_port_print_char. Uses 'putchar' to
- * print a single character to standard output.
+ * Default implementation of jerry_port_print_string. Uses 'fwrite' to
+ * print a utf8 string to standard output.
  */
 void
-jerry_port_print_char (char c) /**< the character to print */
+jerry_port_print_string (const char *s, size_t len) /**< the utf8 string to print */
 {
-  putchar(c);
+  fwrite (s, 1, len, stdout);
 
 #if defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1)
-  debug_buffer[debug_buffer_index++] = c;
-
-  if ((debug_buffer_index == DEBUG_BUFFER_SIZE) || (c == '\n'))
-  {
-    jerry_debugger_send_output ((jerry_char_t *) debug_buffer, (jerry_size_t) debug_buffer_index);
-    debug_buffer_index = 0;
-  }
+  jerry_debugger_send_output (s, len);
 #endif /* defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1) */
-} /* jerry_port_print_char */
+} /* jerry_port_print_string */

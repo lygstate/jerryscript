@@ -21,6 +21,10 @@
 #include "jerryscript-port-default.h"
 #include "jerryscript-debugger.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 /**
  * Actual log level
  */
@@ -80,30 +84,34 @@ jerry_port_log (jerry_log_level_t level, /**< message log level */
   }
 } /* jerry_port_log */
 
-#if defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1)
-
-#define DEBUG_BUFFER_SIZE (256)
-static char debug_buffer[DEBUG_BUFFER_SIZE];
-static int debug_buffer_index = 0;
-
-#endif /* defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1) */
-
 /**
- * Default implementation of jerry_port_print_char. Uses 'putchar' to
- * print a single character to standard output.
+ * Default implementation of jerry_port_print_string. Uses 'fwrite' to
+ * print a utf8 string to standard output.
  */
 void
-jerry_port_print_char (char c) /**< the character to print */
+jerry_port_print_string (const char *s, size_t len) /**< the utf8 string to print */
 {
-  putchar (c);
+#ifdef _WIN32
+  HANDLE hOut = GetStdHandle (STD_OUTPUT_HANDLE);
+  if (hOut != INVALID_HANDLE_VALUE) {
+    int hType = GetFileType(hOut);
+    if (FILE_TYPE_CHAR == hType) {
+      DWORD charsWritten = -1;
+      JERRY_VLA(wchar_t, ws, (len + 1));
+      int utf16_count = MultiByteToWideChar(CP_UTF8, 0, s, (int)len, ws, (int)(len + 1));
+      ws[utf16_count] = '\0';
+      WriteConsoleW (hOut, ws, utf16_count, &charsWritten, 0);
+    } else {
+      WriteFile(hOut, s, len, NULL, NULL);
+    }
+  } else {
+    fwrite (s, 1, len, stdout);
+  }
+#else
+  fwrite (s, 1, len, stdout);
+#endif
 
 #if defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1)
-  debug_buffer[debug_buffer_index++] = c;
-
-  if ((debug_buffer_index == DEBUG_BUFFER_SIZE) || (c == '\n'))
-  {
-    jerry_debugger_send_output ((jerry_char_t *) debug_buffer, (jerry_size_t) debug_buffer_index);
-    debug_buffer_index = 0;
-  }
+  jerry_debugger_send_output (s, len);
 #endif /* defined (JERRY_DEBUGGER) && (JERRY_DEBUGGER == 1) */
-} /* jerry_port_print_char */
+} /* jerry_port_print_string */
