@@ -217,6 +217,26 @@ uint8_t *jerry_port_read_source (const char *file_name_p, size_t *out_size_p);
 void jerry_port_release_source (uint8_t *buffer_p);
 
 /**
+ * Get the current working directory
+ *
+ * Note:
+ *      refer to https://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
+ *
+ * @param out_buf_p Pointer to the output buffer where the normalized path should be written.
+ * @param out_buf_size Size of the output buffer.
+ *
+ * @return the working directory path
+ */
+char *jerry_port_get_cwd (char *out_buf_p,
+                          size_t out_buf_size);
+
+jerry_char_t *
+jerry_port_normalize_path (const jerry_char_t *in_path_p, /**< path to the referenced module */
+                           size_t in_path_length, /**< length of the path */
+                           const jerry_char_t *base_path_p, /**< base path */
+                           size_t base_path_length); /**< length of the base path */
+
+/**
  * Default module resolver.
  *
  * Note:
