@@ -14,6 +14,7 @@
 
 import argparse
 import logging
+import os
 import re
 import select
 import struct
@@ -187,7 +188,11 @@ class JerryFunction:
         self.is_func = bool(is_func)
         self.byte_code_cp = byte_code_cp
         self.source = re.split("\r\n|[\r\n]", source)
-        self.source_name = source_name
+        if source_name:
+            self.source_name = os.path.relpath(source_name, os.getcwd())
+            self.source_name = self.source_name.replace('\\', '/')
+        else:
+            self.source_name = source_name
         self.name = name
         self.lines = {}
         self.offsets = {}
