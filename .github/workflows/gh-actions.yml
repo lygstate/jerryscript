@@ -86,7 +86,7 @@ jobs:
             mingw-w64-x86_64-toolchain
       - run: python $RUNNER -q --jerry-tests
       - run: python $RUNNER -q --unittests --build-config=''
-      # FIXME: enable it with upgrade valgrind - run: python $RUNNER -q --buildoption-test
+      - run: python $RUNNER -q --buildoption-test
 
   Win_x86-64_Tests:
     runs-on: windows-latest
