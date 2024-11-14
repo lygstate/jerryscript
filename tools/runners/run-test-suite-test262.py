@@ -22,12 +22,6 @@ import sys
 
 import util
 
-def get_platform_cmd_prefix():
-    if sys.platform == 'win32':
-        return ['cmd', '/S', '/C']
-    return ['python3']
-
-
 def get_arguments():
     execution_runtime = os.environ.get('RUNTIME', '')
     parser = argparse.ArgumentParser()
@@ -91,14 +85,14 @@ def update_exclude_list(args):
     # Tests pass in strict-mode but fail in non-strict-mode (or vice versa) should be considered as failures
     passing_tests = passing_tests - failing_tests
 
-    with open(args.excludelist_path, 'r+', encoding='utf8') as exclude_file:
+    with open(args.excludelist_path, 'rb+') as exclude_file:
         lines = exclude_file.readlines()
         exclude_file.seek(0)
         exclude_file.truncate()
 
         # Skip the last line "</excludeList>" to be able to insert new failing tests.
         for line in lines[:-1]:
-            match = re.match(r"  <test id=\"(\S*)\">", line)
+            match = re.match(r"  <test id=\"(\S*)\">", line.decode('utf-8', 'ignore'))
             if match:
                 test = match.group(1)
                 if test in failing_tests:
@@ -114,11 +108,12 @@ def update_exclude_list(args):
         if failing_tests:
             print("New failing tests added to the excludelist")
             for test in sorted(failing_tests):
-                exclude_file.write('  <test id="' + test + '"><reason></reason></test>\n')
+                line_added = '  <test id="' + test + '"><reason></reason></test>\n'
+                exclude_file.write(line_added.encode('utf-8'))
                 print("  " + test)
             print("")
 
-        exclude_file.write('</excludeList>\n')
+        exclude_file.write('</excludeList>\n'.encode('utf-8'))
 
     if new_passing_tests:
         print("New passing tests removed from the excludelist")
@@ -135,6 +130,7 @@ def update_exclude_list(args):
 
 
 def main(args):
+    util.setup_stdio()
     return_code = prepare_test262_test_suite(args)
     if return_code:
         return return_code
@@ -154,7 +150,7 @@ def main(args):
 
     test262_harness_path = os.path.join(args.test262_harness_dir, 'test262-harness.py')
 
-    test262_command = get_platform_cmd_prefix() + \
+    test262_command = util.get_python_cmd_prefix() + \
                       [test262_harness_path,
                        '--command', command,
                        '--tests', args.test_dir,

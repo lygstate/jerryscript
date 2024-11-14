@@ -326,6 +326,8 @@ def main():
             break
         if res_type == result.PROMPT:
             prompt.cmdloop()
+            sys.stdout.flush()
+            sys.stderr.flush()
         elif res_type == result.TEXT:
             write(result.get_text())
         continue

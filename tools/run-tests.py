@@ -31,6 +31,9 @@ else:
 
 OUTPUT_DIR = os.path.join(settings.PROJECT_DIR, 'build', 'tests')
 
+# All run_check proc must finished in 30 minutes, may increase in future
+JERRY_CHECK_TIMEOUT = 30 * 60
+
 Options = collections.namedtuple('Options', ['name', 'build_args', 'test_args', 'skip'])
 Options.__new__.__defaults__ = ([], [], False)
 
@@ -197,25 +200,22 @@ def get_arguments():
 
 BINARY_CACHE = {}
 
-TERM_NORMAL = '\033[0m'
-TERM_YELLOW = '\033[1;33m'
-TERM_BLUE = '\033[1;34m'
-TERM_RED = '\033[1;31m'
-
 def report_command(cmd_type, cmd, env=None):
-    sys.stderr.write(f'{TERM_BLUE}{cmd_type}{TERM_NORMAL}\n')
+    sys.stderr.write(f'{util.TERM_BLUE}{cmd_type}{util.TERM_NORMAL}\n')
     if env is not None:
-        sys.stderr.write(''.join(f'{TERM_BLUE}{var}={val!r} \\{TERM_NORMAL}\n'
+        sys.stderr.write(''.join(f'{util.TERM_BLUE}{var}={val!r} \\{util.TERM_NORMAL}\n'
                                  for var, val in sorted(env.items())))
-    sys.stderr.write(f"{TERM_BLUE}" +
-                     f" \\{TERM_NORMAL}\n\t{TERM_BLUE}".join(cmd) +
-                     f"{TERM_NORMAL}\n")
+    sys.stderr.write(f"{util.TERM_BLUE}" +
+                     f" \\{util.TERM_NORMAL}\n\t{util.TERM_BLUE}".join(cmd) +
+                     f"{util.TERM_NORMAL}\n")
+    sys.stderr.flush()
 
 def report_skip(job):
-    sys.stderr.write(f'{TERM_YELLOW}Skipping: {job.name}')
+    sys.stderr.write(f'{util.TERM_YELLOW}Skipping: {job.name}')
     if job.skip:
         sys.stderr.write(f' ({job.skip})')
-    sys.stderr.write(f'{TERM_NORMAL}\n')
+    sys.stderr.write(f'{util.TERM_NORMAL}\n')
+    sys.stderr.flush()
 
 def create_binary(job, options):
     build_args = job.build_args[:]
@@ -246,13 +246,15 @@ def create_binary(job, options):
     if binary_key in BINARY_CACHE:
         ret, build_dir_path = BINARY_CACHE[binary_key]
         sys.stderr.write(f'(skipping: already built at {build_dir_path} with returncode {ret})\n')
+        sys.stderr.flush()
         return ret, build_dir_path
 
     try:
         subprocess.check_output(build_cmd)
         ret = 0
     except subprocess.CalledProcessError as err:
-        print(err.output.decode("utf8"))
+        # For python <-> native program, we use default encoding with error='ignore' to not lost data
+        print(err.output.decode(errors="ignore"))
         ret = err.returncode
 
     BINARY_CACHE[binary_key] = (ret, build_dir_path)
@@ -283,6 +285,7 @@ def iterate_test_runner_jobs(jobs, options):
 
         if build_dir_path in tested_paths:
             sys.stderr.write(f'(skipping: already tested with {build_dir_path})\n')
+            sys.stderr.flush()
             continue
         tested_paths.add(build_dir_path)
 
@@ -291,6 +294,7 @@ def iterate_test_runner_jobs(jobs, options):
 
         if bin_hash in tested_hashes:
             sys.stderr.write(f'(skipping: already tested with equivalent {tested_hashes[bin_hash]})\n')
+            sys.stderr.flush()
             continue
         tested_hashes[bin_hash] = build_dir_path
 
@@ -308,7 +312,7 @@ def run_check(runnable, env=None):
         env = full_env
 
     with subprocess.Popen(runnable, env=env) as proc:
-        proc.wait()
+        proc.wait(timeout=JERRY_CHECK_TIMEOUT)
         return proc.returncode
 
 def run_jerry_debugger_tests(options):
@@ -316,7 +320,7 @@ def run_jerry_debugger_tests(options):
     for job in DEBUGGER_TEST_OPTIONS:
         ret_build, build_dir_path = create_binary(job, options)
         if ret_build:
-            print(f"\n{TERM_RED}Build failed{TERM_NORMAL}\n")
+            print(f"\n{util.TERM_RED}Build failed{util.TERM_NORMAL}\n")
             break
 
         for channel in ["websocket", "rawpacket"]:
@@ -324,7 +328,7 @@ def run_jerry_debugger_tests(options):
                 if test_file.endswith(".cmd"):
                     test_case, _ = os.path.splitext(test_file)
                     test_case_path = os.path.join(settings.DEBUGGER_TESTS_DIR, test_case)
-                    test_cmd = [
+                    test_cmd = util.get_python_cmd_prefix() + [
                         settings.DEBUGGER_TEST_RUNNER_SCRIPT,
                         get_binary_path(build_dir_path),
                         channel,
@@ -379,7 +383,7 @@ def run_test262_test_suite(options):
     for job in jobs:
         ret_build, build_dir_path = create_binary(job, options)
         if ret_build:
-            print(f"\n{TERM_RED}Build failed{TERM_NORMAL}\n")
+            print(f"\n{util.TERM_RED}Build failed{util.TERM_NORMAL}\n")
             break
 
         test_cmd = util.get_python_cmd_prefix() + [
@@ -409,7 +413,7 @@ def run_unittests(options):
             continue
         ret_build, build_dir_path = create_binary(job, options)
         if ret_build:
-            print(f"\n{TERM_RED}Build failed{TERM_NORMAL}\n")
+            print(f"\n{util.TERM_RED}Build failed{util.TERM_NORMAL}\n")
             break
 
         if sys.platform == 'win32':
@@ -438,7 +442,7 @@ def run_buildoption_test(options):
 
         ret, _ = create_binary(job, options)
         if ret:
-            print(f"\n{TERM_RED}Build failed{TERM_NORMAL}\n")
+            print(f"\n{util.TERM_RED}Build failed{util.TERM_NORMAL}\n")
             break
 
     return ret
@@ -446,6 +450,7 @@ def run_buildoption_test(options):
 Check = collections.namedtuple('Check', ['enabled', 'runner', 'arg'])
 
 def main(options):
+    util.setup_stdio()
     checks = [
         Check(options.check_signed_off, run_check, [settings.SIGNED_OFF_SCRIPT]
               + {'tolerant': ['--tolerant'], 'gh-actions': ['--gh-actions']}.get(options.check_signed_off, [])),

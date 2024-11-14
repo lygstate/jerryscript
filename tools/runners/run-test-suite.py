@@ -55,7 +55,7 @@ def get_tests(test_dir, test_list, skip_list):
         for root, _, files in os.walk(test_dir):
             for test_file in files:
                 if test_file.endswith('.js') or test_file.endswith('.mjs'):
-                    tests.extend([os.path.join(root, test_file)])
+                    tests.extend([os.path.normpath(os.path.join(root, test_file))])
 
     if test_list:
         dirname = os.path.dirname(test_list)
@@ -64,6 +64,7 @@ def get_tests(test_dir, test_list, skip_list):
                 tests.append(os.path.normpath(os.path.join(dirname, test.rstrip())))
 
     tests.sort()
+    skip_list = [os.path.normpath(skip) for skip in skip_list]
 
     def filter_tests(test):
         for skipped in skip_list:
@@ -78,6 +79,7 @@ def execute_test_command(test_cmd):
     kwargs = {}
     if sys.version_info.major >= 3:
         kwargs['encoding'] = 'unicode_escape'
+        kwargs['errors'] = 'ignore'
     with subprocess.Popen(test_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                           universal_newlines=True, **kwargs) as process:
         stdout, _ = process.communicate()
@@ -85,6 +87,7 @@ def execute_test_command(test_cmd):
 
 
 def main(args):
+    util.setup_stdio()
     tests = get_tests(args.test_dir, args.test_list, args.skip_list)
     total = len(tests)
     if total == 0:

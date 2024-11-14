@@ -40,6 +40,7 @@
 # This code is governed by the BSD license found in the LICENSE file.
 
 
+import codecs
 import logging
 import argparse
 import os
@@ -54,6 +55,8 @@ from collections import Counter
 
 import signal
 import multiprocessing
+
+import util
 
 #######################################################################
 # based on _monkeyYaml.py
@@ -400,11 +403,12 @@ class TempFile:
             text=self.text)
 
     def write(self, string):
-        os.write(self.file_desc, string.encode('utf8'))
+        os.write(self.file_desc, string.encode('utf8', 'ignore'))
 
     def read(self):
-        with open(self.name, "r", newline='', encoding='utf8') as file_desc:
-            return file_desc.read()
+        with open(self.name, 'rb') as file_desc:
+            result = file_desc.read()
+            return result.decode('utf8', 'ignore')
 
     def close(self):
         if not self.is_closed:
@@ -490,7 +494,7 @@ class TestCase:
         self.name = name
         self.full_path = full_path
         self.strict_mode = strict_mode
-        with open(self.full_path, "r", newline='', encoding='utf8') as file_desc:
+        with open(self.full_path, "r", newline='', encoding='utf8', errors='ignore') as file_desc:
             self.contents = file_desc.read()
         test_record = parse_test_record(self.contents, name)
         self.test = test_record["test"]
@@ -742,7 +746,7 @@ class TestSuite:
         if not tests:
             return True
         for test in tests:
-            if test in rel_path:
+            if os.path.normpath(test) in os.path.normpath(rel_path):
                 return True
         return False
 
@@ -750,8 +754,8 @@ class TestSuite:
         if not name in self.include_cache:
             static = path.join(self.lib_root, name)
             if path.exists(static):
-                with open(static, encoding='utf8') as file_desc:
-                    contents = file_desc.read()
+                with open(static, 'rb') as file_desc:
+                    contents = file_desc.read().decode('utf8', 'ignore')
                     contents = re.sub(r'\r\n', '\n', contents)
                     self.include_cache[name] = contents + "\n"
             else:
@@ -839,7 +843,7 @@ class TestSuite:
             report_error("No tests to run")
         progress = ProgressIndicator(len(cases))
         if logname:
-            self.logf = open(logname, "w", encoding='utf8')  # pylint: disable=consider-using-with
+            self.logf = codecs.open(logname, "w", encoding='utf8', errors='ignore')  # pylint: disable=consider-using-with
 
         if job_count == 1:
             for case in cases:
@@ -901,6 +905,7 @@ class TestSuite:
 
 
 def main():
+    util.setup_stdio()
     code = 0
     parser = build_options()
     options = parser.parse_args()

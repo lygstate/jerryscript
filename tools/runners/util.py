@@ -12,13 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import codecs
 import signal
 import subprocess
 import sys
 
-TERM_NORMAL = '\033[0m'
-TERM_RED = '\033[1;31m'
-TERM_GREEN = '\033[1;32m'
+if sys.platform == 'win32':
+    TERM_NORMAL = ''
+    TERM_RED = ''
+    TERM_GREEN = ''
+    TERM_YELLOW = ''
+    TERM_BLUE = ''
+else:
+    TERM_NORMAL = '\033[0m'
+    TERM_RED = '\033[1;31m'
+    TERM_GREEN = '\033[1;32m'
+    TERM_YELLOW = '\033[1;33m'
+    TERM_BLUE = '\033[1;34m'
 
 
 def set_timezone(timezone):
@@ -40,6 +50,17 @@ def get_timezone():
 def set_sighdl_to_reset_timezone(timezone):
     assert sys.platform == 'win32', "install_signal_handler_to_restore_timezone is Windows only function"
     signal.signal(signal.SIGINT, lambda signal, frame: set_timezone_and_exit(timezone))
+
+
+def setup_stdio():
+    (out_stream, err_stream) = (sys.stdout, sys.stderr)
+    if sys.version_info.major >= 3:
+        (out_stream, err_stream) = (sys.stdout.buffer, sys.stderr.buffer)
+    # For tty using native encoding, otherwise (pipe) use 'utf-8'
+    encoding = sys.stdout.encoding if sys.stdout.isatty() else 'utf-8'
+    # Always override it to anvoid encode error
+    sys.stdout = codecs.getwriter(encoding)(out_stream, 'xmlcharrefreplace')
+    sys.stderr = codecs.getwriter(encoding)(err_stream, 'xmlcharrefreplace')
 
 
 def print_test_summary(summary_string, total, passed, failed):
@@ -72,4 +93,4 @@ def get_platform_cmd_prefix():
 
 def get_python_cmd_prefix():
     # python script doesn't have execute permission on github actions windows runner
-    return get_platform_cmd_prefix() + [sys.executable or 'python']
+    return [sys.executable or 'python']
