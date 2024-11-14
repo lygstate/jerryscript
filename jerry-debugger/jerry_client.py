@@ -16,6 +16,7 @@
 
 from cmd import Cmd
 from pprint import pprint
+import codecs
 import math
 import socket
 import sys
@@ -25,6 +26,7 @@ import jerry_client_main
 
 from jerry_client_websocket import WebSocket
 from jerry_client_rawpacket import RawPacket
+from jerry_client_serial import Serial
 from jerry_client_tcp import Socket
 
 def write(string):
@@ -261,8 +263,19 @@ def src_check_args(args):
         print(f"Error: Non-negative integer number expected: {val_errno}")
         return -1
 
-# pylint: disable=too-many-branches,too-many-locals,too-many-statements,import-outside-toplevel
+# This is for not lost data on 'win32' with python 'print'.
+# When use python subprocess call another script on win32, output with
+# 'utf-8' encoding, that's the same like linux platform; but when
+# call the python script in 'cmd.exe' shell, we have to output in 'native' encoding.
+def setup_stdio():
+    # For tty using native encoding, otherwise (pipe) use 'utf-8'
+    encoding = sys.stdout.encoding if sys.stdout.isatty() else 'utf-8'
+    # Always override it to avoid encode error
+    sys.stdout = codecs.getwriter(encoding)(sys.stdout.buffer, 'xmlcharrefreplace')
+    sys.stderr = codecs.getwriter(encoding)(sys.stderr.buffer, 'xmlcharrefreplace')
+
 def main():
+    setup_stdio()
     args = jerry_client_main.arguments_parse()
 
     channel = None
@@ -278,7 +291,6 @@ def main():
 
         protocol = Socket(address)
     elif args.protocol == "serial":
-        from jerry_client_serial import Serial
         protocol = Serial(args.serial_config)
     else:
         print("Unsupported transmission protocol")
@@ -326,6 +338,8 @@ def main():
             break
         if res_type == result.PROMPT:
             prompt.cmdloop()
+            sys.stdout.flush()
+            sys.stderr.flush()
         elif res_type == result.TEXT:
             write(result.get_text())
         continue
