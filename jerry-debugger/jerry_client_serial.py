@@ -13,7 +13,11 @@
 # limitations under the License.
 
 import select
-import serial
+try:
+    import serial
+except ImportError:
+    # OSX do not have serial
+    pass
 
 class Serial:
     """ Create a new socket using the given address family, socket type and protocol number. """
