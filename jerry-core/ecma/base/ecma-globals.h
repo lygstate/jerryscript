@@ -70,20 +70,51 @@ typedef enum
 } ecma_status_flag_t;
 
 /**
+ * Shift for directly encoded integer in ecma_value_t
+ */
+#define ECMA_INTEGER_SHIFT 1
+
+/**
+ * Shift for pointer in ecma_value_t
+ */
+#define ECMA_POINTER_SHIFT 3
+
+/**
+ * Shift for encoded values in ecma_value_t
+ */
+#define ECMA_ENCODED_SHIFT 6
+
+/**
  * Type of ecma value
  */
 typedef enum
 {
-  ECMA_TYPE_DIRECT = 0, /**< directly encoded value, a 28 bit signed integer or a simple value */
-  ECMA_TYPE_STRING = 1, /**< pointer to description of a string */
-  ECMA_TYPE_FLOAT = 2, /**< pointer to a 64 or 32 bit floating point number */
-  ECMA_TYPE_OBJECT = 3, /**< pointer to description of an object */
-  ECMA_TYPE_SYMBOL = 4, /**< pointer to description of a symbol */
-  ECMA_TYPE_DIRECT_STRING = 5, /**< directly encoded string values */
-  ECMA_TYPE_BIGINT = 6, /**< pointer to a bigint primitive */
-  ECMA_TYPE_ERROR = 7, /**< pointer to description of an error reference (only supported by C API) */
-  ECMA_TYPE_SNAPSHOT_OFFSET = ECMA_TYPE_ERROR, /**< offset to a snapshot number/string */
-  ECMA_TYPE___MAX = ECMA_TYPE_ERROR /** highest value for ecma types */
+  /**< directly encoded types or encoded thin pointer
+   * When the total memory size (the base address needs to be provided) is less
+   * than 512MB ((1 << (32 - 3)) bytes), then the alignment of encoded thin pointer
+   * is 8 for save memory; otherwise the alignment of encoded thin pointer is 64 for
+   * quick access
+   */
+  ECMA_TYPE_ENCODED = (0 << ECMA_INTEGER_SHIFT) | 0,
+
+  /**< directly encoded string(length <= 3) */
+  ECMA_TYPE_DIRECT_STRING = (0 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED,
+  /**< directly encoded magic string(length > 3) id(lit_magic_string_id_t or lit_magic_string_ex_id_t) */
+  ECMA_TYPE_DIRECT_MAGIC_STRING = (0 << ECMA_ENCODED_SHIFT) | (1 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED,
+  /**< directly encoded simple value */
+  ECMA_TYPE_DIRECT_SIMPLE = (1 << ECMA_ENCODED_SHIFT) | (1 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED,
+  ECMA_TYPE_SYMBOL = (2 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED, /**< encoded thin pointer to symbol value */
+  /**< encoded thin pointer to description of an error reference (only supported by C API) */
+  ECMA_TYPE_ERROR = (3 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED,
+  ECMA_TYPE_BIGINT = (4 << ECMA_POINTER_SHIFT) | ECMA_TYPE_ENCODED, /**< encoded thin pointer to bigint primitive */
+
+  ECMA_TYPE_FLOAT = (1 << ECMA_INTEGER_SHIFT) | 0, /**< pointer to a 64 or 32 bit floating point number */
+  ECMA_TYPE_STRING =
+    (2 << ECMA_INTEGER_SHIFT) | 0, /**< pointer to description of a string(length > 3) and not in magic string table */
+  ECMA_TYPE_OBJECT = (3 << ECMA_INTEGER_SHIFT) | 0, /**< pointer to description of an object */
+  ECMA_TYPE_INTEGER = 1, /**< directly encoded 31 bit signed integer */
+  ECMA_TYPE_SNAPSHOT_OFFSET = ECMA_TYPE_OBJECT, /**< offset to a snapshot number/string */
+  ECMA_TYPE___MAX = ECMA_TYPE_OBJECT /** highest value for ecma types */
 } ecma_type_t;
 
 /**
@@ -146,39 +177,19 @@ typedef uint32_t ecma_value_t;
 typedef int32_t ecma_integer_value_t;
 
 /**
- * Mask for ecma types in ecma_value_t
+ * Shift for directly encoded values in ecma_value_t
  */
-#define ECMA_VALUE_TYPE_MASK 0x7u
-
-/**
- * Shift for value part in ecma_value_t
- */
-#define ECMA_VALUE_SHIFT 3
+#define ECMA_DIRECT_ENCODED_SHIFT 7
 
 /**
  * Mask for directly encoded values
  */
-#define ECMA_DIRECT_TYPE_MASK ((1u << ECMA_VALUE_SHIFT) | ECMA_VALUE_TYPE_MASK)
-
-/**
- * Ecma integer value type
- */
-#define ECMA_DIRECT_TYPE_INTEGER_VALUE ((0u << ECMA_VALUE_SHIFT) | ECMA_TYPE_DIRECT)
-
-/**
- * Ecma simple value type
- */
-#define ECMA_DIRECT_TYPE_SIMPLE_VALUE ((1u << ECMA_VALUE_SHIFT) | ECMA_TYPE_DIRECT)
-
-/**
- * Shift for directly encoded values in ecma_value_t
- */
-#define ECMA_DIRECT_SHIFT 4
+#define ECMA_DIRECT_ENCODED_MASK ((1u << ECMA_DIRECT_ENCODED_SHIFT) - 1)
 
 /**
  * ECMA make simple value
  */
-#define ECMA_MAKE_VALUE(value) ((((ecma_value_t) (value)) << ECMA_DIRECT_SHIFT) | ECMA_DIRECT_TYPE_SIMPLE_VALUE)
+#define ECMA_MAKE_VALUE(value) ((((ecma_value_t) (value)) << ECMA_DIRECT_ENCODED_SHIFT) | ECMA_TYPE_DIRECT_SIMPLE)
 
 /**
  * Simple ecma values
@@ -595,7 +606,7 @@ typedef struct
  * Checks whether a property is raw data property (should only be used in assertions)
  */
 #define ECMA_PROPERTY_IS_RAW_DATA(property) \
-  (((property) &ECMA_PROPERTY_FLAG_DATA) && (property) < ECMA_PROPERTY_INTERNAL)
+  (((property) & ECMA_PROPERTY_FLAG_DATA) && (property) < ECMA_PROPERTY_INTERNAL)
 
 /**
  * Create internal property.
@@ -1367,7 +1378,7 @@ typedef float ecma_number_t;
 /**
  * Value '-1' of ecma_number_t
  */
-#define ECMA_NUMBER_MINUS_ONE ((ecma_number_t) -1.0f)
+#define ECMA_NUMBER_MINUS_ONE ((ecma_number_t) - 1.0f)
 
 /**
  * Maximum number of characters in string representation of ecma-number
@@ -1440,11 +1451,7 @@ typedef enum
  * Maximum value of the immediate part of a direct magic string.
  * Must be compatible with the immediate property name.
  */
-#if JERRY_CPOINTER_32_BIT
-#define ECMA_DIRECT_STRING_MAX_IMM 0x07ffffff
-#else /* !JERRY_CPOINTER_32_BIT */
-#define ECMA_DIRECT_STRING_MAX_IMM 0x0000ffff
-#endif /* JERRY_CPOINTER_32_BIT */
+#define ECMA_DIRECT_STRING_MAX_IMM 999
 
 /**
  * Shift for direct string value part in ecma_value_t.
@@ -1454,7 +1461,7 @@ typedef enum
 /**
  * Full mask for direct strings.
  */
-#define ECMA_DIRECT_STRING_MASK ((uintptr_t) (ECMA_DIRECT_TYPE_MASK | (0x3u << ECMA_VALUE_SHIFT)))
+#define ECMA_DIRECT_STRING_MASK ((uintptr_t) (ECMA_ENCODED_TYPE_MASK | (0x3u << ECMA_VALUE_SHIFT)))
 
 /**
  * Create an ecma direct string.
@@ -1513,13 +1520,10 @@ typedef enum
                                            *   maximum size is 2^16. */
   ECMA_STRING_CONTAINER_LONG_OR_EXTERNAL_STRING, /**< the string is a long string or provided externally
                                                   *   and only its attributes are stored. */
-  ECMA_STRING_CONTAINER_UINT32_IN_DESC, /**< string representation of an uint32 number */
   ECMA_STRING_CONTAINER_HEAP_ASCII_STRING, /**< actual data is on the heap as an ASCII string
                                             *   maximum size is 2^16. */
-  ECMA_STRING_CONTAINER_MAGIC_STRING_EX, /**< the ecma-string is equal to one of external magic strings */
-  ECMA_STRING_CONTAINER_SYMBOL, /**< the ecma-string is a symbol */
 
-  ECMA_STRING_CONTAINER__MAX = ECMA_STRING_CONTAINER_SYMBOL /**< maximum value */
+  ECMA_STRING_CONTAINER__MAX = ECMA_STRING_CONTAINER_HEAP_ASCII_STRING /**< maximum value */
 } ecma_string_container_t;
 
 /**
@@ -1580,12 +1584,7 @@ typedef struct
   /**
    * Actual data or identifier of it's place in container (depending on 'container' field)
    */
-  union
-  {
-    lit_string_hash_t hash; /**< hash of the ASCII/UTF8 string */
-    uint32_t magic_string_ex_id; /**< identifier of an external magic string (lit_magic_string_ex_id_t) */
-    uint32_t uint32_number; /**< uint32-represented number placed locally in the descriptor */
-  } u;
+  lit_string_hash_t hash; /**< hash of the ASCII/UTF8 string */
 } ecma_string_t;
 
 /**
@@ -1633,7 +1632,7 @@ typedef struct
  * Set the size of an ecma ASCII string
  */
 #define ECMA_ASCII_STRING_SET_SIZE(string_p, size) \
-  (*((lit_utf8_byte_t *) (string_p) + sizeof (ecma_string_t)) = (uint8_t) ((size) -1))
+  (*((lit_utf8_byte_t *) (string_p) + sizeof (ecma_string_t)) = (uint8_t) ((size) - 1))
 
 /**
  * Get the start position of the string buffer of an ecma ASCII string

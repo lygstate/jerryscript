@@ -140,7 +140,7 @@ ecma_is_value_direct (ecma_value_t value) /**< ecma value */
 extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_simple (ecma_value_t value) /**< ecma value */
 {
-  return (value & ECMA_DIRECT_TYPE_MASK) == ECMA_DIRECT_TYPE_SIMPLE_VALUE;
+  return (value & ECMA_ENCODED_TYPE_MASK) == ECMA_TYPE_DIRECT_SIMPLE;
 } /* ecma_is_value_simple */
 
 /**
@@ -261,7 +261,7 @@ ecma_is_value_array_hole (ecma_value_t value) /**< ecma value */
 extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_integer_number (ecma_value_t value) /**< ecma value */
 {
-  return (value & ECMA_DIRECT_TYPE_MASK) == ECMA_DIRECT_TYPE_INTEGER_VALUE;
+  return (value & ECMA_ENCODED_TYPE_MASK) == ECMA_TYPE_INTEGER;
 } /* ecma_is_value_integer_number */
 
 /**
@@ -274,9 +274,9 @@ extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_are_values_integer_numbers (ecma_value_t first_value, /**< first ecma value */
                                  ecma_value_t second_value) /**< second ecma value */
 {
-  JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_INTEGER_VALUE == 0, ecma_direct_type_integer_value_must_be_zero);
+  JERRY_STATIC_ASSERT (ECMA_TYPE_INTEGER == 0, ecma_direct_type_integer_value_must_be_zero);
 
-  return ((first_value | second_value) & ECMA_DIRECT_TYPE_MASK) == ECMA_DIRECT_TYPE_INTEGER_VALUE;
+  return ((first_value | second_value) & ECMA_ENCODED_TYPE_MASK) == ECMA_TYPE_INTEGER;
 } /* ecma_are_values_integer_numbers */
 
 /**
@@ -494,7 +494,7 @@ ecma_make_integer_value (ecma_integer_value_t integer_value) /**< integer number
 {
   JERRY_ASSERT (ECMA_IS_INTEGER_NUMBER (integer_value));
 
-  return (((ecma_value_t) integer_value) << ECMA_DIRECT_SHIFT) | ECMA_DIRECT_TYPE_INTEGER_VALUE;
+  return (((ecma_value_t) integer_value) << ECMA_INTEGER_SHIFT) | ECMA_TYPE_INTEGER;
 } /* ecma_make_integer_value */
 
 /**

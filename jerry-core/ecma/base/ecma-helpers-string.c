@@ -169,14 +169,6 @@ ecma_string_get_chars_fast (const ecma_string_t *string_p, /**< ecma-string */
       *size_p = ECMA_ASCII_STRING_GET_SIZE (string_p);
       return ECMA_ASCII_STRING_GET_BUFFER (string_p);
     }
-    default:
-    {
-      JERRY_ASSERT (ECMA_STRING_GET_CONTAINER (string_p) == ECMA_STRING_CONTAINER_MAGIC_STRING_EX);
-
-      lit_magic_string_ex_id_t id = LIT_MAGIC_STRING__COUNT - string_p->u.magic_string_ex_id;
-      *size_p = lit_get_magic_string_ex_size (id);
-      return lit_get_magic_string_ex_utf8 (id);
-    }
   }
 } /* ecma_string_get_chars_fast */
 

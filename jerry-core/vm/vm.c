@@ -68,8 +68,7 @@ vm_op_get_value (ecma_value_t object, /**< base object */
     if (ecma_is_value_integer_number (property))
     {
       ecma_integer_value_t int_value = ecma_get_integer_from_value (property);
-
-      if (int_value >= 0 && int_value <= ECMA_DIRECT_STRING_MAX_IMM)
+      if (int_value >= 0)
       {
         if (ecma_get_object_type (object_p) == ECMA_OBJECT_TYPE_ARRAY)
         {
@@ -86,8 +85,10 @@ vm_op_get_value (ecma_value_t object, /**< base object */
             }
           }
         }
-
-        property_name_p = (ecma_string_t *) ECMA_CREATE_DIRECT_STRING (ECMA_DIRECT_STRING_UINT, (uintptr_t) int_value);
+        if (int_value <= ECMA_DIRECT_STRING_MAX_IMM)
+        {
+          property_name_p = (ecma_string_t *) ECMA_CREATE_DIRECT_STRING (ECMA_DIRECT_STRING_UINT, (uintptr_t) int_value);
+        }
       }
     }
     else if (ecma_is_value_string (property))
@@ -3370,12 +3371,12 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_BIT_NOT:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_is_value_integer_number (left_value))
           {
-            *stack_top_p++ = (~ECMA_DIRECT_TYPE_MASK) ^ left_value;
+            *stack_top_p++ = (~ECMA_ENCODED_TYPE_MASK) ^ left_value;
             goto free_left_value;
           }
 
@@ -3679,7 +3680,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_BIT_OR:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
@@ -3700,7 +3701,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_BIT_XOR:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
@@ -3721,7 +3722,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_BIT_AND:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
@@ -3742,7 +3743,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_LEFT_SHIFT:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
@@ -3766,7 +3767,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_RIGHT_SHIFT:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
@@ -3789,7 +3790,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
         }
         case VM_OC_UNS_RIGHT_SHIFT:
         {
-          JERRY_STATIC_ASSERT (ECMA_DIRECT_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
+          JERRY_STATIC_ASSERT (ECMA_ENCODED_TYPE_MASK == ((1 << ECMA_DIRECT_SHIFT) - 1),
                                direct_type_mask_must_fill_all_bits_before_the_value_starts);
 
           if (ecma_are_values_integer_numbers (left_value, right_value))
