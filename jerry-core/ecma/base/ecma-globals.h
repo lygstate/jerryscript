@@ -229,49 +229,15 @@ enum
 #endif /* JERRY_BUILTIN_GLOBAL_THIS */
 };
 
-#if !JERRY_NUMBER_TYPE_FLOAT64
 /**
  * Maximum integer number for an ecma value
  */
-#define ECMA_INTEGER_NUMBER_MAX 0x7fffff
-/**
- * Maximum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MAX_SHIFTED 0x7fffff0
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
-/**
- * Maximum integer number for an ecma value
- */
-#define ECMA_INTEGER_NUMBER_MAX         0x7ffffff
-/**
- * Maximum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MAX_SHIFTED 0x7ffffff0
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
+#define ECMA_INTEGER_NUMBER_MAX         0x3FFFFFFF
 
-#if !JERRY_NUMBER_TYPE_FLOAT64
 /**
  * Minimum integer number for an ecma value
  */
-#define ECMA_INTEGER_NUMBER_MIN -0x7fffff
-/**
- * Minimum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MIN_SHIFTED -0x7fffff0
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
-/**
- * Minimum integer number for an ecma value
- */
-#define ECMA_INTEGER_NUMBER_MIN         -0x8000000
-/**
- * Minimum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MIN_SHIFTED (-0x7fffffff - 1) /* -0x80000000 */
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
-
-#if ECMA_DIRECT_SHIFT != 4
-#error "Please update ECMA_INTEGER_NUMBER_MIN/MAX_SHIFTED according to the new value of ECMA_DIRECT_SHIFT."
-#endif /* ECMA_DIRECT_SHIFT != 4 */
+#define ECMA_INTEGER_NUMBER_MIN         -0x40000000
 
 /**
  * Checks whether the integer number is in the integer number range.
