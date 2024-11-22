@@ -43,10 +43,13 @@ FOLDERS = ["jerry-core",
 
 
 def get_arguments():
+    clang_fomat_default = f'clang-format-{CLANG_FORMAT_MIN_VERSION}'
+    if sys.platform.startswith('win32'):
+        clang_fomat_default = 'clang-format'
     parser = argparse.ArgumentParser()
     parser.add_argument('--fix', action='store_true', dest='fix',
                         help='fix source code stlye')
-    parser.add_argument('--clang-format', dest='clang_format', default=f'clang-format-{CLANG_FORMAT_MIN_VERSION}',
+    parser.add_argument('--clang-format', dest='clang_format', default=clang_fomat_default,
                         help='path to clang-format executable')
 
     script_args = parser.parse_args()

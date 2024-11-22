@@ -14,10 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 import argparse
 import fileinput
@@ -29,6 +26,7 @@ import sys
 
 from settings import FORMAT_SCRIPT, PROJECT_DIR
 from gen_c_source import LICENSE
+from runners import util
 
 MAGIC_STRINGS_INI = os.path.join(PROJECT_DIR, 'jerry-core', 'lit', 'lit-magic-strings.ini')
 MAGIC_STRINGS_INC_H = os.path.join(PROJECT_DIR, 'jerry-core', 'lit', 'lit-magic-strings.inc.h')
@@ -211,7 +209,7 @@ def calculate_magic_string_guards(defs, uses, debug=False):
 
 
 def guards_to_str(guards):
-    return ' \\\n|| '.join(' && '.join(g.strip() for g in sorted(guard))
+    return ' || '.join(' && '.join(g.strip() for g in sorted(guard))
                            for guard in sorted(guards))
 
 
@@ -309,7 +307,7 @@ def main():
                            PARSER_ERRORS_INC_H,
                            'PARSER_ERROR_DEF')
 
-    subprocess.call([FORMAT_SCRIPT, '--fix'])
+    subprocess.call(util.get_python_cmd_prefix() + [FORMAT_SCRIPT, '--fix'])
 
 
 if __name__ == '__main__':
