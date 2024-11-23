@@ -1026,61 +1026,6 @@ ecma_update_float_number (ecma_value_t float_value, /**< original float value */
 } /* ecma_update_float_number */
 
 /**
- * Assign a float number to an ecma-value
- *
- * Note:
- *      value previously stored in the property is freed
- */
-static void
-ecma_value_assign_float_number (ecma_value_t *value_p, /**< [in, out] ecma value */
-                                ecma_number_t ecma_number) /**< number to assign */
-{
-  if (ecma_is_value_float_number (*value_p))
-  {
-    ecma_number_t *num_dst_p = (ecma_number_t *) ecma_get_pointer_from_ecma_value (*value_p);
-
-    *num_dst_p = ecma_number;
-    return;
-  }
-
-  if (ecma_get_value_type_field (*value_p) != ECMA_TYPE_DIRECT
-      && ecma_get_value_type_field (*value_p) != ECMA_TYPE_OBJECT)
-  {
-    ecma_free_value (*value_p);
-  }
-
-  *value_p = ecma_create_float_number (ecma_number);
-} /* ecma_value_assign_float_number */
-
-/**
- * Assign a number to an ecma-value
- *
- * Note:
- *      value previously stored in the property is freed
- */
-void
-ecma_value_assign_number (ecma_value_t *value_p, /**< [in, out] ecma value */
-                          ecma_number_t ecma_number) /**< number to assign */
-{
-  ecma_integer_value_t integer_value = (ecma_integer_value_t) ecma_number;
-
-  if ((ecma_number_t) integer_value == ecma_number
-      && ((integer_value == 0) ? ecma_is_number_equal_to_positive_zero (ecma_number)
-                               : ECMA_IS_INTEGER_NUMBER (integer_value)))
-  {
-    if (ecma_get_value_type_field (*value_p) != ECMA_TYPE_DIRECT
-        && ecma_get_value_type_field (*value_p) != ECMA_TYPE_OBJECT)
-    {
-      ecma_free_value (*value_p);
-    }
-    *value_p = ecma_make_integer_value (integer_value);
-    return;
-  }
-
-  ecma_value_assign_float_number (value_p, ecma_number);
-} /* ecma_value_assign_number */
-
-/**
  * Free the ecma value
  */
 void
