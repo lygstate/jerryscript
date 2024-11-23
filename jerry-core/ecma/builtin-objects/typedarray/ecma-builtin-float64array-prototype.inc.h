@@ -18,11 +18,9 @@
  */
 
 #if JERRY_BUILTIN_TYPEDARRAY
-#if JERRY_NUMBER_TYPE_FLOAT64
 
 #define TYPEDARRAY_BYTES_PER_ELEMENT 8
 #define TYPEDARRAY_BUILTIN_ID        ECMA_BUILTIN_ID_FLOAT64ARRAY
 #include "ecma-builtin-typedarray-prototype-template.inc.h"
 
-#endif /* JERRY_NUMBER_TYPE_FLOAT64 */
 #endif /* JERRY_BUILTIN_TYPEDARRAY */

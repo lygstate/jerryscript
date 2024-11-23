@@ -16,7 +16,6 @@
 #include "ecma-builtins.h"
 
 #if JERRY_BUILTIN_TYPEDARRAY
-#if JERRY_NUMBER_TYPE_FLOAT64
 
 #define ECMA_BUILTINS_INTERNAL
 #include "ecma-builtins-internal.h"
@@ -41,5 +40,4 @@
  * @}
  */
 
-#endif /* JERRY_NUMBER_TYPE_FLOAT64 */
 #endif /* JERRY_BUILTIN_TYPEDARRAY */

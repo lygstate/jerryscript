@@ -218,45 +218,23 @@ enum
 #endif /* JERRY_BUILTIN_GLOBAL_THIS */
 };
 
-#if !JERRY_NUMBER_TYPE_FLOAT64
 /**
  * Maximum integer number for an ecma value
  */
-#define ECMA_INTEGER_NUMBER_MAX 0x7fffff
-/**
- * Maximum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MAX_SHIFTED 0x7fffff0
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
-/**
- * Maximum integer number for an ecma value
- */
-#define ECMA_INTEGER_NUMBER_MAX         0x7ffffff
+#define ECMA_INTEGER_NUMBER_MAX 0x7ffffff
 /**
  * Maximum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
  */
 #define ECMA_INTEGER_NUMBER_MAX_SHIFTED 0x7ffffff0
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
 
-#if !JERRY_NUMBER_TYPE_FLOAT64
 /**
  * Minimum integer number for an ecma value
  */
-#define ECMA_INTEGER_NUMBER_MIN -0x7fffff
-/**
- * Minimum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
- */
-#define ECMA_INTEGER_NUMBER_MIN_SHIFTED -0x7fffff0
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
-/**
- * Minimum integer number for an ecma value
- */
-#define ECMA_INTEGER_NUMBER_MIN         -0x8000000
+#define ECMA_INTEGER_NUMBER_MIN -0x8000000
 /**
  * Minimum integer number for an ecma value (shifted left with ECMA_DIRECT_SHIFT)
  */
 #define ECMA_INTEGER_NUMBER_MIN_SHIFTED (-0x7fffffff - 1) /* -0x80000000 */
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
 
 #if ECMA_DIRECT_SHIFT != 4
 #error "Please update ECMA_INTEGER_NUMBER_MIN/MAX_SHIFTED according to the new value of ECMA_DIRECT_SHIFT."
@@ -270,11 +248,7 @@ enum
 /**
  * Maximum integer number, which if squared, still fits in ecma_integer_value_t
  */
-#if !JERRY_NUMBER_TYPE_FLOAT64
-#define ECMA_INTEGER_MULTIPLY_MAX 0xb50
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
 #define ECMA_INTEGER_MULTIPLY_MAX 0x2d41
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
 
 /**
  * Checks whether the error flag is set.
@@ -1333,11 +1307,7 @@ typedef struct
 /**
  * Description of an ecma-number
  */
-#if JERRY_NUMBER_TYPE_FLOAT64
 typedef double ecma_number_t;
-#else /* !JERRY_NUMBER_TYPE_FLOAT64 */
-typedef float ecma_number_t;
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
 
 /**
  * Convert double to an ecma-number.
