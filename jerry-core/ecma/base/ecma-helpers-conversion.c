@@ -30,8 +30,6 @@
  * @{
  */
 
-#if JERRY_NUMBER_TYPE_FLOAT64
-
 /**
  * \addtogroup ecmahelpersbigintegers Helpers for operations intermediate 128-bit integers
  * @{
@@ -252,28 +250,6 @@ ecma_uint64_normalize_shift (uint64_t n) /**< integer to count leading zeros in 
 /**
  * @}
  */
-
-/**
- * Number.MAX_VALUE exponent part when using 64 bit float representation.
- */
-#define NUMBER_MAX_DECIMAL_EXPONENT 308
-/**
- * Number.MIN_VALUE exponent part when using 64 bit float representation.
- */
-#define NUMBER_MIN_DECIMAL_EXPONENT -324
-
-#elif !JERRY_NUMBER_TYPE_FLOAT64
-
-/**
- * Number.MAX_VALUE exponent part when using 32 bit float representation.
- */
-#define NUMBER_MAX_DECIMAL_EXPONENT 38
-/**
- * Number.MIN_VALUE exponent part when using 32 bit float representation.
- */
-#define NUMBER_MIN_DECIMAL_EXPONENT -45
-
-#endif /* JERRY_NUMBER_TYPE_FLOAT64 */
 
 /**
  * Value of epsilon
@@ -535,7 +511,6 @@ ecma_utf8_string_to_number (const lit_utf8_byte_t *str_p, /**< utf-8 string */
     return sign ? -ECMA_NUMBER_ZERO : ECMA_NUMBER_ZERO;
   }
 
-#if JERRY_NUMBER_TYPE_FLOAT64
   /*
    * 128-bit mantissa storage
    *
@@ -628,25 +603,6 @@ ecma_utf8_string_to_number (const lit_utf8_byte_t *str_p, /**< utf-8 string */
   JERRY_ASSERT (significand < (1ull << ECMA_NUMBER_FRACTION_WIDTH));
 
   return ecma_number_create (sign, (uint32_t) binary_exponent, significand);
-#elif !JERRY_NUMBER_TYPE_FLOAT64
-  /* Less precise conversion */
-  ecma_number_t num = (ecma_number_t) (uint32_t) fraction_uint64;
-
-  ecma_number_t m = e_sign ? (ecma_number_t) 0.1 : (ecma_number_t) 10.0;
-
-  while (e)
-  {
-    if (e % 2)
-    {
-      num *= m;
-    }
-
-    m *= m;
-    e /= 2;
-  }
-
-  return num;
-#endif /* JERRY_NUMBER_TYPE_FLOAT64 */
 } /* ecma_utf8_string_to_number */
 
 /**

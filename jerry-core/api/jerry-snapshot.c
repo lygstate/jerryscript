@@ -123,11 +123,7 @@ snapshot_write_to_buffer_by_offset (uint8_t *buffer_p, /**< buffer */
 /**
  * Maximum snapshot write buffer offset.
  */
-#if !JERRY_NUMBER_TYPE_FLOAT64
-#define JERRY_SNAPSHOT_MAXIMUM_WRITE_OFFSET (0x7fffff >> 1)
-#else /* JERRY_NUMBER_TYPE_FLOAT64 */
 #define JERRY_SNAPSHOT_MAXIMUM_WRITE_OFFSET (UINT32_MAX >> 1)
-#endif /* !JERRY_NUMBER_TYPE_FLOAT64 */
 
 /**
  * Save snapshot helper.

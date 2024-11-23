@@ -667,13 +667,6 @@
  */
 
 /**
- * The date module can only use the float 64 number types.
- */
-#if JERRY_BUILTIN_DATE && !JERRY_NUMBER_TYPE_FLOAT64
-#error "Date does not support float32"
-#endif /* JERRY_BUILTIN_DATE && !JERRY_NUMBER_TYPE_FLOAT64 */
-
-/**
  * Source name related types into a single guard
  */
 #if JERRY_LINE_INFO || JERRY_ERROR_MESSAGES || JERRY_MODULE_SYSTEM
