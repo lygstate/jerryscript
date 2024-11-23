@@ -475,7 +475,7 @@ ecma_builtin_array_dispatch_call (const ecma_value_t *arguments_list_p, /**< arg
   ecma_number_t num = ecma_get_number_from_value (arguments_list_p[0]);
   uint32_t num_uint32 = ecma_number_to_uint32 (num);
 
-  if (num != ((ecma_number_t) num_uint32))
+  if (!ecma_number_equal_to (num, ecma_number_from_uint32 (num_uint32)))
   {
     return ecma_raise_range_error (ECMA_ERR_INVALID_ARRAY_LENGTH);
   }

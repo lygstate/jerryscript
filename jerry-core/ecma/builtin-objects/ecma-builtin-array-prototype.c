@@ -221,7 +221,7 @@ ecma_builtin_array_prototype_object_concat (const ecma_value_t args[], /**< argu
   }
 
   ecma_value_t set_length_value =
-    ecma_builtin_array_prototype_helper_set_length (new_array_p, ((ecma_number_t) new_length));
+    ecma_builtin_array_prototype_helper_set_length (new_array_p, ecma_number_from_uint64 (new_length));
   if (ECMA_IS_VALUE_ERROR (set_length_value))
   {
     ecma_deref_object (new_array_p);
@@ -400,7 +400,7 @@ ecma_builtin_array_prototype_object_pop (ecma_object_t *obj_p, /**< object */
   ecma_free_value (del_value);
 
   /* 5.d */
-  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, ((ecma_number_t) len));
+  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, ecma_number_from_uint64 (len));
 
   if (ECMA_IS_VALUE_ERROR (set_length_value))
   {
@@ -426,9 +426,15 @@ ecma_builtin_array_prototype_object_push (const ecma_value_t *argument_list_p, /
                                           ecma_object_t *obj_p, /**< object */
                                           ecma_length_t length) /**< object's length */
 {
+  ecma_length_t length_new = length + arguments_number;
+  if (length_new < length)
+  {
+    /* length overflow */
+    return ecma_raise_range_error (ECMA_ERR_INVALID_ARRAY_LENGTH);
+  }
   if (ecma_op_object_is_fast_array (obj_p))
   {
-    if ((ecma_number_t) (length + arguments_number) > UINT32_MAX)
+    if (length_new > UINT32_MAX)
     {
       return ecma_raise_range_error (ECMA_ERR_INVALID_ARRAY_LENGTH);
     }
@@ -453,7 +459,7 @@ ecma_builtin_array_prototype_object_push (const ecma_value_t *argument_list_p, /
   }
 
   /* 5. */
-  if ((ecma_number_t) (length + arguments_number) > ECMA_NUMBER_MAX_SAFE_INTEGER)
+  if (length_new > ECMA_NUMBER_MAX_SAFE_INTEGER)
   {
     return ecma_raise_type_error (ECMA_ERR_PUSHING_TOO_HIGH_ELEMENT);
   }
@@ -471,7 +477,8 @@ ecma_builtin_array_prototype_object_push (const ecma_value_t *argument_list_p, /
   }
 
   /* 6 - 7. */
-  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, (ecma_number_t) length);
+  ecma_value_t set_length_value =
+    ecma_builtin_array_prototype_helper_set_length (obj_p, ecma_number_from_uint64 (length));
 
   if (ECMA_IS_VALUE_ERROR (set_length_value))
   {
@@ -732,7 +739,7 @@ ecma_builtin_array_prototype_object_shift (ecma_object_t *obj_p, /**< object */
   }
 
   /* 9. */
-  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, ((ecma_number_t) len));
+  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, ecma_number_from_uint64 (len));
 
   if (ECMA_IS_VALUE_ERROR (set_length_value))
   {
@@ -888,7 +895,8 @@ ecma_builtin_array_prototype_object_slice (ecma_value_t arg1, /**< start */
     }
   }
 
-  ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (new_array_p, ((ecma_number_t) n));
+  ecma_value_t set_length_value =
+    ecma_builtin_array_prototype_helper_set_length (new_array_p, ecma_number_from_uint64 (n));
 
   if (ECMA_IS_VALUE_ERROR (set_length_value))
   {
@@ -1207,17 +1215,17 @@ ecma_builtin_array_prototype_object_splice (const ecma_value_t args[], /**< argu
       {
         return ECMA_VALUE_ERROR;
       }
+      uint64_t delete_num_u64 = ecma_number_clamp_uint64 (delete_num);
 
       /* ES5.1: 7 */
-      actual_delete_count =
-        (ecma_length_t) (JERRY_MIN (JERRY_MAX (delete_num, 0), (ecma_number_t) (len - actual_start)));
+      actual_delete_count = (ecma_length_t) (JERRY_MIN (delete_num_u64, (len - actual_start)));
     }
   }
 
   ecma_length_t new_length = len + insert_count - actual_delete_count;
 
   /* ES11: 8. */
-  if ((ecma_number_t) new_length > ECMA_NUMBER_MAX_SAFE_INTEGER)
+  if (new_length > ECMA_NUMBER_MAX_SAFE_INTEGER)
   {
     return ecma_raise_type_error (ECMA_ERR_INVALID_NEW_ARRAY_LENGTH);
   }
@@ -1264,7 +1272,7 @@ ecma_builtin_array_prototype_object_splice (const ecma_value_t args[], /**< argu
 
   /* ES11: 12. */
   ecma_value_t set_length =
-    ecma_builtin_array_prototype_helper_set_length (new_array_p, ((ecma_number_t) actual_delete_count));
+    ecma_builtin_array_prototype_helper_set_length (new_array_p, ecma_number_from_uint64 (actual_delete_count));
 
   if (ECMA_IS_VALUE_ERROR (set_length))
   {
@@ -1373,7 +1381,8 @@ ecma_builtin_array_prototype_object_splice (const ecma_value_t args[], /**< argu
   }
 
   /* ES5.1: 16, ES11: 19. */
-  ecma_value_t set_new_length = ecma_builtin_array_prototype_helper_set_length (obj_p, ((ecma_number_t) new_length));
+  ecma_value_t set_new_length =
+    ecma_builtin_array_prototype_helper_set_length (obj_p, ecma_number_from_uint64 (new_length));
 
   if (ECMA_IS_VALUE_ERROR (set_new_length))
   {
@@ -1438,7 +1447,7 @@ ecma_builtin_array_prototype_object_unshift (const ecma_value_t args[], /**< arg
   if (args_number > 0)
   {
     /* ES11:4.a. */
-    if ((ecma_number_t) (len + args_number) > ECMA_NUMBER_MAX_SAFE_INTEGER)
+    if ((len + args_number) > ECMA_NUMBER_MAX_SAFE_INTEGER)
     {
       return ecma_raise_type_error (ECMA_ERR_UNSHIFT_TOO_HIGH);
     }
@@ -1455,7 +1464,7 @@ ecma_builtin_array_prototype_object_unshift (const ecma_value_t args[], /**< arg
       }
 
       /* ES5.1:6.b, ES11:4.c.ii. */
-      ecma_number_t new_idx = ((ecma_number_t) k) + ((ecma_number_t) args_number) - 1;
+      ecma_number_t new_idx = ecma_number_from_uint64 (k + args_number - 1);
       ecma_string_t *index_str_p = ecma_new_ecma_string_from_number (new_idx);
       ecma_value_t operation_value;
 
@@ -1492,7 +1501,7 @@ ecma_builtin_array_prototype_object_unshift (const ecma_value_t args[], /**< arg
   }
 
   /* ES5.1:10., ES11:5. */
-  ecma_number_t new_len = ((ecma_number_t) len) + ((ecma_number_t) args_number);
+  ecma_number_t new_len = ecma_number_from_uint64 (len + args_number);
   ecma_value_t set_length_value = ecma_builtin_array_prototype_helper_set_length (obj_p, new_len);
 
   if (ECMA_IS_VALUE_ERROR (set_length_value))
@@ -1545,34 +1554,39 @@ ecma_builtin_array_prototype_object_index_of (const ecma_value_t args[], /**< ar
                                               ecma_length_t len) /**< object's length */
 {
   /* 4. */
-  if (len == 0)
+  if (len > ECMA_NUMBER_MAX_SAFE_INTEGER)
   {
     return ecma_make_integer_value (-1);
   }
 
   /* 5. */
-  ecma_number_t idx = 0;
+  int64_t idx = 0;
+  int64_t len_signed = (int64_t) len;
   if (args_number > 1)
   {
-    if (ECMA_IS_VALUE_ERROR (ecma_op_to_integer (args[1], &idx)))
+    if (ECMA_IS_VALUE_ERROR (ecma_op_clamp_int64 (args[1], &idx)))
     {
       return ECMA_VALUE_ERROR;
     }
   }
 
   /* 6. */
-  if (idx >= (ecma_number_t) len)
+  if (idx >= (int64_t) len)
   {
-    return ecma_make_number_value (-1);
+    return ecma_make_integer_value (-1);
   }
 
   /* 7. */
-  ecma_length_t from_idx = (ecma_length_t) idx;
+  ecma_length_t from_idx = idx;
 
   /* 8. */
-  if (idx < 0)
+  if (idx < (-(int64_t) len))
   {
-    from_idx = (ecma_length_t) JERRY_MAX ((ecma_number_t) len + idx, 0);
+    from_idx = 0;
+  }
+  else if (idx < 0)
+  {
+    from_idx = len + idx;
   }
 
   if (ecma_op_object_is_fast_array (obj_p))
@@ -1646,16 +1660,16 @@ ecma_builtin_array_prototype_object_last_index_of (const ecma_value_t args[], /*
                                                    ecma_length_t len) /**< object's length */
 {
   /* 4. */
-  if (len == 0)
+  if (len > ECMA_NUMBER_MAX_SAFE_INTEGER)
   {
     return ecma_make_integer_value (-1);
   }
 
   /* 5. */
-  ecma_number_t idx = (ecma_number_t) len - 1;
+  ecma_length_t idx = len - 1;
   if (args_number > 1)
   {
-    if (ECMA_IS_VALUE_ERROR (ecma_op_to_integer (args[1], &idx)))
+    if (ECMA_IS_VALUE_ERROR (ecma_op_clamp_int64 (args[1], &idx)))
     {
       return ECMA_VALUE_ERROR;
     }
@@ -1666,16 +1680,16 @@ ecma_builtin_array_prototype_object_last_index_of (const ecma_value_t args[], /*
   /* 6 */
   if (idx >= 0)
   {
-    from_idx = (ecma_length_t) (JERRY_MIN (idx, (ecma_number_t) (len - 1)));
+    from_idx = JERRY_MIN (idx, (len - 1));
   }
   else
   {
-    ecma_number_t k = (ecma_number_t) len + idx;
+    ecma_length_t k = len + idx;
     if (k < 0)
     {
       return ecma_make_integer_value (-1);
     }
-    from_idx = (ecma_length_t) k;
+    from_idx = k;
   }
 
   ecma_value_t search_element = (args_number > 0) ? args[0] : ECMA_VALUE_UNDEFINED;
@@ -2551,7 +2565,7 @@ ecma_builtin_array_flatten_into_array (ecma_value_t target, /**< target will con
                                        ecma_object_t *source, /**< source object */
                                        ecma_length_t source_len, /**< source object length */
                                        ecma_length_t start, /**< remaining recursion depth */
-                                       ecma_number_t depth, /**< start index offset */
+                                       ecma_length_t depth, /**< start index offset */
                                        ecma_value_t mapped_value, /**< mapped value  */
                                        ecma_value_t thisArg) /**< this arg */
 {
@@ -2628,12 +2642,10 @@ ecma_builtin_array_flatten_into_array (ecma_value_t target, /**< target will con
 
         ecma_deref_object (element_obj);
 
-        if (ECMA_IS_VALUE_ERROR (target_index_val))
+        if (ECMA_IS_VALUE_ERROR (ecma_op_clamp_int64 (target_index_val, &target_index)))
         {
           return target_index_val;
         }
-
-        target_index = (ecma_length_t) ecma_get_number_from_value (target_index_val);
         continue;
       }
     }
@@ -2672,12 +2684,15 @@ ecma_builtin_array_prototype_object_flat (const ecma_value_t args[], /**< argume
                                           ecma_length_t len) /**< array object's length */
 {
   /* 3. */
-  ecma_number_t depth_num = 1;
+  ecma_length_t depth_num = 1;
 
   /* 4. */
-  if (args_number > 0 && ECMA_IS_VALUE_ERROR (ecma_op_to_integer (args[0], &depth_num)))
+  if (args_number > 0)
   {
-    return ECMA_VALUE_ERROR;
+    if (ECMA_IS_VALUE_ERROR (ecma_op_clamp_int64 (args[0], &depth_num)))
+    {
+      return ECMA_VALUE_ERROR;
+    }
   }
 
   /* 5. */

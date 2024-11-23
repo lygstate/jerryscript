@@ -158,14 +158,14 @@ ecma_builtin_number_dispatch_construct (const ecma_value_t *arguments_list_p, /*
  *
  * See also:
  *          ECMA-262 v6, 20.1.2.3
- *          ECMA-262 v6, 20.1.2.3
+ *          ECMA-262 v15, 21.1.2.3
+ *          ECMA-262 v15, 21.1.2.5
  *
  * @return ecma value
  *         Returned value must be freed with ecma_free_value.
  */
 static ecma_value_t
-ecma_builtin_number_object_is_integer_helper (ecma_value_t arg, /**< routine's argument */
-                                              ecma_number_t num, /**< this number */
+ecma_builtin_number_object_is_integer_helper (ecma_number_t num, /**< this number */
                                               bool is_safe) /**< is the number safe */
 {
   if (ecma_number_is_nan (num) || ecma_number_is_infinity (num))
@@ -173,23 +173,18 @@ ecma_builtin_number_object_is_integer_helper (ecma_value_t arg, /**< routine's a
     return ECMA_VALUE_FALSE;
   }
 
-  ecma_number_t int_num;
-
+  ecma_number_t int_num = ecma_number_truncate (num);
+  bool is_integral_number = ecma_number_equal_to (int_num, num);
+  if (!is_integral_number)
+    return ECMA_VALUE_FALSE;
   if (is_safe)
   {
-    int_num = ecma_number_trunc (num);
-
-    if (fabs (int_num) > ECMA_NUMBER_MAX_SAFE_INTEGER)
+    if (ecma_number_greater_than (ecma_number_abs (int_num), ecma_number_from_uint64 (ECMA_NUMBER_MAX_SAFE_INTEGER)))
     {
       return ECMA_VALUE_FALSE;
     }
   }
-  else
-  {
-    ecma_op_to_integer (arg, &int_num);
-  }
-
-  return (int_num == num) ? ECMA_VALUE_TRUE : ECMA_VALUE_FALSE;
+  return ECMA_VALUE_TRUE;
 } /* ecma_builtin_number_object_is_integer_helper */
 
 /**
@@ -225,10 +220,12 @@ ecma_builtin_number_dispatch_routine (uint8_t builtin_routine_id, /**< built-in 
       return ecma_make_boolean_value (ecma_number_is_nan (num));
     }
     case ECMA_NUMBER_OBJECT_ROUTINE_IS_INTEGER:
+    {
+      return ecma_builtin_number_object_is_integer_helper (num, false);
+    }
     case ECMA_NUMBER_OBJECT_ROUTINE_IS_SAFE_INTEGER:
     {
-      bool is_safe = (builtin_routine_id == ECMA_NUMBER_OBJECT_ROUTINE_IS_SAFE_INTEGER);
-      return ecma_builtin_number_object_is_integer_helper (arguments_list_p[0], num, is_safe);
+      return ecma_builtin_number_object_is_integer_helper (num, true);
     }
     default:
     {

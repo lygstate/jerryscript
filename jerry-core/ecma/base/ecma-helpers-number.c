@@ -40,34 +40,6 @@ JERRY_STATIC_ASSERT (sizeof (ecma_number_t) == sizeof (ecma_binary_num_t),
                      size_of_ecma_number_t_must_be_equal_to_binary_representation);
 
 /**
- * Convert an ecma-number to it's binary representation.
- *
- * @return binary representation
- */
-extern inline ecma_binary_num_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
-ecma_number_to_binary (ecma_number_t number) /**< ecma number */
-{
-  ecma_number_accessor_t f;
-  f.as_number = number;
-
-  return f.as_binary;
-} /* ecma_number_to_binary */
-
-/**
- * Convert a binary representation to the corresponding ecma-number.
- *
- * @return ecma-number
- */
-extern inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
-ecma_number_from_binary (ecma_binary_num_t binary) /**< binary representation */
-{
-  ecma_number_accessor_t f;
-  f.as_binary = binary;
-
-  return f.as_number;
-} /* ecma_number_from_binary */
-
-/**
  * Check signedness of the binary number.
  *
  * @return true  - if sign bit is set
@@ -137,7 +109,7 @@ ecma_number_create (bool sign, /**< sign */
 extern inline bool JERRY_ATTR_ALWAYS_INLINE
 ecma_number_is_nan (ecma_number_t num) /**< ecma-number */
 {
-  bool is_nan = (num != num);
+  bool is_nan = (num.as_number != num.as_number);
 
 #ifndef JERRY_NDEBUG
   /* IEEE-754 2008, 3.4, a */
@@ -160,10 +132,10 @@ ecma_number_is_nan (ecma_number_t num) /**< ecma-number */
 extern inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
 ecma_number_make_nan (void)
 {
-  ecma_number_accessor_t f;
+  ecma_number_t f;
   f.as_binary = ECMA_NUMBER_BINARY_QNAN;
 
-  return f.as_number;
+  return f;
 } /* ecma_number_make_nan */
 
 /**
@@ -175,7 +147,7 @@ ecma_number_make_nan (void)
 extern inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
 ecma_number_make_infinity (bool sign) /**< sign of the value */
 {
-  ecma_number_accessor_t f;
+  ecma_number_t f;
   f.as_binary = ECMA_NUMBER_BINARY_INF;
 
   if (sign)
@@ -183,7 +155,7 @@ ecma_number_make_infinity (bool sign) /**< sign of the value */
     f.as_binary |= ECMA_NUMBER_SIGN_BIT;
   }
 
-  return f.as_number;
+  return f;
 } /* ecma_number_make_infinity */
 
 /**
@@ -209,7 +181,7 @@ ecma_number_is_negative (ecma_number_t num) /**< ecma-number */
 extern inline bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
 ecma_number_is_zero (ecma_number_t num) /**< ecma-number */
 {
-  bool is_zero = (num == ECMA_NUMBER_ZERO);
+  bool is_zero = ecma_number_equal_to (num, ECMA_NUMBER_ZERO);
 
 #ifndef JERRY_NDEBUG
   bool is_zero_ieee754 = ((ecma_number_to_binary (num) & ~ECMA_NUMBER_SIGN_BIT) == 0);
@@ -242,9 +214,9 @@ extern inline bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
 ecma_number_is_finite (ecma_number_t num) /**< ecma-number */
 {
 #if defined(__GNUC__) || defined(__clang__)
-  return __builtin_isfinite (num);
+  return __builtin_isfinite (num.as_number);
 #elif defined(_WIN32)
-  return isfinite (num);
+  return isfinite (num.as_number);
 #else /* !(defined(__GNUC__) || defined(__clang__) || defined(_WIN32)) */
   return !ecma_number_is_nan (num) && !ecma_number_is_infinity (num);
 #endif /* defined (__GNUC__) || defined (__clang__) */
@@ -259,7 +231,7 @@ ecma_number_t JERRY_ATTR_CONST
 ecma_number_get_prev (ecma_number_t num) /**< ecma-number */
 {
 #if defined(__GNUC__) || defined(__clang__)
-  return __builtin_nextafter (num, -INFINITY);
+  return __builtin_nextafter (num.as_number, -INFINITY);
 #else /* !defined (__GNUC__) && !defined (__clang__) */
   JERRY_ASSERT (!ecma_number_is_nan (num));
   ecma_binary_num_t binary = ecma_number_to_binary (num);
@@ -273,7 +245,7 @@ ecma_number_get_prev (ecma_number_t num) /**< ecma-number */
   /* If +0.0, return -0.0 */
   if (binary == ECMA_NUMBER_BINARY_ZERO)
   {
-    return -num;
+    return ecma_number_from_binary (ECMA_NUMBER_BINARY_ZERO_NEGATIVE);
   }
 
   if (ecma_number_sign (binary))
@@ -294,7 +266,7 @@ ecma_number_t JERRY_ATTR_CONST
 ecma_number_get_next (ecma_number_t num) /**< ecma-number */
 {
 #if defined(__GNUC__) || defined(__clang__)
-  return __builtin_nextafter (num, INFINITY);
+  return __builtin_nextafter (num.as_number, INFINITY);
 #else /* !defined (__GNUC__) && !defined (__clang__) */
   JERRY_ASSERT (!ecma_number_is_nan (num));
   ecma_binary_num_t binary = ecma_number_to_binary (num);
@@ -306,9 +278,9 @@ ecma_number_get_next (ecma_number_t num) /**< ecma-number */
   }
 
   /* If -0.0, return +0.0 */
-  if (binary == (ECMA_NUMBER_SIGN_BIT | ECMA_NUMBER_BINARY_ZERO))
+  if (binary == ECMA_NUMBER_BINARY_ZERO_NEGATIVE)
   {
-    return -num;
+    return ecma_number_from_binary (ECMA_NUMBER_BINARY_ZERO);
   }
 
   if (ecma_number_sign (binary))
@@ -328,6 +300,7 @@ ecma_number_get_next (ecma_number_t num) /**< ecma-number */
 ecma_number_t JERRY_ATTR_CONST
 ecma_number_trunc (ecma_number_t num) /**< ecma-number */
 {
+  /* TODO Replace with ecma_number_truncate */
   JERRY_ASSERT (!ecma_number_is_nan (num));
 
   ecma_binary_num_t binary = ecma_number_to_binary (num);
@@ -335,7 +308,7 @@ ecma_number_trunc (ecma_number_t num) /**< ecma-number */
 
   if (exponent < ECMA_NUMBER_EXPONENT_BIAS)
   {
-    return ECMA_NUMBER_ZERO;
+    return ecma_number_from_binary (ECMA_NUMBER_BINARY_ZERO);
   }
 
   uint32_t unbiased_exp = exponent - ECMA_NUMBER_EXPONENT_BIAS;
@@ -364,16 +337,12 @@ ecma_number_remainder (ecma_number_t left_num, /**< left operand */
 {
   JERRY_ASSERT (ecma_number_is_finite (left_num) && !ecma_number_is_zero (left_num));
   JERRY_ASSERT (ecma_number_is_finite (right_num) && !ecma_number_is_zero (right_num));
-
-  const ecma_number_t q = ecma_number_trunc (left_num / right_num);
-  ecma_number_t r = left_num - right_num * q;
-
-  if (ecma_number_is_zero (r) && ecma_number_is_negative (left_num))
-  {
-    r = -r;
+  const ecma_number_t q = ecma_number_div_trunc (left_num, right_num);
+  ecma_number_t r = ecma_number_sub(left_num, ecma_number_mul(right_num, q));
+  if (!ecma_number_is_zero (r)) {
+    return r;
   }
-
-  return r;
+  return ECMA_NUMBER_ZERO;
 } /* ecma_number_remainder */
 
 /**
@@ -385,7 +354,9 @@ ecma_number_t JERRY_ATTR_CONST
 ecma_number_pow (ecma_number_t x, /**< left operand */
                  ecma_number_t y) /**< right operand */
 {
-  if (ecma_number_is_nan (y) || (ecma_number_is_infinity (y) && (x == ECMA_NUMBER_ONE || x == ECMA_NUMBER_MINUS_ONE)))
+  if (ecma_number_is_nan (y)
+      || (ecma_number_is_infinity (y)
+          && (ecma_number_equal_to (x, ECMA_NUMBER_ONE) || ecma_number_equal_to (x, ECMA_NUMBER_MINUS_ONE))))
   {
     /* Handle differences between ES5.1 and ISO C standards for pow. */
     return ecma_number_make_nan ();
@@ -397,7 +368,7 @@ ecma_number_pow (ecma_number_t x, /**< left operand */
     return ECMA_NUMBER_ONE;
   }
 
-  return DOUBLE_TO_ECMA_NUMBER_T (pow (x, y));
+  return DOUBLE_TO_ECMA_NUMBER_T (pow (ecma_number_cast_double (x), ecma_number_cast_double (y)));
 } /* ecma_number_pow */
 
 /**
@@ -542,8 +513,8 @@ ecma_number_parse_int (const lit_utf8_byte_t *str_p, /**< routine's first argume
       break;
     }
 
-    value *= radix;
-    value += digit;
+    value = ecma_number_mul_i32(value, radix);
+    value = ecma_number_add_i32(value, digit);
 
     str_p++;
   }
@@ -557,7 +528,7 @@ ecma_number_parse_int (const lit_utf8_byte_t *str_p, /**< routine's first argume
   /* 15. */
   if (sign)
   {
-    value *= ECMA_NUMBER_MINUS_ONE;
+    value = ecma_number_negative(value);
   }
 
   return ecma_make_number_value (value);
@@ -665,7 +636,7 @@ ecma_number_parse_float (const lit_utf8_byte_t *str_p, /**< routine's first argu
 
   if (sign)
   {
-    ret_num *= ECMA_NUMBER_MINUS_ONE;
+    ret_num = ecma_number_negative(ret_num);
   }
 
   return ecma_make_number_value (ret_num);

@@ -289,6 +289,7 @@ ecma_builtin_string_object_from_code_point (const ecma_value_t args[], /**< argu
 
   for (uint32_t index = 0; index < args_number; index++)
   {
+    ecma_op_to_length()
     ecma_number_t to_number_num;
     ecma_value_t to_number_value = ecma_op_to_number (args[index], &to_number_num);
 

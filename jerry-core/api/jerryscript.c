@@ -2078,7 +2078,7 @@ jerry_value_as_number (const jerry_value_t value) /**< api value */
     return 0;
   }
 
-  return (double) ecma_get_number_from_value (value);
+  return ecma_number_cast_double (ecma_get_number_from_value (value));
 } /* jerry_value_as_number */
 
 /**
@@ -2247,19 +2247,19 @@ jerry_value_as_integer (const jerry_value_t value) /**< input value */
     return 0;
   }
 
-  double number = ecma_get_number_from_value (value);
+  ecma_number_t number = ecma_get_number_from_value (value);
 
   if (ecma_number_is_nan (number))
   {
-    return ECMA_NUMBER_ZERO;
+    return ecma_number_cast_double(ECMA_NUMBER_ZERO);
   }
 
   if (ecma_number_is_zero (number) || ecma_number_is_infinity (number))
   {
-    return number;
+    return ecma_number_cast_double (number);
   }
 
-  ecma_number_t floor_fabs = (ecma_number_t) floor (fabs (number));
+  double floor_fabs = floor (fabs (ecma_number_cast_double (number)));
 
   return ecma_number_is_negative (number) ? -floor_fabs : floor_fabs;
 } /* jerry_value_as_integer */
@@ -2479,7 +2479,7 @@ jerry_number (double value) /**< double value from which a jerry_value_t will be
 {
   jerry_assert_api_enabled ();
 
-  return ecma_make_number_value ((ecma_number_t) value);
+  return ecma_make_number_value (ecma_number_from_double (value));
 } /* jerry_number */
 
 /**
@@ -4606,7 +4606,7 @@ jerry_object_property_names (const jerry_value_t object, /**< object */
           JERRY_ASSERT (ecma_is_value_prop_name (value) || ecma_is_value_number (value));
           if (JERRY_UNLIKELY (ecma_is_value_number (value)))
           {
-            if (ecma_get_number_from_value (value) == ecma_get_number_from_value (key))
+            if (ecma_number_equal_to (ecma_get_number_from_value (value), ecma_get_number_from_value (key)))
             {
               break;
             }

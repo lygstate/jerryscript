@@ -264,7 +264,7 @@ ecma_find_or_create_literal_number (ecma_number_t number_arg) /**< number to be 
       {
         ecma_number_t *number_p = JMEM_CP_GET_NON_NULL_POINTER (ecma_number_t, number_list_p->values[i]);
 
-        if (*number_p == number_arg)
+        if (ecma_number_equal_to(*number_p, number_arg))
         {
           ecma_free_value (num);
           return ecma_make_float_value (number_p);

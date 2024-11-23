@@ -584,11 +584,11 @@ ecma_new_ecma_string_from_length (ecma_length_t number) /**< property length */
     return (ecma_string_t *) ECMA_CREATE_DIRECT_STRING (ECMA_DIRECT_STRING_UINT, (uintptr_t) number);
   }
 
-  JERRY_ASSERT ((ecma_number_t) number <= ECMA_NUMBER_MAX_SAFE_INTEGER);
+  JERRY_ASSERT (number <= ECMA_NUMBER_MAX_SAFE_INTEGER);
 
   if (JERRY_UNLIKELY (number > UINT32_MAX))
   {
-    return ecma_new_ecma_string_from_number ((ecma_number_t) number);
+    return ecma_new_ecma_string_from_number (ecma_number_from_uint64 (number));
   }
 
   return ecma_new_non_direct_string_from_uint32 ((uint32_t) number);
@@ -635,7 +635,7 @@ ecma_string_t *
 ecma_new_ecma_string_from_number (ecma_number_t num) /**< ecma-number */
 {
   uint32_t uint32_num = ecma_number_to_uint32 (num);
-  if (num == ((ecma_number_t) uint32_num))
+  if (ecma_number_equal_to (num, ecma_number_from_uint32 (uint32_num)))
   {
     return ecma_new_ecma_string_from_uint32 (uint32_num);
   }
@@ -1015,12 +1015,12 @@ ecma_string_to_number (const ecma_string_t *string_p) /**< ecma-string */
   {
     if (ECMA_IS_DIRECT_STRING_WITH_TYPE (string_p, ECMA_DIRECT_STRING_UINT))
     {
-      return (ecma_number_t) ECMA_GET_DIRECT_STRING_VALUE (string_p);
+      return ecma_number_from_uint32 (ECMA_GET_DIRECT_STRING_VALUE (string_p));
     }
   }
   else if (ECMA_STRING_GET_CONTAINER (string_p) == ECMA_STRING_CONTAINER_UINT32_IN_DESC)
   {
-    return ((ecma_number_t) string_p->u.uint32_number);
+    return ecma_number_from_uint32 (string_p->u.uint32_number);
   }
 
   lit_utf8_size_t size;
@@ -2757,7 +2757,7 @@ ecma_op_advance_string_index (ecma_string_t *str_p, /**< input string */
                               bool is_unicode) /**< true - if regexp object's "unicode" flag is set
                                                     false - otherwise */
 {
-  JERRY_ASSERT ((ecma_number_t) index <= ECMA_NUMBER_MAX_SAFE_INTEGER);
+  JERRY_ASSERT (index <= ECMA_NUMBER_MAX_SAFE_INTEGER);
   ecma_length_t next_index = index + 1;
 
   if (!is_unicode)

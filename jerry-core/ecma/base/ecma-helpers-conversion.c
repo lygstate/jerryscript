@@ -309,7 +309,8 @@ ecma_utf8_string_to_number_by_radix (const lit_utf8_byte_t *str_p, /**< utf-8 st
       return ecma_number_make_nan ();
     }
 
-    num = num * radix + value;
+    num = ecma_number_mul_i32 (num, radix);
+    num = ecma_number_add_i32 (num, value);
   }
 
   return num;
@@ -494,7 +495,7 @@ ecma_utf8_string_to_number (const lit_utf8_byte_t *str_p, /**< utf-8 string */
 
       if (exponent_sign * exponent < NUMBER_MIN_DECIMAL_EXPONENT)
       {
-        return sign ? -ECMA_NUMBER_ZERO : ECMA_NUMBER_ZERO;
+        return sign ? ECMA_NUMBER_ZERO_NEGATIVE : ECMA_NUMBER_ZERO;
       }
     }
 
@@ -508,7 +509,7 @@ ecma_utf8_string_to_number (const lit_utf8_byte_t *str_p, /**< utf-8 string */
 
   if (significand == 0)
   {
-    return sign ? -ECMA_NUMBER_ZERO : ECMA_NUMBER_ZERO;
+    return sign ? ECMA_NUMBER_ZERO_NEGATIVE : ECMA_NUMBER_ZERO;
   }
 
   /*
@@ -658,16 +659,16 @@ ecma_number_to_uint32 (ecma_number_t num) /**< ecma-number */
   }
 
   const bool sign = ecma_number_is_negative (num);
-  const ecma_number_t abs_num = sign ? -num : num;
+  const ecma_number_t abs_num = ecma_number_abs (num);
 
   /* 2 ^ 32 */
   const uint64_t uint64_2_pow_32 = (1ull << 32);
 
-  const ecma_number_t num_2_pow_32 = (float) uint64_2_pow_32;
+  const ecma_number_t num_2_pow_32 = ecma_number_from_double ((double) uint64_2_pow_32);
 
   ecma_number_t num_in_uint32_range;
 
-  if (abs_num >= num_2_pow_32)
+  if (ecma_number_greater_equal (abs_num, num_2_pow_32))
   {
     num_in_uint32_range = ecma_number_remainder (abs_num, num_2_pow_32);
   }
@@ -677,8 +678,8 @@ ecma_number_to_uint32 (ecma_number_t num) /**< ecma-number */
   }
 
   /* Check that the floating point value can be represented with uint32_t. */
-  JERRY_ASSERT (num_in_uint32_range < uint64_2_pow_32);
-  uint32_t uint32_num = (uint32_t) num_in_uint32_range;
+  JERRY_ASSERT (ecma_number_less_than (num_in_uint32_range, ecma_number_from_uint64 (uint64_2_pow_32)));
+  uint32_t uint32_num = (uint32_t) ecma_number_cast_double (num_in_uint32_range);
 
   const uint32_t ret = sign ? -uint32_num : uint32_num;
 
@@ -765,7 +766,7 @@ ecma_number_to_decimal (ecma_number_t num, /**< ecma-number */
   JERRY_ASSERT (!ecma_number_is_infinity (num));
   JERRY_ASSERT (!ecma_number_is_negative (num));
 
-  return ecma_errol0_dtoa ((double) num, out_digits_p, out_decimal_exp_p);
+  return ecma_errol0_dtoa (ecma_number_cast_double (num), out_digits_p, out_decimal_exp_p);
 } /* ecma_number_to_decimal */
 
 /**
@@ -805,7 +806,7 @@ ecma_number_to_utf8_string (ecma_number_t num, /**< ecma-number */
   {
     /* 3. */
     *dst_p++ = LIT_CHAR_MINUS;
-    num = -num;
+    num = ecma_number_abs(num);
   }
 
   if (ecma_number_is_infinity (num))
@@ -821,7 +822,7 @@ ecma_number_to_utf8_string (ecma_number_t num, /**< ecma-number */
   /* 5. */
   uint32_t num_uint32 = ecma_number_to_uint32 (num);
 
-  if (((ecma_number_t) num_uint32) == num)
+  if (((double) num_uint32) == ecma_number_cast_double(num))
   {
     dst_p += ecma_uint32_to_utf8_string (num_uint32, dst_p, (lit_utf8_size_t) (buffer_p + buffer_size - dst_p));
     JERRY_ASSERT (dst_p <= buffer_p + buffer_size);

@@ -17,6 +17,7 @@
 #define ECMA_HELPERS_H
 
 #include "ecma-globals.h"
+#include "ecma-helpers-number.h"
 
 #include "jmem.h"
 #include "lit-strings.h"
@@ -370,16 +371,7 @@ void ecma_stringbuilder_destroy (ecma_stringbuilder_t *builder_p);
 /* ecma-helpers-number.c */
 ecma_number_t ecma_number_make_nan (void);
 ecma_number_t ecma_number_make_infinity (bool sign);
-bool ecma_number_is_nan (ecma_number_t num);
-bool ecma_number_is_negative (ecma_number_t num);
-bool ecma_number_is_zero (ecma_number_t num);
-bool ecma_number_is_infinity (ecma_number_t num);
 bool ecma_number_is_finite (ecma_number_t num);
-ecma_number_t ecma_number_get_prev (ecma_number_t num);
-ecma_number_t ecma_number_get_next (ecma_number_t num);
-ecma_number_t ecma_number_trunc (ecma_number_t num);
-ecma_number_t ecma_number_remainder (ecma_number_t left_num, ecma_number_t right_num);
-ecma_number_t ecma_number_pow (ecma_number_t x, ecma_number_t y);
 ecma_value_t
 ecma_number_parse_int (const lit_utf8_byte_t *string_buff, lit_utf8_size_t string_buff_size, ecma_value_t radix);
 ecma_value_t ecma_number_parse_float (const lit_utf8_byte_t *string_buff, lit_utf8_size_t string_buff_size);

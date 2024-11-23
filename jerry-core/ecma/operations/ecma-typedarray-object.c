@@ -127,7 +127,7 @@ ecma_typedarray_get_int32_element (lit_utf8_byte_t *src) /**< the location in th
 {
   int32_t num;
   ECMA_TYPEDARRAY_GET_ELEMENT (src, num, int32_t);
-  return ecma_make_number_value (num);
+  return ecma_make_number_value (ecma_number_from_int32 (num));
 } /* ecma_typedarray_get_int32_element */
 
 /**
@@ -138,7 +138,7 @@ ecma_typedarray_get_uint32_element (lit_utf8_byte_t *src) /**< the location in t
 {
   uint32_t num;
   ECMA_TYPEDARRAY_GET_ELEMENT (src, num, uint32_t);
-  return ecma_make_number_value (num);
+  return ecma_make_number_value (ecma_number_from_uint32 (num));
 } /* ecma_typedarray_get_uint32_element */
 
 /**
@@ -149,7 +149,7 @@ ecma_typedarray_get_float_element (lit_utf8_byte_t *src) /**< the location in th
 {
   float num;
   ECMA_TYPEDARRAY_GET_ELEMENT (src, num, float);
-  return ecma_make_number_value (num);
+  return ecma_make_number_value (ecma_number_from_double ((double) num));
 } /* ecma_typedarray_get_float_element */
 
 /**
@@ -160,7 +160,7 @@ ecma_typedarray_get_double_element (lit_utf8_byte_t *src) /**< the location in t
 {
   double num;
   ECMA_TYPEDARRAY_GET_ELEMENT (src, num, double);
-  return ecma_make_number_value (num);
+  return ecma_make_number_value (ecma_number_from_double(num));
 } /* ecma_typedarray_get_double_element */
 
 #if JERRY_BUILTIN_BIGINT
@@ -1633,7 +1633,7 @@ ecma_op_create_typedarray (const ecma_value_t *arguments_list_p, /**< the arg li
 
   if (!ecma_is_value_object (arguments_list_p[0]))
   {
-    ecma_number_t num = 0;
+    ecma_length_t num = 0;
 
     if (!ecma_is_value_undefined (arguments_list_p[0])
         && ECMA_IS_VALUE_ERROR (ecma_op_to_index (arguments_list_p[0], &num)))
@@ -1678,27 +1678,20 @@ ecma_op_create_typedarray (const ecma_value_t *arguments_list_p, /**< the arg li
 
   ecma_value_t length_value = ((arguments_list_len > 2) ? arguments_list_p[2] : ECMA_VALUE_UNDEFINED);
 
-  ecma_number_t offset;
+  ecma_length_t offset;
 
   if (ECMA_IS_VALUE_ERROR (ecma_op_to_index (byte_offset_value, &offset)))
   {
     return ECMA_VALUE_ERROR;
   }
 
-  if (ecma_number_is_negative (offset) || fmod (offset, (1 << element_size_shift)) != 0)
+  if ((offset % (1 << element_size_shift)) != 0)
   {
     /* ES2015 22.2.1.5: 9 - 10. */
-    if (ecma_number_is_zero (offset))
-    {
-      offset = 0;
-    }
-    else
-    {
-      return ecma_raise_range_error (ECMA_ERR_INVALID_OFFSET);
-    }
+    return ecma_raise_range_error (ECMA_ERR_INVALID_OFFSET);
   }
 
-  ecma_number_t new_length = 0;
+  ecma_length_t new_length = 0;
 
   if (ECMA_IS_VALUE_ERROR (ecma_op_to_index (length_value, &new_length)))
   {

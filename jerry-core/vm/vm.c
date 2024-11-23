@@ -3075,13 +3075,7 @@ vm_loop (vm_frame_ctx_t *frame_ctx_p) /**< frame context */
             result = ecma_make_number_value (result_number);
           }
 
-          ecma_number_t increase = ECMA_NUMBER_ONE;
-
-          if (opcode_flags & VM_OC_DECREMENT_OPERATOR_FLAG)
-          {
-            /* For decrement operators */
-            increase = ECMA_NUMBER_MINUS_ONE;
-          }
+          int32_t increase = (opcode_flags & VM_OC_DECREMENT_OPERATOR_FLAG) ? -1 : 1;
 
           /* Postfix operators require the unmodifed number value. */
           if (opcode_flags & VM_OC_POST_INCR_DECR_OPERATOR_FLAG)

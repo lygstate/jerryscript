@@ -873,11 +873,12 @@ ecma_op_is_integer (ecma_number_t num) /**< ecma number */
 } /* ecma_op_is_integer */
 
 /**
- * ToInteger operation.
+ * ToIntegerOrInfinity operation.
  *
  * See also:
  *          ECMA-262 v5, 9.4
  *          ECMA-262 v6, 7.1.4
+ *          ECMA-262 v15, 7.1.5
  *
  * @return ECMA_VALUE_EMPTY if successful
  *         conversion error otherwise
@@ -894,32 +895,27 @@ ecma_op_to_integer (ecma_value_t value, /**< ecma value */
   /* 1 */
   ecma_value_t to_number = ecma_op_to_number (value, number_p);
 
-  /* 2 */
   if (ECMA_IS_VALUE_ERROR (to_number))
   {
     return to_number;
   }
 
-  ecma_number_t number = *number_p;
-
-  /* 3 */
-  if (ecma_number_is_nan (number))
-  {
-    *number_p = ECMA_NUMBER_ZERO;
-    return ECMA_VALUE_EMPTY;
-  }
-
-  /* 4 */
-  if (ecma_number_is_zero (number) || ecma_number_is_infinity (number))
-  {
-    return ECMA_VALUE_EMPTY;
-  }
-
-  ecma_number_t floor_fabs = (ecma_number_t) floor (fabs (number));
-  /* 5 */
-  *number_p = ecma_number_is_negative (number) ? -floor_fabs : floor_fabs;
+  /* 2,3,4,5 */
+  *number_p = ecma_number_to_integer_or_infinity(*number_p);
   return ECMA_VALUE_EMPTY;
 } /* ecma_op_to_integer */
+
+ecma_value_t ecma_op_clamp_int64 (ecma_value_t value, int64_t *out)
+{
+  ecma_number_t num;
+  ecma_value_t ret = ecma_op_to_integer (value, &num);
+  if (ECMA_IS_VALUE_ERROR(ret))
+  {
+    return ret;
+  }
+  *out = ecma_number_clamp_int64 (num);
+  return ECMA_VALUE_EMPTY;
+}
 
 /**
  * ToLength operation.
@@ -941,8 +937,8 @@ ecma_op_to_length (ecma_value_t value, /**< ecma value */
   }
 
   /* 2 */
-  ecma_number_t num;
-  ecma_value_t length_num = ecma_op_to_integer (value, &num);
+  int64_t num;
+  ecma_value_t length_num = ecma_op_clamp_int64 (value, &num);
 
   /* 3 */
   if (ECMA_IS_VALUE_ERROR (length_num))
@@ -951,7 +947,7 @@ ecma_op_to_length (ecma_value_t value, /**< ecma value */
   }
 
   /* 4 */
-  if (num <= 0.0f)
+  if (num <= 0.0)
   {
     *length = 0;
     return ECMA_VALUE_EMPTY;
@@ -980,7 +976,7 @@ ecma_op_to_length (ecma_value_t value, /**< ecma value */
  */
 ecma_value_t
 ecma_op_to_index (ecma_value_t value, /**< ecma value */
-                  ecma_number_t *index) /**< [out] ecma number */
+                  ecma_length_t *index) /**< [out] ecma number */
 {
   /* 1. */
   if (ecma_is_value_undefined (value))
@@ -990,8 +986,8 @@ ecma_op_to_index (ecma_value_t value, /**< ecma value */
   }
 
   /* 2.a */
-  ecma_number_t integer_index;
-  ecma_value_t index_value = ecma_op_to_integer (value, &integer_index);
+  int64_t integer_index;
+  ecma_value_t index_value = ecma_op_clamp_int64 (value, &integer_index);
 
   if (ECMA_IS_VALUE_ERROR (index_value))
   {
@@ -999,7 +995,7 @@ ecma_op_to_index (ecma_value_t value, /**< ecma value */
   }
 
   /* 2.b - 2.d */
-  if (integer_index < 0.0f || integer_index > ECMA_NUMBER_MAX_SAFE_INTEGER)
+  if (integer_index < 0 || integer_index > ECMA_NUMBER_MAX_SAFE_INTEGER)
   {
     return ecma_raise_range_error (ECMA_ERR_INVALID_OR_OUT_OF_RANGE_INDEX);
   }

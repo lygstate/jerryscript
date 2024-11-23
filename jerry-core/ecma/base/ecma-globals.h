@@ -1458,38 +1458,49 @@ typedef struct
 
 /**
  * Description of an ecma-number
+ * Makes it possible to read/write the binary representation of an ecma_number_t
+ * without strict aliasing rule violation.
  */
-typedef double ecma_number_t;
+typedef union
+{
+  uint64_t as_binary; /**< binary representation */
+  double as_number;
+} ecma_number_t;
 
 /**
  * Convert double to an ecma-number.
  */
-#define DOUBLE_TO_ECMA_NUMBER_T(value) ((ecma_number_t) (value))
+#define DOUBLE_TO_ECMA_NUMBER_T(value) ((ecma_number_from_double) (value))
 
 /**
  * Value '0' of ecma_number_t
  */
-#define ECMA_NUMBER_ZERO ((ecma_number_t) 0.0f)
+#define ECMA_NUMBER_ZERO (ecma_number_from_double (0.0))
+
+/**
+ * Value negative '0' of ecma_number_t
+ */
+#define ECMA_NUMBER_ZERO_NEGATIVE (ecma_number_from_double (-0.0))
 
 /**
  * Value '1' of ecma_number_t
  */
-#define ECMA_NUMBER_ONE ((ecma_number_t) 1.0f)
+#define ECMA_NUMBER_ONE (ecma_number_from_double (1.0))
 
 /**
  * Value '2' of ecma_number_t
  */
-#define ECMA_NUMBER_TWO ((ecma_number_t) 2.0f)
+#define ECMA_NUMBER_TWO (ecma_number_from_double (2.0))
 
 /**
  * Value '0.5' of ecma_number_t
  */
-#define ECMA_NUMBER_HALF ((ecma_number_t) 0.5f)
+#define ECMA_NUMBER_HALF (ecma_number_from_double (0.5))
 
 /**
  * Value '-1' of ecma_number_t
  */
-#define ECMA_NUMBER_MINUS_ONE ((ecma_number_t) -1.0f)
+#define ECMA_NUMBER_MINUS_ONE (ecma_number_from_double (-1.0))
 
 /**
  * Maximum number of characters in string representation of ecma-number

@@ -21,6 +21,7 @@
 #include "ecma-exceptions.h"
 #include "ecma-gc.h"
 #include "ecma-globals.h"
+#include "ecma-helpers-number.h"
 #include "ecma-helpers.h"
 #include "ecma-objects-general.h"
 #include "ecma-objects.h"
@@ -139,16 +140,14 @@ ecma_builtin_math_object_max_min (bool is_max, /**< 'max' or 'min' operation */
 
     if (ecma_number_is_zero (arg_num) && ecma_number_is_zero (result_num))
     {
-      bool is_negative = ecma_number_is_negative (arg_num);
-
-      if (is_max ? !is_negative : is_negative)
+      if (is_max == ecma_number_is_positive (arg_num))
       {
         result_num = arg_num;
       }
     }
     else
     {
-      if (is_max ? (arg_num > result_num) : (arg_num < result_num))
+      if (is_max == ecma_number_greater_than(arg_num, result_num))
       {
         result_num = arg_num;
       }
@@ -173,10 +172,10 @@ ecma_builtin_math_object_hypot (const ecma_value_t *arg, /**< arguments list */
 {
   if (args_number == 0)
   {
-    return ecma_make_number_value (0.0);
+    return ecma_make_integer_value (0);
   }
 
-  ecma_number_t result_num = 0;
+  ecma_number_t result_num = ECMA_NUMBER_ZERO;
   bool inf = false;
 
   while (args_number > 0)
@@ -203,11 +202,10 @@ ecma_builtin_math_object_hypot (const ecma_value_t *arg, /**< arguments list */
       result_num = ecma_number_make_infinity (false);
       continue;
     }
-
-    result_num += arg_num * arg_num;
+    result_num = ecma_number_add(result_num, ecma_number_mul(arg_num, arg_num));
   }
 
-  return ecma_make_number_value (sqrt (result_num));
+  return ecma_make_number_value (ecma_number_sqrt (result_num));
 } /* ecma_builtin_math_object_hypot */
 
 /**
@@ -226,17 +224,7 @@ ecma_builtin_math_object_trunc (ecma_number_t arg)
     return arg;
   }
 
-  if ((arg > 0) && (arg < 1))
-  {
-    return (ecma_number_t) 0.0;
-  }
-
-  if ((arg < 0) && (arg > -1))
-  {
-    return (ecma_number_t) -0.0;
-  }
-
-  return (ecma_number_t) arg - fmod (arg, 1);
+  return ecma_number_truncate(arg);
 } /* ecma_builtin_math_object_trunc */
 
 /**
@@ -257,10 +245,10 @@ ecma_builtin_math_object_sign (ecma_number_t arg)
 
   if (ecma_number_is_negative (arg))
   {
-    return (ecma_number_t) -1.0;
+    return ECMA_NUMBER_MINUS_ONE;
   }
 
-  return (ecma_number_t) 1.0;
+  return ECMA_NUMBER_ONE;
 } /* ecma_builtin_math_object_sign */
 
 /**
@@ -403,7 +391,7 @@ ecma_builtin_math_dispatch_routine (uint8_t builtin_routine_id, /**< built-in wi
         {
           if (x >= -ECMA_NUMBER_HALF)
           {
-            x = -ECMA_NUMBER_ZERO;
+            x = ECMA_NUMBER_ZERO_NEGATIVE;
             break;
           }
 

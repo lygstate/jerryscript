@@ -958,19 +958,9 @@ ecma_op_array_object_set_length (ecma_object_t *object_p, /**< the array object 
 
   JERRY_ASSERT (!ECMA_IS_VALUE_ERROR (completion));
 
-  if (ecma_is_value_object (new_value))
-  {
-    ecma_value_t compared_num_val = ecma_op_to_number (new_value, &new_len_num);
+  uint32_t new_len_uint32 = ecma_number_clamp_uint32 (new_len_num);
 
-    if (ECMA_IS_VALUE_ERROR (compared_num_val))
-    {
-      return compared_num_val;
-    }
-  }
-
-  uint32_t new_len_uint32 = ecma_number_to_uint32 (new_len_num);
-
-  if (((ecma_number_t) new_len_uint32) != new_len_num)
+  if (!ecma_number_equal_to(new_len_num, ecma_number_from_uint32(new_len_uint32)))
   {
     return ecma_raise_range_error (ECMA_ERR_INVALID_ARRAY_LENGTH);
   }
@@ -986,7 +976,7 @@ ecma_op_array_object_set_length (ecma_object_t *object_p, /**< the array object 
 
   uint32_t old_len_uint32 = ext_object_p->u.array.length;
 
-  if (new_len_num == old_len_uint32)
+  if (new_len_uint32 == old_len_uint32)
   {
     /* Only the writable flag must be updated. */
     if (flags & JERRY_PROP_IS_WRITABLE_DEFINED)

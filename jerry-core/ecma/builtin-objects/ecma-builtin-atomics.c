@@ -86,29 +86,29 @@ ecma_convert_number_to_typed_array_type (ecma_number_t num, /**< ecma_number arg
   {
     case ECMA_INT8_ARRAY:
     {
-      return ecma_make_number_value ((int8_t) value);
+      return ecma_make_int32_value((int8_t) value);
     }
     case ECMA_UINT8_ARRAY:
     {
-      return ecma_make_number_value ((uint8_t) value);
+      return ecma_make_uint32_value ((uint8_t) value);
     }
     case ECMA_INT16_ARRAY:
     {
-      return ecma_make_number_value ((int16_t) value);
+      return ecma_make_int32_value ((int16_t) value);
     }
     case ECMA_UINT16_ARRAY:
     {
-      return ecma_make_number_value ((uint16_t) value);
+      return ecma_make_uint32_value ((uint16_t) value);
     }
     case ECMA_INT32_ARRAY:
     {
-      return ecma_make_number_value ((int32_t) value);
+      return ecma_make_int32_value ((int32_t) value);
     }
     default:
     {
       JERRY_ASSERT (element_type == ECMA_UINT32_ARRAY);
 
-      return ecma_make_number_value (value);
+      return ecma_make_uint32_value (value);
     }
   }
 } /* ecma_convert_number_to_typed_array_type */
@@ -329,7 +329,7 @@ ecma_builtin_atomics_store (ecma_value_t typedarray, /**< typedArray argument */
 
     if (ecma_number_is_zero (num_int) && ecma_number_is_negative (num_int))
     {
-      num_int = (ecma_number_t) 0;
+      num_int = ECMA_NUMBER_ZERO;
     }
 
     value_to_store = ecma_make_number_value (num_int);

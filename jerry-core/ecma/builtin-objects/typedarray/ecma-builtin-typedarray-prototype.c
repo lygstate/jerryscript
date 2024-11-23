@@ -234,7 +234,7 @@ ecma_builtin_typedarray_prototype_map (ecma_value_t this_arg, /**< this object *
   }
 
   // TODO: 22.2.3.18, 7-8.
-  ecma_value_t len = ecma_make_number_value (src_info_p->length);
+  ecma_value_t len = ecma_make_number_value (ecma_number_from_uint32(src_info_p->length));
   ecma_value_t new_typedarray = ecma_typedarray_species_create (this_arg, &len, 1);
   ecma_free_value (len);
 
@@ -500,7 +500,7 @@ ecma_builtin_typedarray_prototype_filter (ecma_value_t this_arg, /**< this objec
     ecma_fast_free_value (call_value);
   }
 
-  ecma_value_t collected = ecma_make_number_value (collected_p->item_count);
+  ecma_value_t collected = ecma_make_number_value (ecma_number_from_uint32(collected_p->item_count));
   ret_value = ecma_typedarray_species_create (this_arg, &collected, 1);
   ecma_free_value (collected);
 

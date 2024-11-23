@@ -54,7 +54,7 @@ ecma_builtin_helper_array_merge_sort_bottom_up (ecma_value_t *source_array_p, /*
       }
     }
 
-    if (i < right_idx && ecma_get_number_from_value (compare_value) <= ECMA_NUMBER_ZERO)
+    if (i < right_idx && ecma_number_less_equal (ecma_get_number_from_value (compare_value), ECMA_NUMBER_ZERO))
     {
       output_array_p[k] = source_array_p[i];
       i++;

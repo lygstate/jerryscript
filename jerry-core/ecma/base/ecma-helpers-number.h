@@ -16,6 +16,8 @@
 #ifndef ECMA_HELPERS_NUMBER_H
 #define ECMA_HELPERS_NUMBER_H
 
+#include <math.h>
+
 #include "ecma-globals.h"
 
 #include "config.h"
@@ -25,23 +27,19 @@
  */
 typedef uint64_t ecma_binary_num_t;
 
-/**
- * Makes it possible to read/write the binary representation of an ecma_number_t
- * without strict aliasing rule violation.
- */
-typedef union
-{
-  ecma_number_t as_number; /**< ecma-number */
-  ecma_binary_num_t as_binary; /**< binary representation */
-} ecma_number_accessor_t;
-
-ecma_binary_num_t ecma_number_to_binary (ecma_number_t number);
-ecma_number_t ecma_number_from_binary (ecma_binary_num_t binary);
-
 bool ecma_number_sign (ecma_binary_num_t binary);
 uint32_t ecma_number_biased_exp (ecma_binary_num_t binary);
 uint64_t ecma_number_fraction (ecma_binary_num_t binary);
 ecma_number_t ecma_number_create (bool sign, uint32_t biased_exp, uint64_t fraction);
+ecma_number_t ecma_number_get_prev (ecma_number_t num);
+ecma_number_t ecma_number_get_next (ecma_number_t num);
+ecma_number_t ecma_number_trunc (ecma_number_t num);
+ecma_number_t ecma_number_remainder (ecma_number_t left_num, ecma_number_t right_num);
+ecma_number_t ecma_number_pow (ecma_number_t x, ecma_number_t y);
+bool ecma_number_is_nan (ecma_number_t num);
+bool ecma_number_is_negative (ecma_number_t num);
+bool ecma_number_is_zero (ecma_number_t num);
+bool ecma_number_is_infinity (ecma_number_t num);
 
 /**
  * Maximum number of significant decimal digits that an ecma-number can store
@@ -98,6 +96,11 @@ ecma_number_t ecma_number_create (bool sign, uint32_t biased_exp, uint64_t fract
 #define ECMA_NUMBER_BINARY_ZERO 0x0ull
 
 /**
+ * Binary representation of an IEEE-754 negative zero value.
+ */
+#define ECMA_NUMBER_BINARY_ZERO_NEGATIVE (ECMA_NUMBER_BINARY_ZERO | ECMA_NUMBER_SIGN_BIT)
+
+/**
  * Number.MIN_VALUE (i.e., the smallest positive value of ecma-number)
  *
  * See also: ECMA_262 v5, 15.7.3.3
@@ -123,14 +126,14 @@ ecma_number_t ecma_number_create (bool sign, uint32_t biased_exp, uint64_t fract
  *
  * See also: ECMA_262 v6, 20.1.2.6
  */
-#define ECMA_NUMBER_MAX_SAFE_INTEGER ((ecma_number_t) 0x1FFFFFFFFFFFFF)
+#define ECMA_NUMBER_MAX_SAFE_INTEGER (0x1FFFFFFFFFFFFFLL)
 
 /**
  * Number.MIN_SAFE_INTEGER
  *
  * See also: ECMA_262 v6, 20.1.2.8
  */
-#define ECMA_NUMBER_MIN_SAFE_INTEGER ((ecma_number_t) -0x1FFFFFFFFFFFFF)
+#define ECMA_NUMBER_MIN_SAFE_INTEGER (-0x1FFFFFFFFFFFFFLL)
 
 /**
  * Number.MAX_VALUE exponent part
@@ -181,5 +184,341 @@ ecma_number_t ecma_number_create (bool sign, uint32_t biased_exp, uint64_t fract
  * Square root of 2
  */
 #define ECMA_NUMBER_SQRT2 ((ecma_number_t) 1.4142135623730951)
+
+/**
+ * Convert an ecma-number to it's binary representation.
+ *
+ * @return binary representation
+ */
+extern inline uint64_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_to_binary (ecma_number_t number) /**< ecma number */
+{
+  return number.as_binary;
+} /* ecma_number_to_binary */
+
+/**
+ * Convert a binary representation to the corresponding ecma-number.
+ *
+ * @return ecma-number
+ */
+extern inline ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_binary (uint64_t binary) /**< binary representation */
+{
+  ecma_number_t f;
+  f.as_binary = binary;
+
+  return f;
+} /* ecma_number_from_binary */
+
+/**
+ * Check if ecma-number is positive
+ *
+ * @return true - if sign bit of ecma-number is set
+ *         false - otherwise
+ */
+extern inline bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_is_positive (ecma_number_t num) /**< ecma-number */
+{
+  JERRY_ASSERT (!ecma_number_is_nan (num));
+
+  return (ecma_number_to_binary (num) & ECMA_NUMBER_SIGN_BIT) == 0;
+} /* ecma_number_is_positive */
+
+double JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_cast_double (ecma_number_t number)
+{
+  return number.as_number;
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_double (double dbl)
+{
+  ecma_number_t number;
+  number.as_number = dbl;
+  return number;
+}
+
+int32_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_cast_int32 (ecma_number_t num)
+{
+  return (int32_t) num.as_number;
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_int32 (int32_t val)
+{
+  ecma_number_t number;
+  number.as_number = (double) val;
+  return number;
+}
+
+uint32_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_cast_uint32 (ecma_number_t num)
+{
+  return (uint32_t) num.as_number;
+}
+
+uint32_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_clamp_uint32 (ecma_number_t num)
+{
+  if (num.as_number >= UINT32_MAX)
+  {
+    return UINT32_MAX;
+  }
+  if (num.as_number <= 0)
+  {
+    return 0;
+  }
+  return ecma_number_cast_uint32 (num);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_uint32 (uint32_t val)
+{
+  ecma_number_t number;
+  number.as_number = (double) val;
+  return number;
+}
+
+int64_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_cast_int64 (ecma_number_t num)
+{
+  return (int64_t) num.as_number;
+}
+
+int64_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_clamp_int64 (ecma_number_t num)
+{
+  if (num.as_number >= INT64_MAX)
+  {
+    return INT64_MAX;
+  }
+  if (num.as_number <= INT64_MIN)
+  {
+    return INT64_MIN;
+  }
+  return ecma_number_cast_int64 (num);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_int64 (int64_t val)
+{
+  ecma_number_t number;
+  number.as_number = (double) val;
+  return number;
+}
+
+uint64_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_cast_uint64 (ecma_number_t num)
+{
+  return (uint64_t) num.as_number;
+}
+
+uint64_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_clamp_uint64 (ecma_number_t num)
+{
+  if (num.as_number >= UINT64_MAX)
+  {
+    return UINT64_MAX;
+  }
+  if (num.as_number <= 0)
+  {
+    return 0;
+  }
+  return ecma_number_cast_uint64 (num);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_from_uint64 (uint64_t val)
+{
+  ecma_number_t number;
+  number.as_number = (double) val;
+  return number;
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_abs (ecma_number_t number)
+{
+  number.as_binary &= ~ECMA_NUMBER_SIGN_BIT;
+  return number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_greater_than (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_number > b.as_number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_greater_equal (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_number >= b.as_number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_less_than (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_number < b.as_number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_less_equal (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_number <= b.as_number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_equal_to (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_number == b.as_number;
+}
+
+bool JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_equal_binary (ecma_number_t a, ecma_number_t b)
+{
+  return a.as_binary == b.as_binary;
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_div_trunc (ecma_number_t left_num, ecma_number_t right_num)
+{
+  double divded = ecma_number_cast_double (left_num) / ecma_number_cast_double (right_num);
+  const ecma_number_t q = ecma_number_trunc (ecma_number_from_double (divded));
+  return q;
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_add (ecma_number_t a, ecma_number_t b)
+{
+  double sub = ecma_number_cast_double (a) + ecma_number_cast_double (b);
+  return ecma_number_from_double (sub);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_add_i32 (ecma_number_t a, int32_t b)
+{
+  double sub = ecma_number_cast_double (a) + b;
+  return ecma_number_from_double (sub);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_sub (ecma_number_t a, ecma_number_t b)
+{
+  double sub = ecma_number_cast_double (a) - ecma_number_cast_double (b);
+  return ecma_number_from_double (sub);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_sub_i32 (ecma_number_t a, int32_t b)
+{
+  double sub = ecma_number_cast_double (a) - b;
+  return ecma_number_from_double (sub);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_mul (ecma_number_t a, ecma_number_t b)
+{
+  double mul = ecma_number_cast_double (a) - ecma_number_cast_double (b);
+  return ecma_number_from_double (mul);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_sqrt (ecma_number_t a)
+{
+  return ecma_number_from_double (sqrt(a.as_number));
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_mul_i32 (ecma_number_t a, int32_t v)
+{
+  double mul = ecma_number_cast_double (a) - v;
+  return ecma_number_from_double (mul);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_negative (ecma_number_t num)
+{
+  return ecma_number_from_binary (ecma_number_to_binary (num) ^ ECMA_NUMBER_SIGN_BIT);
+}
+
+ecma_number_t JERRY_ATTR_ALWAYS_INLINE JERRY_ATTR_CONST
+ecma_number_step (ecma_number_t num, int32_t increment)
+{
+  num.as_number += increment;
+  return num;
+#if 0
+  if (increment == 1)
+  {
+    return ecma_number_get_next (num);
+  }
+  else
+  {
+    return ecma_number_get_prev (num);
+  }
+#endif
+}
+/**
+ * Exponent bits
+ */
+#define ECMA_NUMBER_EXPONENT_BITS 0x7FF0000000000000ull
+
+/**
+ * Fraction bits
+ */
+#define ECMA_NUMBER_FRACTION_BITS ((1ULL << ECMA_NUMBER_FRACTION_WIDTH) - 1)
+
+/**
+ * truncate function
+ * See also:
+ *          ECMA-262 v15, 5.2.5 https://262.ecma-international.org/#eqn-truncate
+ * @param number
+ * @return ecma_number_t
+ */
+ecma_number_t
+ecma_number_truncate (ecma_number_t number)
+{
+  double value = ecma_number_is_negative (number) ? -floor (-number.as_number) : floor (number.as_number);
+  return ecma_number_from_double (value);
+}
+
+/**
+ * ToIntegerOrInfinity body.
+ *
+ * See also:
+ *          ECMA-262 v15, 7.1.5
+ */
+ecma_number_t
+ecma_number_to_integer_or_infinity (ecma_number_t number)
+{
+  /* 2 */
+  if (ecma_number_is_nan (number) || ecma_number_is_zero (number))
+  {
+    return ECMA_NUMBER_ZERO;
+  }
+  /* 3, 4 */
+  if (ecma_number_is_infinity (number))
+  {
+    return number;
+  }
+  /* 5 */
+  return ecma_number_truncate (number);
+}
+
+/**
+ * @brief Convert ecma_number_t to safe integer when possible
+ *
+ * @param number
+ * @return int64_t INT64_MIN means not a safe integer and not convert
+ */
+int64_t
+ecma_number_to_safe_integer (ecma_number_t number)
+{
+  if ((number.as_binary & ECMA_NUMBER_EXPONENT_BITS) == 0)
+  {
+    int64_t val = number.as_binary & ECMA_NUMBER_FRACTION_BITS;
+    return number.as_binary & ECMA_NUMBER_SIGN_BIT ? -val : val;
+  }
+  return INT64_MIN;
+}
 
 #endif /* !ECMA_HELPERS_NUMBER_H */

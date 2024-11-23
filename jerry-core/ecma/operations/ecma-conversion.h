@@ -61,8 +61,9 @@ ecma_string_t *ecma_op_to_property_key (ecma_value_t value);
 ecma_value_t ecma_op_to_object (ecma_value_t value);
 bool ecma_op_is_integer (ecma_number_t value);
 ecma_value_t ecma_op_to_integer (ecma_value_t value, ecma_number_t *number_p);
+ecma_value_t ecma_op_clamp_int64 (ecma_value_t value, int64_t *out);
 ecma_value_t ecma_op_to_length (ecma_value_t value, ecma_length_t *length);
-ecma_value_t ecma_op_to_index (ecma_value_t value, ecma_number_t *index);
+ecma_value_t ecma_op_to_index (ecma_value_t value, ecma_length_t *index);
 ecma_collection_t *ecma_op_create_list_from_array_like (ecma_value_t arr, bool prop_names_only);
 
 ecma_object_t *ecma_op_from_property_descriptor (const ecma_property_descriptor_t *src_prop_desc_p);

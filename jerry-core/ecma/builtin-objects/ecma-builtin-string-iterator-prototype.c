@@ -100,7 +100,7 @@ ecma_builtin_string_iterator_prototype_object_next (ecma_value_t this_val) /**< 
     ecma_string_t *prop_name_p = ecma_get_magic_string (LIT_INTERNAL_MAGIC_STRING_ITERATOR_NEXT_INDEX);
     ecma_value_t position_value = ecma_op_object_get (obj_p, prop_name_p);
 
-    position = (lit_utf8_size_t) (ecma_get_number_from_value (position_value));
+    position = ecma_number_cast_uint32 (ecma_get_number_from_value (position_value));
     ecma_free_value (position_value);
   }
 

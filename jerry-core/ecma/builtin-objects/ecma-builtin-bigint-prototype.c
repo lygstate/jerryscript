@@ -104,18 +104,20 @@ ecma_builtin_bigint_prototype_object_to_string (ecma_value_t this_arg, /**< this
   if (arguments_list_len > 0 && !ecma_is_value_undefined (arguments_list_p[0]))
   {
     ecma_number_t arg_num;
+    int32_t arg_radix;
 
     if (ECMA_IS_VALUE_ERROR (ecma_op_to_integer (arguments_list_p[0], &arg_num)))
     {
       return ECMA_VALUE_ERROR;
     }
+    arg_radix = ecma_number_to_int32(arg_num);
 
-    if (arg_num < 2 || arg_num > 36)
+    if (arg_radix < 2 || arg_radix > 36)
     {
       return ecma_raise_range_error (ECMA_ERR_RADIX_IS_OUT_OF_RANGE);
     }
 
-    radix = (uint32_t) arg_num;
+    radix = arg_radix;
   }
 
   ecma_string_t *string_p = ecma_bigint_to_string (this_arg, radix);
