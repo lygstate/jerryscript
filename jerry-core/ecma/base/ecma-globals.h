@@ -256,6 +256,13 @@ enum
 #define ECMA_IS_VALUE_ERROR(value) (JERRY_UNLIKELY ((value) == ECMA_VALUE_ERROR))
 
 /**
+ * Maximum value of [[%Iterator%NextIndex]] until it can be stored
+ * in an ecma pseudo array object structure element.
+ */
+#define ECMA_ITERATOR_INDEX_BITS 22
+#define ECMA_ITERATOR_INDEX_LIMIT ((1 << ECMA_ITERATOR_INDEX_BITS) - 1)
+
+/**
  * Callback which tells whether the ECMAScript execution should be stopped.
  */
 typedef ecma_value_t (*ecma_vm_exec_stop_callback_t) (void *user_p);
@@ -1090,9 +1097,9 @@ typedef union
    */
   struct
   {
-    uint8_t cls_type; /**< class type of the object */
-    uint8_t kind; /**< type of iterator */
-    uint16_t index; /**< for %Iterator%: [[%Iterator%NextIndex]] property */
+    uint32_t cls_type:8; /**< class type of the object */
+    uint32_t kind: 2; /**< type of iterator ecma_iterator_kind_t */
+    uint32_t index: ECMA_ITERATOR_INDEX_BITS; /**< for %Iterator%: [[%Iterator%NextIndex]] property */
     ecma_value_t value; /**< for %Iterator%: [[IteratedObject]] property */
   } iterator;
 #if JERRY_BUILTIN_CONTAINER

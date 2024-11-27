@@ -35,12 +35,6 @@ typedef enum
   ECMA_ITERATOR_RETURN, /**< generator should perform a return operation */
 } ecma_iterator_command_type_t;
 
-/**
- * Maximum value of [[%Iterator%NextIndex]] until it can be stored
- * in an ecma pseudo array object structure element.
- */
-#define ECMA_ITERATOR_INDEX_LIMIT UINT16_MAX
-
 ecma_value_t ecma_op_create_iterator_object (ecma_value_t iterated_value,
                                              ecma_object_t *prototype_obj_p,
                                              ecma_object_class_type_t iterator_type,
