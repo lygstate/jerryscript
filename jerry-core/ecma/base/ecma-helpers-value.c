@@ -315,7 +315,7 @@ JERRY_STATIC_ASSERT ((ECMA_TYPE_STRING | 0x4) == ECMA_TYPE_DIRECT_STRING,
 extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
 ecma_is_value_string (ecma_value_t value) /**< ecma value */
 {
-  return ((value & (ECMA_VALUE_TYPE_MASK - 0x4)) == ECMA_TYPE_STRING);
+  return (ecma_get_value_type_field (value) == ECMA_TYPE_STRING);
 } /* ecma_is_value_string */
 
 /**
@@ -371,18 +371,6 @@ ecma_is_value_prop_name (ecma_value_t value) /**< ecma value */
 {
   return ecma_is_value_string (value) || ecma_is_value_symbol (value);
 } /* ecma_is_value_prop_name */
-
-/**
- * Check if the value is direct ecma-string.
- *
- * @return true - if the value contains direct ecma-string value,
- *         false - otherwise
- */
-extern inline bool JERRY_ATTR_CONST JERRY_ATTR_ALWAYS_INLINE
-ecma_is_value_direct_string (ecma_value_t value) /**< ecma value */
-{
-  return (ecma_get_value_type_field (value) == ECMA_TYPE_DIRECT_STRING);
-} /* ecma_is_value_direct_string */
 
 /**
  * Check if the value is non-direct ecma-string.

@@ -74,12 +74,12 @@ typedef enum
  */
 typedef enum
 {
-  ECMA_TYPE_DIRECT = 0, /**< directly encoded value, a 28 bit signed integer or a simple value */
-  ECMA_TYPE_STRING = 1, /**< pointer to description of a string */
-  ECMA_TYPE_FLOAT = 2, /**< pointer to a 64 or 32 bit floating point number */
-  ECMA_TYPE_OBJECT = 3, /**< pointer to description of an object */
-  ECMA_TYPE_SYMBOL = 4, /**< pointer to description of a symbol */
-  ECMA_TYPE_DIRECT_STRING = 5, /**< directly encoded string values */
+  ECMA_TYPE_INTEGER = 0, /**< directly encoded number value, a 29 bit signed integer */
+  ECMA_TYPE_DIRECT = 1, /**< directly encoded value, a simple value */
+  ECMA_TYPE_STRING = 2, /**< pointer to description of a string */
+  ECMA_TYPE_SYMBOL = 3, /**< pointer to description of a symbol */
+  ECMA_TYPE_FLOAT = 4, /**< pointer to a 64 or 32 bit floating point number */
+  ECMA_TYPE_OBJECT = 5, /**< pointer to description of an object */
   ECMA_TYPE_BIGINT = 6, /**< pointer to a bigint primitive */
   ECMA_TYPE_ERROR = 7, /**< pointer to description of an error reference (only supported by C API) */
   ECMA_TYPE_SNAPSHOT_OFFSET = ECMA_TYPE_ERROR, /**< offset to a snapshot number/string */
