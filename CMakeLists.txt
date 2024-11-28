@@ -324,3 +324,7 @@ endif()
 if(DOCTESTS)
   add_subdirectory(tests/unit-doc)
 endif()
+
+add_executable(test-api
+  test-api.c
+)
