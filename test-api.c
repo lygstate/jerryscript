@@ -97,7 +97,7 @@ typedef struct
 
 /**
  * Actual data of ecma_compact_string_t depending on `tag::utf16` `tag::size_type`)
- * the allocated size for ecma_compact_string_t always be 8
+ *  the allocated size for ecma_compact_string_t always be 8
  *  the hash is not stored in header, should be calculated when retrieve hash
  *  size = size_type - ECMA_STRING_SIZE_TYPE_COMPACT
  */
