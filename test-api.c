@@ -94,6 +94,7 @@ typedef struct
    */
   ecma_tag_t size_type : 4;
 } ecma_string_t;
+JERRY_STATIC_ASSERT (sizeof (ecma_string_t) == sizeof (ecma_tag_t), sizeof_ecma_string_t_is_ecma_tag_size);
 
 /**
  * Actual data of ecma_compact_string_t depending on `tag::utf16` `tag::size_type`)
@@ -115,7 +116,8 @@ JERRY_STATIC_ASSERT (sizeof (ecma_compact_string_t) == 8, sizeof_ecma_compact_st
 /**
  * Actual data of ecma_internal_string_t depending on `tag::utf16` and `tag::size_type` field)
  *  the hash is stored in header
- *  size_bits = `tag::size_type` << (3 + utf16)
+ *  size_bits = `tag::size_type` << 3
+ *    for utf16 satisfy `size_bits % 16 === 0`
  *  size is stored in ecma_internal_string_t::u::size(length is `tag::size_type << utf16` bytes)
  */
 typedef union
@@ -152,7 +154,7 @@ typedef struct
 #if JERRY_CPOINTER_16_BIT
   uint32_t size;
 #else
-  uintptr_t size;
+  uint64_t size;
 #endif
   ecma_external_string_body_t body;
 } ecma_external_string_t;
@@ -163,7 +165,7 @@ JERRY_STATIC_ASSERT (sizeof (ecma_external_string_t) == 32, sizeof_ecma_external
 #if UINTPTR_MAX > UINT32_MAX
 JERRY_STATIC_ASSERT (sizeof (ecma_external_string_t) == 32, sizeof_ecma_external_string_t_equal_32);
 #else
-JERRY_STATIC_ASSERT (sizeof (ecma_external_string_t) == 20, sizeof_ecma_external_string_t_equal_20);
+JERRY_STATIC_ASSERT (sizeof (ecma_external_string_t) == 24, sizeof_ecma_external_string_t_equal_24);
 #endif /* UINTPTR_MAX > UINT32_MAX */
 #elif JERRY_CPOINTER_16_BIT
 #if UINTPTR_MAX > UINT32_MAX
