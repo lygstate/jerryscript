@@ -143,6 +143,11 @@ typedef uint8_t jerry_char_t;
 typedef uint32_t jerry_size_t;
 
 /**
+ * Maximal value of jerry_size_t
+ */
+#define JERRY_SIZE_MAX UINT32_MAX
+
+/**
  * Length type of JerryScript.
  */
 typedef uint32_t jerry_length_t;
